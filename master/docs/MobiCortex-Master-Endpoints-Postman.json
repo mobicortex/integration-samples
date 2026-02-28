@@ -1,0 +1,562 @@
+{
+  "info": {
+    "_postman_id": "mobicortex-master-api-v1",
+    "name": "MobiCortex Master API",
+    "description": "Coleção de endpoints da API da Controladora Master MobiCortex",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "http://{{base_url}}/api/login",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            },
+            "description": "Autentica o usuário e retorna um token JWT"
+          },
+          "response": []
+        },
+        {
+          "name": "Alterar Senha",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"old_password\": \"senha_atual\",\n  \"new_password\": \"nova_senha\"\n}"
+            },
+            "url": {
+              "raw": "http://{{base_url}}/api/change-password",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "change-password"
+              ]
+            },
+            "description": "Altera a senha do usuário autenticado"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Configuração de Rede",
+      "item": [
+        {
+          "name": "Obter Configuração",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://{{base_url}}/api/network",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "network"
+              ]
+            },
+            "description": "Retorna as configurações de rede do dispositivo"
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Configuração",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ethernet\": {\n    \"dhcp\": false,\n    \"ip\": \"192.168.1.100\",\n    \"mask\": \"255.255.255.0\",\n    \"gateway\": \"192.168.1.1\"\n  },\n  \"wifi\": {\n    \"enabled\": true,\n    \"ssid\": \"MinhaRedeWiFi\",\n    \"password\": \"senha123\",\n    \"dhcp\": true,\n    \"ip\": \"\",\n    \"mask\": \"\",\n    \"gateway\": \"\"\n  },\n  \"server\": {\n    \"name\": \"Controladora de Acesso\",\n    \"port\": \"8080\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://{{base_url}}/api/network",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "network"
+              ]
+            },
+            "description": "Atualiza as configurações de rede do dispositivo"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Veículos",
+      "item": [
+        {
+          "name": "Listar Veículos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://{{base_url}}/api/veiculos?filtro=",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "veiculos"
+              ],
+              "query": [
+                {
+                  "key": "filtro",
+                  "value": "",
+                  "description": "Filtro opcional por placa ou proprietário"
+                }
+              ]
+            },
+            "description": "Retorna a lista de veículos cadastrados"
+          },
+          "response": []
+        },
+        {
+          "name": "Obter Veículo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://{{base_url}}/api/veiculos/{{veiculo_id}}",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "veiculos",
+                "{{veiculo_id}}"
+              ]
+            },
+            "description": "Retorna os detalhes de um veículo específico"
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Veículo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"ABC1234\",\n  \"tag_rfid\": \"A12B34C5\",\n  \"proprietario\": \"João Silva\",\n  \"tipo\": \"Morador\"\n}"
+            },
+            "url": {
+              "raw": "http://{{base_url}}/api/veiculos",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "veiculos"
+              ]
+            },
+            "description": "Cadastra um novo veículo"
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Veículo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"ABC1234\",\n  \"tag_rfid\": \"A12B34C5\",\n  \"proprietario\": \"João Silva Atualizado\",\n  \"tipo\": \"Morador\"\n}"
+            },
+            "url": {
+              "raw": "http://{{base_url}}/api/veiculos/{{veiculo_id}}",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "veiculos",
+                "{{veiculo_id}}"
+              ]
+            },
+            "description": "Atualiza os dados de um veículo existente"
+          },
+          "response": []
+        },
+        {
+          "name": "Excluir Veículo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://{{base_url}}/api/veiculos/{{veiculo_id}}",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "veiculos",
+                "{{veiculo_id}}"
+              ]
+            },
+            "description": "Remove um veículo do sistema"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Exportação",
+      "item": [
+        {
+          "name": "Exportar Veículos (XLSX)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://{{base_url}}/api/veiculos.xlsx",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "veiculos.xlsx"
+              ]
+            },
+            "description": "Exporta a lista de veículos em formato Excel"
+          },
+          "response": []
+        },
+        {
+          "name": "Exportar Veículos (PDF)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://{{base_url}}/api/veiculos.pdf",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "veiculos.pdf"
+              ]
+            },
+            "description": "Exporta a lista de veículos em formato PDF"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Eventos",
+      "item": [
+        {
+          "name": "Registrar Evento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"TAG\",\n  \"valor\": \"A12B34C5\",\n  \"nome\": \"João Silva\"\n}"
+            },
+            "url": {
+              "raw": "http://{{base_url}}/api/events/new",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "events",
+                "new"
+              ]
+            },
+            "description": "Registra um novo evento de acesso (TAG, Placa ou Facial)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Logs",
+      "item": [
+        {
+          "name": "Obter Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://{{base_url}}/api/logs?filtro=",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "logs"
+              ],
+              "query": [
+                {
+                  "key": "filtro",
+                  "value": "",
+                  "description": "Filtro opcional por tipo, dado ou nome"
+                }
+              ]
+            },
+            "description": "Retorna os logs de acesso registrados"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "WebSockets",
+      "item": [
+        {
+          "name": "WebSocket Eventos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "ws://{{base_url}}/ws/events",
+              "protocol": "ws",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ws",
+                "events"
+              ]
+            },
+            "description": "Conexão WebSocket para receber eventos em tempo real"
+          },
+          "response": []
+        },
+        {
+          "name": "WebSocket Dispositivos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "ws://{{base_url}}/ws/devices",
+              "protocol": "ws",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ws",
+                "devices"
+              ]
+            },
+            "description": "Conexão WebSocket para monitorar dispositivos conectados"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Proxy Master",
+      "item": [
+        {
+          "name": "Proxy Master",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{base_url}}/master/",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "master",
+                ""
+              ]
+            },
+            "description": "Proxy para a aplicação legada pro.exe"
+          },
+          "response": []
+        },
+        {
+          "name": "Acesso a Fotos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{base_url}}/cws/acesso/FOTO.MCUT?fname=",
+              "protocol": "http",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cws",
+                "acesso",
+                "FOTO.MCUT"
+              ],
+              "query": [
+                {
+                  "key": "fname",
+                  "value": "",
+                  "description": "Nome do arquivo de foto"
+                }
+              ]
+            },
+            "description": "Retorna fotos capturadas pelo sistema LPR"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "192.168.1.100:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "veiculo_id",
+      "value": "1",
+      "type": "string"
+    }
+  ]
+}
