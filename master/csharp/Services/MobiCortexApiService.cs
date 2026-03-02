@@ -5,761 +5,411 @@ using SmartSdk.Models;
 
 namespace SmartSdk.Services
 {
-    /// <summary>
-    /// Serviço para comunicação com a API MobiCortex Master
-    /// Documentação completa em: docs/MobiCortex-Master-Endpoints.md
-    /// </summary>
+    // =============================================================================
+    //  SERVIÇO DE API - MobiCortex Master
+    //
+    //  Este serviço encapsula todas as chamadas HTTP à API REST do controlador.
+    //  Todas as rotas usam o prefixo: /mbcortex/master/api/v1/
+    //
+    //  FLUXO DE USO:
+    //  1. Configurar a URL base (IP do controlador + porta 4449)
+    //  2. Fazer login (POST /login) - recebe session_key
+    //  3. Usar os métodos CRUD normalmente (o token é enviado automaticamente)
+    //
+    //  AUTENTICAÇÃO:
+    //  O controlador usa session_key (SHA256 hex, 64 chars) enviado como
+    //  header "Authorization: Bearer <session_key>".
+    //  A sessão expira em 900 segundos (15 minutos) sem uso.
+    //
+    //  SSL:
+    //  O controlador usa certificado SSL auto-assinado.
+    //  Por isso, desabilitamos a validação de certificado no HttpClient.
+    // =============================================================================
+
     public class MobiCortexApiService
     {
-        private readonly HttpClient _httpClient;
-        private string _baseUrl = "https://192.168.120.45";
-        private string? _token;
-        private readonly JsonSerializerOptions _jsonOptions;
+        // Prefixo de todas as rotas da API
+        private const string API = "/mbcortex/master/api/v1";
 
+        private readonly HttpClient _http;
+        private string _baseUrl = "";
+        private string? _sessionKey;
+
+        private readonly JsonSerializerOptions _json = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
+        /// <summary>Evento disparado para cada log de operação</summary>
         public event Action<string>? OnLog;
 
         public MobiCortexApiService()
         {
+            // Desabilita validação de SSL (o controlador usa certificado auto-assinado)
             var handler = new HttpClientHandler
             {
-                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true,
-                AllowAutoRedirect = true
+                ServerCertificateCustomValidationCallback = (_, _, _, _) => true
             };
-            _httpClient = new HttpClient(handler);
-            _httpClient.Timeout = TimeSpan.FromSeconds(30);
-            _jsonOptions = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
+            _http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(15) };
         }
 
-        private void Log(string message)
-        {
-            var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
-            var logMessage = $"[{timestamp}] {message}";
-            OnLog?.Invoke(logMessage);
-        }
-
-        /// <summary>
-        /// Configura a URL base da API
-        /// </summary>
-        public void ConfigureBaseUrl(string baseUrl)
-        {
-            _baseUrl = baseUrl.TrimEnd('/');
-            Log($"URL configurada: {_baseUrl}");
-        }
-
-        /// <summary>
-        /// Retorna a URL base configurada
-        /// </summary>
+        /// <summary>URL base configurada (ex: https://192.168.0.100:4449)</summary>
         public string BaseUrl => _baseUrl;
 
-        /// <summary>
-        /// Verifica se está autenticado
-        /// </summary>
-        public bool IsAuthenticated => !string.IsNullOrEmpty(_token);
+        /// <summary>Verifica se está autenticado</summary>
+        public bool IsAuthenticated => !string.IsNullOrEmpty(_sessionKey);
+
+        /// <summary>Session key atual (para uso no WebSocket/MQTT)</summary>
+        public string? SessionKey => _sessionKey;
+
+        /// <summary>Configura a URL base do controlador</summary>
+        public void ConfigureBaseUrl(string url)
+        {
+            _baseUrl = url.TrimEnd('/');
+            Log($"URL base: {_baseUrl}");
+        }
+
+        // =====================================================================
+        //  HELPERS HTTP (GET, POST, PUT, DELETE)
+        //  Todos os métodos adicionam o prefixo da API automaticamente.
+        // =====================================================================
+
+        private void Log(string msg) => OnLog?.Invoke(msg);
+
+        /// <summary>Monta a URL completa: baseUrl + /mbcortex/master/api/v1 + endpoint</summary>
+        private string Url(string endpoint) => $"{_baseUrl}{API}{endpoint}";
+
+        /// <summary>GET genérico com deserialização</summary>
+        private async Task<ApiResult<T>> GetAsync<T>(string endpoint)
+        {
+            try
+            {
+                Log($"GET {API}{endpoint}");
+                var resp = await _http.GetAsync(Url(endpoint));
+                var body = await resp.Content.ReadAsStringAsync();
+                Log($"  → {(int)resp.StatusCode} | {Truncate(body)}");
+
+                if (!resp.IsSuccessStatusCode)
+                    return Fail<T>($"HTTP {(int)resp.StatusCode}", body);
+
+                var data = JsonSerializer.Deserialize<T>(body, _json);
+                return Ok(data, body);
+            }
+            catch (Exception ex)
+            {
+                Log($"  ERRO: {ex.Message}");
+                return Fail<T>(ex.Message);
+            }
+        }
+
+        /// <summary>POST genérico com body JSON</summary>
+        private async Task<ApiResult<T>> PostAsync<T>(string endpoint, object body)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(body, _json);
+                Log($"POST {API}{endpoint} → {Truncate(json)}");
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var resp = await _http.PostAsync(Url(endpoint), content);
+                var respBody = await resp.Content.ReadAsStringAsync();
+                Log($"  → {(int)resp.StatusCode} | {Truncate(respBody)}");
+
+                if (!resp.IsSuccessStatusCode)
+                    return Fail<T>($"HTTP {(int)resp.StatusCode}", respBody);
+
+                var data = JsonSerializer.Deserialize<T>(respBody, _json);
+                return Ok(data, respBody);
+            }
+            catch (Exception ex)
+            {
+                Log($"  ERRO: {ex.Message}");
+                return Fail<T>(ex.Message);
+            }
+        }
+
+        /// <summary>PUT genérico com body JSON</summary>
+        private async Task<ApiResult<T>> PutAsync<T>(string endpoint, object body)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(body, _json);
+                Log($"PUT {API}{endpoint} → {Truncate(json)}");
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var resp = await _http.PutAsync(Url(endpoint), content);
+                var respBody = await resp.Content.ReadAsStringAsync();
+                Log($"  → {(int)resp.StatusCode} | {Truncate(respBody)}");
+
+                if (!resp.IsSuccessStatusCode)
+                    return Fail<T>($"HTTP {(int)resp.StatusCode}", respBody);
+
+                var data = JsonSerializer.Deserialize<T>(respBody, _json);
+                return Ok(data, respBody);
+            }
+            catch (Exception ex)
+            {
+                Log($"  ERRO: {ex.Message}");
+                return Fail<T>(ex.Message);
+            }
+        }
+
+        /// <summary>DELETE genérico</summary>
+        private async Task<ApiResult<T>> DeleteAsync<T>(string endpoint)
+        {
+            try
+            {
+                Log($"DELETE {API}{endpoint}");
+                var resp = await _http.DeleteAsync(Url(endpoint));
+                var body = await resp.Content.ReadAsStringAsync();
+                Log($"  → {(int)resp.StatusCode} | {Truncate(body)}");
+
+                if (!resp.IsSuccessStatusCode)
+                    return Fail<T>($"HTTP {(int)resp.StatusCode}", body);
+
+                var data = JsonSerializer.Deserialize<T>(body, _json);
+                return Ok(data, body);
+            }
+            catch (Exception ex)
+            {
+                Log($"  ERRO: {ex.Message}");
+                return Fail<T>(ex.Message);
+            }
+        }
+
+        private static ApiResult<T> Ok<T>(T? data, string raw) =>
+            new() { Success = true, Data = data, RawResponse = raw };
+
+        private static ApiResult<T> Fail<T>(string msg, string? raw = null) =>
+            new() { Success = false, Message = msg, RawResponse = raw };
+
+        private static string Truncate(string s, int max = 200) =>
+            s.Length <= max ? s : s[..max] + "...";
+
+        // =====================================================================
+        //  AUTENTICAÇÃO
+        //  POST /login   → fazer login (retorna session_key)
+        //  PUT  /login   → alterar senha
+        //  DELETE /login → logout
+        // =====================================================================
 
         /// <summary>
-        /// Retorna o token atual
-        /// </summary>
-        public string? Token => _token;
-
-        // ==================== AUTENTICAÇÃO ====================
-
-        /// <summary>
-        /// POST /master/api/v1/login - Faz login na API
-        /// Body: { "pass": "senha" }
-        /// Response: { "ret": "OK", "session_key": "...", "expires_in": 900 }
+        /// Faz login no controlador.
+        /// A senha padrão de fábrica é "admin".
         /// </summary>
         public async Task<ApiResult<LoginResponse>> LoginAsync(string password)
         {
-            try
+            var result = await PostAsync<LoginResponse>("/login", new LoginRequest { Password = password });
+
+            // Se login OK, armazena o session_key para usar nas próximas chamadas
+            if (result.Success && result.Data?.Ret == 0 && !string.IsNullOrEmpty(result.Data.SessionKey))
             {
-                Log($"=== POST /master/api/v1/login ===");
-                var request = new LoginRequest { Password = password };
-                var json = JsonSerializer.Serialize(request, _jsonOptions);
-                Log($"Request: {json}");
-
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync($"{_baseUrl}/master/api/v1/login", content);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<LoginResponse>(responseContent, _jsonOptions);
-                    // A API retorna session_key (64 chars hex) em vez de token JWT
-                    if (!string.IsNullOrEmpty(result?.SessionKey))
-                    {
-                        _token = result.SessionKey;
-                        _httpClient.DefaultRequestHeaders.Authorization = 
-                            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
-                        Log("✅ SessionKey armazenada com sucesso");
-                    }
-                    // Também suporta o formato antigo com Token
-                    else if (!string.IsNullOrEmpty(result?.Token))
-                    {
-                        _token = result.Token;
-                        _httpClient.DefaultRequestHeaders.Authorization = 
-                            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
-                        Log("✅ Token armazenado com sucesso");
-                    }
-                    // ret=0 indica sucesso na API rxppro
-                    return new ApiResult<LoginResponse> { 
-                        Success = result?.Ret == 0 && !string.IsNullOrEmpty(result?.SessionKey), 
-                        Data = result, 
-                        RawResponse = responseContent 
-                    };
-                }
-
-                return new ApiResult<LoginResponse> { Success = false, Message = $"Login falhou: {response.StatusCode}", RawResponse = responseContent };
+                _sessionKey = result.Data.SessionKey;
+                _http.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _sessionKey);
+                Log($"Autenticado! Session expira em {result.Data.ExpiresIn}s");
             }
-            catch (Exception ex)
+
+            return result;
+        }
+
+        /// <summary>Faz logout (invalida a sessão)</summary>
+        public async Task<ApiResult<ApiRetResponse>> LogoutAsync()
+        {
+            var result = await DeleteAsync<ApiRetResponse>("/login");
+            _sessionKey = null;
+            _http.DefaultRequestHeaders.Authorization = null;
+            return result;
+        }
+
+        /// <summary>Altera a senha do controlador</summary>
+        public async Task<ApiResult<ApiRetResponse>> ChangePasswordAsync(string senhaAtual, string senhaNova)
+        {
+            return await PutAsync<ApiRetResponse>("/login", new ChangePasswordRequest
             {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<LoginResponse> { Success = false, Message = ex.Message };
-            }
+                SenhaAtual = senhaAtual,
+                SenhaNova = senhaNova,
+                SenhaNovaConfirm = senhaNova
+            });
+        }
+
+        // =====================================================================
+        //  CADASTRO CENTRAL (Central Registry)
+        //  GET    /central-registry?offset=0&count=20&name=filtro
+        //  GET    /central-registry?id=123
+        //  POST   /central-registry  (body: CadastroCentral)
+        //  DELETE /central-registry?id=123
+        //  GET    /central-registry/stats
+        // =====================================================================
+
+        /// <summary>Lista cadastros (paginado, com filtro opcional por nome)</summary>
+        public async Task<ApiResult<CadastroListResponse>> ListarCadastrosAsync(
+            int offset = 0, int count = 20, string? filtroNome = null)
+        {
+            var query = $"/central-registry?offset={offset}&count={count}";
+            if (!string.IsNullOrWhiteSpace(filtroNome))
+                query += $"&name={Uri.EscapeDataString(filtroNome)}";
+            return await GetAsync<CadastroListResponse>(query);
+        }
+
+        /// <summary>Busca um cadastro pelo ID</summary>
+        public async Task<ApiResult<CadastroCentral>> ObterCadastroAsync(uint id)
+        {
+            return await GetAsync<CadastroCentral>($"/central-registry?id={id}");
+        }
+
+        /// <summary>Cria ou atualiza um cadastro central (upsert pelo id)</summary>
+        public async Task<ApiResult<ApiRetResponse>> SalvarCadastroAsync(CadastroCentral cadastro)
+        {
+            return await PostAsync<ApiRetResponse>("/central-registry", cadastro);
+        }
+
+        /// <summary>Remove um cadastro central e todas as entidades/mídias vinculadas</summary>
+        public async Task<ApiResult<ApiRetResponse>> ExcluirCadastroAsync(uint id)
+        {
+            return await DeleteAsync<ApiRetResponse>($"/central-registry?id={id}");
+        }
+
+        /// <summary>Obtém estatísticas (capacidade, uso, percentual)</summary>
+        public async Task<ApiResult<CadastroStats>> ObterEstatisticasAsync()
+        {
+            return await GetAsync<CadastroStats>("/central-registry/stats");
+        }
+
+        // =====================================================================
+        //  ENTIDADES (Entities)
+        //  GET    /entities?id=123           → busca por entity_id
+        //  GET    /entities?cadastro_id=456  → lista entidades do cadastro
+        //  POST   /entities                  → cria entidade
+        //  PUT    /entities?id=123           → atualiza parcialmente
+        //  DELETE /entities?id=123           → exclui (cascade: remove mídias)
+        // =====================================================================
+
+        /// <summary>Busca uma entidade pelo entity_id</summary>
+        public async Task<ApiResult<Entidade>> ObterEntidadeAsync(uint entityId)
+        {
+            return await GetAsync<Entidade>($"/entities?id={entityId}");
+        }
+
+        /// <summary>Lista entidades de um cadastro</summary>
+        public async Task<ApiResult<EntidadeListResponse>> ListarEntidadesAsync(uint cadastroId)
+        {
+            return await GetAsync<EntidadeListResponse>($"/entities?cadastro_id={cadastroId}");
         }
 
         /// <summary>
-        /// PUT /master/api/v1/login - Altera a senha do usuário
-        /// Body: { "pass_atual": "...", "pass_nova": "...", "pass_nova2": "..." }
+        /// Cria uma entidade.
+        /// - Modelo MobiCortex: informe cadastro_id (cadastro central deve existir)
+        /// - Modelo Simples: use createid=true (gera IDs automaticamente)
         /// </summary>
-        public async Task<ApiResult<ApiResponse>> ChangePasswordAsync(string oldPassword, string newPassword)
+        public async Task<ApiResult<CriarEntidadeResponse>> CriarEntidadeAsync(CriarEntidadeRequest request)
         {
-            try
-            {
-                Log($"=== PUT /master/api/v1/login ===");
-                var request = new ChangePasswordRequest { 
-                    OldPassword = oldPassword, 
-                    NewPassword = newPassword,
-                    NewPasswordConfirm = newPassword
-                };
-                var json = JsonSerializer.Serialize(request, _jsonOptions);
-                Log($"Request: {json}");
-
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PutAsync($"{_baseUrl}/master/api/v1/login", content);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<ApiResponse>(responseContent, _jsonOptions);
-                    return new ApiResult<ApiResponse> { Success = true, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<ApiResponse> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<ApiResponse> { Success = false, Message = ex.Message };
-            }
+            return await PostAsync<CriarEntidadeResponse>("/entities", request);
         }
 
-        // ==================== CONFIGURAÇÃO DE REDE ====================
-
-        /// <summary>
-        /// GET /api/network - Obtém configuração de rede
-        /// </summary>
-        public async Task<ApiResult<NetworkConfig>> GetNetworkConfigAsync()
+        /// <summary>Atualiza uma entidade parcialmente (só os campos informados)</summary>
+        public async Task<ApiResult<ApiRetResponse>> AtualizarEntidadeAsync(uint entityId, AtualizarEntidadeRequest request)
         {
-            try
-            {
-                Log($"=== GET /master/api/v1/network-config-cable ===");
-                var response = await _httpClient.GetAsync($"{_baseUrl}/master/api/v1/network-config-cable");
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<NetworkConfig>(responseContent, _jsonOptions);
-                    return new ApiResult<NetworkConfig> { Success = true, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<NetworkConfig> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<NetworkConfig> { Success = false, Message = ex.Message };
-            }
+            return await PutAsync<ApiRetResponse>($"/entities?id={entityId}", request);
         }
 
-        /// <summary>
-        /// PUT /api/network - Atualiza configuração de rede
-        /// </summary>
-        public async Task<ApiResult<ApiResponse>> UpdateNetworkConfigAsync(NetworkInterface ethernet, WiFiConfig wifi, ServerConfig server)
+        /// <summary>Exclui uma entidade e todas as suas mídias vinculadas</summary>
+        public async Task<ApiResult<ApiRetResponse>> ExcluirEntidadeAsync(uint entityId)
         {
-            try
-            {
-                Log($"=== PUT /master/api/v1/network-config-cable ===");
-                var request = new UpdateNetworkRequest { Ethernet = ethernet, WiFi = wifi, Server = server };
-                var json = JsonSerializer.Serialize(request, _jsonOptions);
-                Log($"Request: {json}");
-
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PutAsync($"{_baseUrl}/master/api/v1/network-config-cable", content);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<ApiResponse>(responseContent, _jsonOptions);
-                    return new ApiResult<ApiResponse> { Success = true, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<ApiResponse> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<ApiResponse> { Success = false, Message = ex.Message };
-            }
+            return await DeleteAsync<ApiRetResponse>($"/entities?id={entityId}");
         }
 
-        // ==================== VEÍCULOS ====================
+        // =====================================================================
+        //  MÍDIAS DE ACESSO (Media)
+        //  GET    /media?id=123        → busca mídia por media_id
+        //  GET    /media?entity_id=456 → lista mídias da entidade
+        //  POST   /media               → cria mídia
+        //  PUT    /media?id=123        → atualiza mídia
+        //  DELETE /media?id=123        → remove mídia
+        // =====================================================================
 
-        /// <summary>
-        /// GET /api/veiculos - Lista todos os veículos
-        /// </summary>
-        public async Task<ApiResult<List<Vehicle>>> GetVehiclesAsync(string? filtro = null)
+        /// <summary>Lista mídias de uma entidade</summary>
+        public async Task<ApiResult<MidiaListResponse>> ListarMidiasAsync(uint entityId)
         {
-            try
-            {
-                var url = $"{_baseUrl}/master/api/v1/vehicles";
-                if (!string.IsNullOrEmpty(filtro))
-                    url += $"?filtro={Uri.EscapeDataString(filtro)}";
-
-                Log($"=== GET /master/api/v1/vehicles ===");
-                var response = await _httpClient.GetAsync(url);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<List<Vehicle>>(responseContent, _jsonOptions);
-                    return new ApiResult<List<Vehicle>> { Success = true, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<List<Vehicle>> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<List<Vehicle>> { Success = false, Message = ex.Message };
-            }
+            return await GetAsync<MidiaListResponse>($"/media?entity_id={entityId}");
         }
 
-        /// <summary>
-        /// GET /api/veiculos/{id} - Obtém um veículo específico
-        /// </summary>
-        public async Task<ApiResult<Vehicle>> GetVehicleAsync(long id)
+        /// <summary>Busca uma mídia pelo media_id</summary>
+        public async Task<ApiResult<MidiaAcesso>> ObterMidiaAsync(uint mediaId)
         {
-            try
-            {
-                Log($"=== GET /master/api/v1/vehicles/{id} ===");
-                var response = await _httpClient.GetAsync($"{_baseUrl}/master/api/v1/vehicles/{id}");
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<Vehicle>(responseContent, _jsonOptions);
-                    return new ApiResult<Vehicle> { Success = true, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<Vehicle> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<Vehicle> { Success = false, Message = ex.Message };
-            }
+            return await GetAsync<MidiaAcesso>($"/media?id={mediaId}");
         }
 
-        /// <summary>
-        /// POST /api/veiculos - Cria um novo veículo
-        /// </summary>
-        public async Task<ApiResult<Vehicle>> CreateVehicleAsync(string placa, string tagRfid, string proprietario, string tipo)
+        /// <summary>Cria uma nova mídia de acesso vinculada a uma entidade</summary>
+        public async Task<ApiResult<CriarMidiaResponse>> CriarMidiaAsync(CriarMidiaRequest request)
         {
-            try
-            {
-                Log($"=== POST /master/api/v1/vehicles ===");
-                var request = new CreateVehicleRequest 
-                { 
-                    Placa = placa, 
-                    TagRfid = tagRfid, 
-                    Proprietario = proprietario, 
-                    Tipo = tipo 
-                };
-                var json = JsonSerializer.Serialize(request, _jsonOptions);
-                Log($"Request: {json}");
-
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync($"{_baseUrl}/master/api/v1/vehicles", content);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<Vehicle>(responseContent, _jsonOptions);
-                    return new ApiResult<Vehicle> { Success = true, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<Vehicle> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<Vehicle> { Success = false, Message = ex.Message };
-            }
+            return await PostAsync<CriarMidiaResponse>("/media", request);
         }
 
-        /// <summary>
-        /// PUT /api/veiculos/{id} - Atualiza um veículo
-        /// </summary>
-        public async Task<ApiResult<Vehicle>> UpdateVehicleAsync(long id, string placa, string tagRfid, string proprietario, string tipo)
+        /// <summary>Remove uma mídia de acesso</summary>
+        public async Task<ApiResult<ApiRetResponse>> ExcluirMidiaAsync(uint mediaId)
         {
-            try
-            {
-                Log($"=== PUT /master/api/v1/vehicles/{id} ===");
-                var request = new CreateVehicleRequest 
-                { 
-                    Placa = placa, 
-                    TagRfid = tagRfid, 
-                    Proprietario = proprietario, 
-                    Tipo = tipo 
-                };
-                var json = JsonSerializer.Serialize(request, _jsonOptions);
-                Log($"Request: {json}");
-
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PutAsync($"{_baseUrl}/master/api/v1/vehicles/{id}", content);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<Vehicle>(responseContent, _jsonOptions);
-                    return new ApiResult<Vehicle> { Success = true, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<Vehicle> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<Vehicle> { Success = false, Message = ex.Message };
-            }
+            return await DeleteAsync<ApiRetResponse>($"/media?id={mediaId}");
         }
 
-        /// <summary>
-        /// DELETE /api/veiculos/{id} - Remove um veículo
-        /// </summary>
-        public async Task<ApiResult<ApiResponse>> DeleteVehicleAsync(long id)
+        // =====================================================================
+        //  DASHBOARD E DISPOSITIVO
+        //  GET /dashboard   → estatísticas gerais
+        //  GET /device-info → informações do hardware
+        // =====================================================================
+
+        /// <summary>Obtém estatísticas gerais (cadastros, pessoas, veículos, mídias)</summary>
+        public async Task<ApiResult<DashboardStats>> ObterDashboardAsync()
         {
-            try
-            {
-                Log($"=== DELETE /master/api/v1/vehicles/{id} ===");
-                var response = await _httpClient.DeleteAsync($"{_baseUrl}/master/api/v1/vehicles/{id}");
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<ApiResponse>(responseContent, _jsonOptions);
-                    return new ApiResult<ApiResponse> { Success = true, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<ApiResponse> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<ApiResponse> { Success = false, Message = ex.Message };
-            }
+            return await GetAsync<DashboardStats>("/dashboard");
         }
 
-        // ==================== EXPORTAÇÃO ====================
-
-        /// <summary>
-        /// GET /api/veiculos.xlsx - Exporta veículos em Excel
-        /// </summary>
-        public async Task<ApiResult<byte[]>> ExportVehiclesXlsxAsync()
+        /// <summary>Obtém informações do hardware (modelo, firmware, CPU, memória)</summary>
+        public async Task<ApiResult<DeviceInfo>> ObterDeviceInfoAsync()
         {
-            try
-            {
-                Log($"=== GET /master/api/v1/vehicles.xlsx ===");
-                var response = await _httpClient.GetAsync($"{_baseUrl}/master/api/v1/vehicles.xlsx");
-                var bytes = await response.Content.ReadAsByteArrayAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Tamanho: {bytes.Length} bytes");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return new ApiResult<byte[]> { Success = true, Data = bytes };
-                }
-
-                return new ApiResult<byte[]> { Success = false, Message = $"Erro: {response.StatusCode}" };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<byte[]> { Success = false, Message = ex.Message };
-            }
+            return await GetAsync<DeviceInfo>("/device-info");
         }
 
-        /// <summary>
-        /// GET /api/veiculos.pdf - Exporta veículos em PDF
-        /// </summary>
-        public async Task<ApiResult<byte[]>> ExportVehiclesPdfAsync()
+        // =====================================================================
+        //  REDE
+        //  GET  /network-config-cable → configuração de rede (cabo)
+        //  POST /network-config-cable → salvar configuração
+        // =====================================================================
+
+        /// <summary>Obtém configuração de rede (ethernet cabo)</summary>
+        public async Task<ApiResult<NetworkCableConfig>> ObterRedeAsync()
         {
-            try
-            {
-                Log($"=== GET /master/api/v1/vehicles.pdf ===");
-                var response = await _httpClient.GetAsync($"{_baseUrl}/master/api/v1/vehicles.pdf");
-                var bytes = await response.Content.ReadAsByteArrayAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Tamanho: {bytes.Length} bytes");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return new ApiResult<byte[]> { Success = true, Data = bytes };
-                }
-
-                return new ApiResult<byte[]> { Success = false, Message = $"Erro: {response.StatusCode}" };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<byte[]> { Success = false, Message = ex.Message };
-            }
+            return await GetAsync<NetworkCableConfig>("/network-config-cable");
         }
 
-        // ==================== EVENTOS ====================
-
-        /// <summary>
-        /// POST /api/events/new - Registra um novo evento
-        /// </summary>
-        public async Task<ApiResult<Event>> CreateEventAsync(string tipo, string valor, string? nome = null)
+        /// <summary>Salva configuração de rede (ethernet cabo)</summary>
+        public async Task<ApiResult<ApiRetResponse>> SalvarRedeAsync(NetworkCableConfig config)
         {
-            try
-            {
-                Log($"=== POST /master/api/v1/events/new ===");
-                var request = new CreateEventRequest { Tipo = tipo, Valor = valor, Nome = nome };
-                var json = JsonSerializer.Serialize(request, _jsonOptions);
-                Log($"Request: {json}");
-
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync($"{_baseUrl}/master/api/v1/events/new", content);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<Event>(responseContent, _jsonOptions);
-                    return new ApiResult<Event> { Success = true, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<Event> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<Event> { Success = false, Message = ex.Message };
-            }
+            return await PostAsync<ApiRetResponse>("/network-config-cable", config);
         }
 
-        // ==================== LOGS ====================
+        // =====================================================================
+        //  WEBHOOKS
+        //  GET    /webhook?id=1   → busca webhook (id=1..4)
+        //  POST   /webhook?id=1   → salva webhook
+        //  DELETE /webhook?id=1   → remove webhook
+        // =====================================================================
 
-        /// <summary>
-        /// GET /api/logs - Obtém logs de acesso
-        /// </summary>
-        public async Task<ApiResult<List<LogEntry>>> GetLogsAsync(string? filtro = null)
+        /// <summary>Obtém configuração de um webhook (id=1..4)</summary>
+        public async Task<ApiResult<WebhookConfig>> ObterWebhookAsync(int id)
         {
-            try
-            {
-                var url = $"{_baseUrl}/master/api/v1/logs";
-                if (!string.IsNullOrEmpty(filtro))
-                    url += $"?filtro={Uri.EscapeDataString(filtro)}";
-
-                Log($"=== GET /master/api/v1/logs ===");
-                var response = await _httpClient.GetAsync(url);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<List<LogEntry>>(responseContent, _jsonOptions);
-                    return new ApiResult<List<LogEntry>> { Success = true, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<List<LogEntry>> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<List<LogEntry>> { Success = false, Message = ex.Message };
-            }
+            return await GetAsync<WebhookConfig>($"/webhook?id={id}");
         }
 
-        // ==================== PROXY MASTER ====================
-
-        /// <summary>
-        /// GET/POST /master/{path} - Proxy para aplicação pro.exe
-        /// </summary>
-        public async Task<ApiResult<string>> ProxyMasterAsync(string path, HttpMethod? method = null, object? body = null)
+        /// <summary>Salva configuração de um webhook</summary>
+        public async Task<ApiResult<ApiRetResponse>> SalvarWebhookAsync(int id, WebhookConfig config)
         {
-            try
-            {
-                method ??= HttpMethod.Get;
-                Log($"=== {method} /master/{path} ===");
-
-                HttpRequestMessage request;
-                if (body != null)
-                {
-                    var json = JsonSerializer.Serialize(body, _jsonOptions);
-                    Log($"Request: {json}");
-                    request = new HttpRequestMessage(method, $"{_baseUrl}/master/{path}")
-                    {
-                        Content = new StringContent(json, Encoding.UTF8, "application/json")
-                    };
-                }
-                else
-                {
-                    request = new HttpRequestMessage(method, $"{_baseUrl}/master/{path}");
-                }
-
-                var response = await _httpClient.SendAsync(request);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response length: {responseContent.Length} chars");
-
-                return new ApiResult<string> 
-                { 
-                    Success = response.IsSuccessStatusCode, 
-                    Data = responseContent, 
-                    RawResponse = responseContent 
-                };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<string> { Success = false, Message = ex.Message };
-            }
+            return await PostAsync<ApiRetResponse>($"/webhook?id={id}", config);
         }
 
-        /// <summary>
-        /// GET /cws/acesso/FOTO.MCUT - Obtém foto de acesso
-        /// </summary>
-        public async Task<ApiResult<byte[]>> GetFotoAcessoAsync(string fname)
+        /// <summary>Remove um webhook</summary>
+        public async Task<ApiResult<ApiRetResponse>> ExcluirWebhookAsync(int id)
         {
-            try
-            {
-                Log($"=== GET /cws/acesso/FOTO.MCUT?fname={fname} ===");
-                var response = await _httpClient.GetAsync($"{_baseUrl}/cws/acesso/FOTO.MCUT?fname={Uri.EscapeDataString(fname)}");
-                var bytes = await response.Content.ReadAsByteArrayAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Tamanho: {bytes.Length} bytes");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return new ApiResult<byte[]> { Success = true, Data = bytes };
-                }
-
-                return new ApiResult<byte[]> { Success = false, Message = $"Erro: {response.StatusCode}" };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<byte[]> { Success = false, Message = ex.Message };
-            }
-        }
-
-        // ==================== CENTRAL REGISTRY ====================
-
-        /// <summary>
-        /// GET /master/api/v1/central-registry/stats - Obtém estatísticas do cadastro
-        /// </summary>
-        public async Task<ApiResult<CentralRegistryStats>> GetCentralRegistryStatsAsync()
-        {
-            try
-            {
-                Log($"=== GET /master/api/v1/central-registry/stats ===");
-                var response = await _httpClient.GetAsync($"{_baseUrl}/master/api/v1/central-registry/stats");
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<CentralRegistryStats>(responseContent, _jsonOptions);
-                    return new ApiResult<CentralRegistryStats> { Success = result?.Ret == 0, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<CentralRegistryStats> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<CentralRegistryStats> { Success = false, Message = ex.Message };
-            }
-        }
-
-        /// <summary>
-        /// GET /master/api/v1/central-registry - Lista cadastros paginados
-        /// </summary>
-        public async Task<ApiResult<CentralRegistryListResponse>> GetCentralRegistryAsync(int offset = 0, int count = 10, string? name = null)
-        {
-            try
-            {
-                var url = $"{_baseUrl}/master/api/v1/central-registry?offset={offset}&count={count}";
-                if (!string.IsNullOrEmpty(name))
-                    url += $"&name={Uri.EscapeDataString(name)}";
-
-                Log($"=== GET /master/api/v1/central-registry ===");
-                Log($"Params: offset={offset}, count={count}, name={name}");
-                
-                var response = await _httpClient.GetAsync(url);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<CentralRegistryListResponse>(responseContent, _jsonOptions);
-                    return new ApiResult<CentralRegistryListResponse> { Success = result?.Ret == 0, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<CentralRegistryListResponse> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<CentralRegistryListResponse> { Success = false, Message = ex.Message };
-            }
-        }
-
-        /// <summary>
-        /// GET /master/api/v1/central-registry?id={id} - Obtém um usuário específico
-        /// </summary>
-        public async Task<ApiResult<CentralRegistryUser>> GetCentralRegistryUserAsync(int id)
-        {
-            try
-            {
-                Log($"=== GET /master/api/v1/central-registry?id={id} ===");
-                var response = await _httpClient.GetAsync($"{_baseUrl}/master/api/v1/central-registry?id={id}");
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<CentralRegistryUser>(responseContent, _jsonOptions);
-                    return new ApiResult<CentralRegistryUser> { Success = true, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<CentralRegistryUser> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<CentralRegistryUser> { Success = false, Message = ex.Message };
-            }
-        }
-
-        /// <summary>
-        /// POST /master/api/v1/central-registry - Cria ou atualiza usuário
-        /// </summary>
-        public async Task<ApiResult<CentralRegistryUser>> SaveCentralRegistryUserAsync(CentralRegistryUser user)
-        {
-            try
-            {
-                Log($"=== POST /master/api/v1/central-registry ===");
-                var json = JsonSerializer.Serialize(user, _jsonOptions);
-                Log($"Request: {json}");
-
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync($"{_baseUrl}/master/api/v1/central-registry", content);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = JsonSerializer.Deserialize<CentralRegistryUser>(responseContent, _jsonOptions);
-                    return new ApiResult<CentralRegistryUser> { Success = true, Data = result, RawResponse = responseContent };
-                }
-
-                return new ApiResult<CentralRegistryUser> { Success = false, Message = $"Erro: {response.StatusCode}", RawResponse = responseContent };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<CentralRegistryUser> { Success = false, Message = ex.Message };
-            }
-        }
-
-        /// <summary>
-        /// DELETE /master/api/v1/central-registry?id={id} - Remove um usuário
-        /// </summary>
-        public async Task<ApiResult<bool>> DeleteCentralRegistryUserAsync(int id)
-        {
-            try
-            {
-                Log($"=== DELETE /master/api/v1/central-registry?id={id} ===");
-                var response = await _httpClient.DeleteAsync($"{_baseUrl}/master/api/v1/central-registry?id={id}");
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                Log($"Status: {(int)response.StatusCode} {response.StatusCode}");
-                Log($"Response: {responseContent}");
-
-                return new ApiResult<bool> 
-                { 
-                    Success = response.IsSuccessStatusCode, 
-                    Data = response.IsSuccessStatusCode,
-                    RawResponse = responseContent 
-                };
-            }
-            catch (Exception ex)
-            {
-                Log($"❌ ERRO: {ex.Message}");
-                return new ApiResult<bool> { Success = false, Message = ex.Message };
-            }
+            return await DeleteAsync<ApiRetResponse>($"/webhook?id={id}");
         }
     }
-
 }

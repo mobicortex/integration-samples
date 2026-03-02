@@ -1,156 +1,147 @@
 using SmartSdk.Services;
-using SmartSdk.Controls;
+using SmartSdk.Forms;
 
 namespace SmartSdk
 {
+    // =============================================================================
+    //  FORMULÁRIO PRINCIPAL - Launcher
+    //
+    //  Este é o ponto de entrada do aplicativo.
+    //  Contém apenas a configuração de conexão (IP, usuário, senha)
+    //  e botões que abrem cada formulário de demonstração.
+    //
+    //  A instância do MobiCortexApiService é compartilhada entre todos os forms.
+    //  Cada form demonstra uma funcionalidade específica da API.
+    // =============================================================================
+
     public partial class MainForm : Form
     {
-        private readonly MobiCortexApiService _apiService;
-        private bool _isConnected = false;
+        // Serviço da API - compartilhado entre todos os formulários
+        private readonly MobiCortexApiService _api;
 
         public MainForm()
         {
-            _apiService = new MobiCortexApiService();
-            _apiService.OnLog += Log;
+            _api = new MobiCortexApiService();
+            _api.OnLog += Log;
             InitializeComponent();
-            InitializeUserControls();
         }
 
-        private void InitializeUserControls()
-        {
-            // Injetar o serviço API nos controles criados pelo Designer
-            cadastrosControl.SetApiService(_apiService);
-            vehiclesControl.SetApiService(_apiService);
-            eventsControl.SetApiService(_apiService);
-            logsControl.SetApiService(_apiService);
-            networkControl.SetApiService(_apiService);
-            wsControl.SetApiService(_apiService);
-            mqttControl.SetApiService(_apiService);
-        }
+        // =====================================================================
+        //  CONEXÃO
+        // =====================================================================
 
-        private void OnLoginClick(object? sender, EventArgs e)
+        private async void btnConectar_Click(object? sender, EventArgs e)
         {
-            _ = BtnLogin_Click();
-        }
+            // Monta a URL base a partir do IP informado
+            var ip = txtIP.Text.Trim();
+            if (string.IsNullOrEmpty(ip)) { Erro("Informe o IP do controlador"); return; }
 
-        private async Task BtnLogin_Click()
-        {
-            if (_isConnected)
-            {
-                Log("Já está conectado. Usando sessão existente.");
-                return;
-            }
+            // Adiciona porta padrão se não informada
+            if (!ip.Contains(':')) ip += ":4449";
+            if (!ip.StartsWith("https://")) ip = "https://" + ip;
+
+            // Configura a URL base no serviço
+            _api.ConfigureBaseUrl(ip);
 
             try
             {
-                var serverUrl = _txtServerUrl.Text.Trim();
-                var user = _txtUser.Text.Trim();
-                var password = _txtPassword.Text.Trim();
+                btnConectar.Enabled = false;
+                btnConectar.Text = "Conectando...";
+                lblStatus.Text = "Conectando...";
+                lblStatus.ForeColor = Color.DarkBlue;
 
-                if (string.IsNullOrEmpty(serverUrl) || string.IsNullOrEmpty(password))
+                // Faz login na API (POST /login com a senha)
+                var result = await _api.LoginAsync(txtSenha.Text);
+
+                if (result.Success && result.Data?.Ret == 0)
                 {
-                    MessageBox.Show("Preencha o IP da Master e a senha", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                // Adiciona porta padrão se não especificada
-                if (!serverUrl.Contains(":"))
-                {
-                    serverUrl += ":4449";
-                }
-
-                if (!serverUrl.StartsWith("https://"))
-                {
-                    serverUrl = "https://" + serverUrl;
-                }
-
-                _btnLogin.Enabled = false;
-                _btnLogin.Text = "Conectando...";
-                _lblStatus.Text = "⏳ Conectando...";
-                _lblStatus.ForeColor = Color.DarkBlue;
-                Application.DoEvents();
-
-                // Tentar login
-                var loginResult = await _apiService.LoginAsync(password);
-
-                if (loginResult.Success && loginResult.Data?.Ret == 0)
-                {
-                    _isConnected = true;
-                    _lblStatus.Text = $"✓ Conectado: {user} | Session: {loginResult.Data.SessionKey?[..16]}...";
-                    _lblStatus.ForeColor = Color.DarkGreen;
-                    _btnLogin.Text = "Conectado ✓";
-                    _btnLogin.BackColor = Color.FromArgb(40, 167, 69);
-                    Log($"✓ Login bem-sucedido - Usuário: {user}");
-                    Log($"  Session Key: {loginResult.Data.SessionKey?[..32]}...");
-                    Log($"  Expira em: {loginResult.Data.ExpiresIn}s");
-
-                    // Notificar controles da conexão
-                    OnConnected();
-                    
-                    // Passar URL base para o controle MQTT (para WSS)
-                    mqttControl.SetBaseUrl(serverUrl);
+                    // Login OK - habilita os botões de demo
+                    lblStatus.Text = $"Conectado - Session: {result.Data.SessionKey?[..16]}...";
+                    lblStatus.ForeColor = Color.DarkGreen;
+                    btnConectar.Text = "Conectado";
+                    btnConectar.BackColor = Color.FromArgb(40, 167, 69);
+                    HabilitarBotoes(true);
+                    Log($"Login OK! Expira em {result.Data.ExpiresIn}s");
                 }
                 else
                 {
-                    var errorMsg = loginResult.Message ?? $"Erro de autenticação (ret: {loginResult.Data?.Ret})";
-                    _lblStatus.Text = $"✗ Falha: {errorMsg}";
-                    _lblStatus.ForeColor = Color.DarkRed;
-                    _btnLogin.Text = "Conectar";
-                    _btnLogin.Enabled = true;
-                    Log($"✗ Login falhou: {errorMsg}");
-
-                    if (!string.IsNullOrEmpty(loginResult.RawResponse))
-                    {
-                        Log($"  Resposta: {loginResult.RawResponse}");
-                    }
+                    lblStatus.Text = $"Falha: {result.Message ?? "erro desconhecido"}";
+                    lblStatus.ForeColor = Color.DarkRed;
+                    btnConectar.Text = "Conectar";
+                    btnConectar.Enabled = true;
                 }
             }
             catch (Exception ex)
             {
-                _lblStatus.Text = $"✗ Erro: {ex.Message}";
-                _lblStatus.ForeColor = Color.DarkRed;
-                _btnLogin.Text = "Conectar";
-                _btnLogin.Enabled = true;
-                Log($"✗ Erro durante login: {ex.Message}");
+                lblStatus.Text = $"Erro: {ex.Message}";
+                lblStatus.ForeColor = Color.DarkRed;
+                btnConectar.Text = "Conectar";
+                btnConectar.Enabled = true;
             }
         }
 
-        private void OnClearLogClick(object? sender, EventArgs e)
+        private void HabilitarBotoes(bool enabled)
         {
-            _txtLog.Clear();
-            Log("🗑️ Log limpo");
+            btnCadastroCompleto.Enabled = enabled;
+            btnCadastroSimples.Enabled = enabled;
+            btnMonitoramento.Enabled = enabled;
+            btnRede.Enabled = enabled;
+            btnDashboard.Enabled = enabled;
         }
+
+        // =====================================================================
+        //  BOTÕES - Abrir formulários de demonstração
+        //  Cada botão abre um Form independente passando o serviço da API.
+        // =====================================================================
+
+        private void btnCadastroCompleto_Click(object? sender, EventArgs e)
+        {
+            // Abre o formulário do modelo MobiCortex (3 níveis: Cadastro → Entidade → Mídia)
+            new FormCadastroCompleto(_api).Show();
+        }
+
+        private void btnCadastroSimples_Click(object? sender, EventArgs e)
+        {
+            // Abre o formulário do modelo simples (2 níveis: Entidade → Mídia)
+            new FormCadastroSimples(_api).Show();
+        }
+
+        private void btnMonitoramento_Click(object? sender, EventArgs e)
+        {
+            // Abre o formulário de monitoramento MQTT em tempo real
+            new FormMonitoramento(_api).Show();
+        }
+
+        private void btnRede_Click(object? sender, EventArgs e)
+        {
+            // Abre o formulário de configuração de rede
+            new FormRede(_api).Show();
+        }
+
+        private void btnDashboard_Click(object? sender, EventArgs e)
+        {
+            // Abre o formulário de dashboard (informações do dispositivo)
+            new FormDashboard(_api).Show();
+        }
+
+        // =====================================================================
+        //  LOG
+        // =====================================================================
 
         private void Log(string message)
         {
-            if (_txtLog == null || _txtLog.IsDisposed) return;
+            if (txtLog.IsDisposed) return;
+            if (txtLog.InvokeRequired) { txtLog.Invoke(() => Log(message)); return; }
 
-            if (_txtLog.InvokeRequired)
-            {
-                _txtLog.Invoke(() => Log(message));
-                return;
-            }
-
-            var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
-            _txtLog.AppendText($"[{timestamp}] {message}{Environment.NewLine}");
-            _txtLog.SelectionStart = _txtLog.Text.Length;
-            _txtLog.ScrollToCaret();
+            var ts = DateTime.Now.ToString("HH:mm:ss.fff");
+            txtLog.AppendText($"[{ts}] {message}{Environment.NewLine}");
+            txtLog.SelectionStart = txtLog.Text.Length;
+            txtLog.ScrollToCaret();
         }
 
-        private void OnConnected()
-        {
-            cadastrosControl?.OnConnected();
-            vehiclesControl?.OnConnected();
-            eventsControl?.OnConnected();
-            logsControl?.OnConnected();
-            networkControl?.OnConnected();
-            wsControl?.OnConnected();
-            mqttControl?.OnConnected();
-        }
+        private void btnLimparLog_Click(object? sender, EventArgs e) => txtLog.Clear();
 
-        private void cadastrosControl_Load(object sender, EventArgs e)
-        {
-
-        }
+        private void Erro(string msg) =>
+            MessageBox.Show(msg, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
     }
 }
