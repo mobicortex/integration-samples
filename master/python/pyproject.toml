@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mbcortex-master-demo"
+version = "1.0.0"
+description = "Demo interativa para integracao com MobiCortex Master"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [{name = "MobiCortex"}]
+keywords = ["mbcortex", "master", "demo", "api", "integration"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+# Zero dependencias externas
+dependencies = []
+
+[project.scripts]
+mbcortex-demo = "mbcortex_demo:main"
+
+[tool.setuptools]
+py-modules = ["mbcortex_demo"]

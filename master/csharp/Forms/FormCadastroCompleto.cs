@@ -191,7 +191,11 @@ namespace SmartSdk.Forms
                 await CarregarCadastros();
             }
             else
-                Log($"Erro ao criar cadastro: {result.Message}");
+            {
+                var msg = $"Erro ao criar cadastro:\n{result.Message}";
+                Log(msg);
+                Aviso(msg);
+            }
         }
 
         /// <summary>
@@ -214,7 +218,11 @@ namespace SmartSdk.Forms
                 await CarregarCadastros();
             }
             else
-                Log($"Erro ao excluir: {result.Message}");
+            {
+                var msg = $"Erro ao excluir cadastro:\n{result.Message}";
+                Log(msg);
+                Aviso(msg);
+            }
         }
 
         private async void btnBuscarCadastro_Click(object? sender, EventArgs e)
@@ -336,7 +344,11 @@ namespace SmartSdk.Forms
                 await CarregarEntidades(_cadastroSelecionado.Id);
             }
             else
-                Log($"Erro ao criar entidade: {result.Message}");
+            {
+                var msg = $"Erro ao criar entidade:\n{result.Message}";
+                Log(msg);
+                Aviso(msg);
+            }
         }
 
         /// <summary>
@@ -360,7 +372,11 @@ namespace SmartSdk.Forms
                     await CarregarEntidades(_cadastroSelecionado.Id);
             }
             else
-                Log($"Erro: {result.Message}");
+            {
+                var msg = $"Erro ao excluir entidade:\n{result.Message}";
+                Log(msg);
+                Aviso(msg);
+            }
         }
 
         // =====================================================================
@@ -441,7 +457,11 @@ namespace SmartSdk.Forms
                 await CarregarMidias(_entidadeSelecionada.EntityId);
             }
             else
-                Log($"Erro ao criar mídia: {result.Message}");
+            {
+                var msg = $"Erro ao criar mídia:\n{result.Message}";
+                Log(msg);
+                Aviso(msg);
+            }
         }
 
         /// <summary>
@@ -463,7 +483,11 @@ namespace SmartSdk.Forms
                     await CarregarMidias(_entidadeSelecionada.EntityId);
             }
             else
-                Log($"Erro: {result.Message}");
+            {
+                var msg = $"Erro ao excluir mídia:\n{result.Message}";
+                Log(msg);
+                Aviso(msg);
+            }
         }
 
         // =====================================================================

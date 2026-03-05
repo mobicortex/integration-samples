@@ -374,18 +374,25 @@ namespace SmartSdk.Models
     }
 
     /// <summary>
-    /// GET /entities?cadastro_id=X - Lista entidades de um cadastro
+    /// GET /entities?cadastro_id=X  → lista entidades de um cadastro (sem paginação)
+    /// GET /entities?offset=X&amp;count=Y  → lista global paginada
+    /// GET /entities?offset=X&amp;count=Y&amp;name=filtro  → com filtro server-side
     /// </summary>
     public class EntidadeListResponse
     {
         [JsonPropertyName("ret")]
         public int Ret { get; set; }
 
-        [JsonPropertyName("cadastro_id")]
-        public uint CadastroId { get; set; }
+        /// <summary>Total de entidades no controlador (presente na listagem global paginada)</summary>
+        [JsonPropertyName("total")]
+        public uint Total { get; set; }
 
         [JsonPropertyName("count")]
         public uint Count { get; set; }
+
+        /// <summary>Presente apenas quando filtrado por cadastro_id</summary>
+        [JsonPropertyName("cadastro_id")]
+        public uint? CadastroId { get; set; }
 
         [JsonPropertyName("items")]
         public List<Entidade> Items { get; set; } = new();

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using SmartSdk.Services;
 using SmartSdk.Forms;
 
@@ -19,11 +20,50 @@ namespace SmartSdk
         // Serviço da API - compartilhado entre todos os formulários
         private readonly MobiCortexApiService _api;
 
+        // Caminho do arquivo de configurações do usuário
+        private static readonly string SettingsPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "SmartSdk", "settings.json");
+
         public MainForm()
         {
             _api = new MobiCortexApiService();
             _api.OnLog += Log;
             InitializeComponent();
+            CarregarConfiguracoes();
+        }
+
+        // =====================================================================
+        //  PERSISTÊNCIA DE CONFIGURAÇÕES
+        // =====================================================================
+
+        private void CarregarConfiguracoes()
+        {
+            try
+            {
+                if (!File.Exists(SettingsPath)) return;
+                var json = File.ReadAllText(SettingsPath);
+                var cfg = JsonSerializer.Deserialize<AppSettings>(json);
+                if (cfg == null) return;
+                if (!string.IsNullOrEmpty(cfg.Ip)) txtIP.Text = cfg.Ip;
+            }
+            catch { /* ignora erros de leitura */ }
+        }
+
+        private void SalvarConfiguracoes()
+        {
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
+                var cfg = new AppSettings { Ip = txtIP.Text.Trim() };
+                File.WriteAllText(SettingsPath, JsonSerializer.Serialize(cfg));
+            }
+            catch { /* ignora erros de escrita */ }
+        }
+
+        private record AppSettings
+        {
+            public string Ip { get; init; } = "";
         }
 
         // =====================================================================
@@ -46,15 +86,32 @@ namespace SmartSdk
             try
             {
                 btnConectar.Enabled = false;
-                btnConectar.Text = "Conectando...";
-                lblStatus.Text = "Conectando...";
+                btnConectar.Text = "Testando...";
+                lblStatus.Text = "Testando conexão TCP...";
                 lblStatus.ForeColor = Color.DarkBlue;
+
+                // Primeiro testa conectividade TCP básica
+                var tcpTest = await _api.TestTcpConnectionAsync();
+                if (!tcpTest.Success)
+                {
+                    lblStatus.Text = "Falha na conexão TCP";
+                    lblStatus.ForeColor = Color.DarkRed;
+                    btnConectar.Text = "Conectar";
+                    btnConectar.Enabled = true;
+                    Erro(tcpTest.Message);
+                    return;
+                }
+
+                btnConectar.Text = "Conectando...";
+                lblStatus.Text = "Fazendo login...";
 
                 // Faz login na API (POST /login com a senha)
                 var result = await _api.LoginAsync(txtSenha.Text);
 
                 if (result.Success && result.Data?.Ret == 0)
                 {
+                    SalvarConfiguracoes();
+
                     // Login OK - habilita os botões de demo
                     lblStatus.Text = $"Conectado - Session: {result.Data.SessionKey?[..16]}...";
                     lblStatus.ForeColor = Color.DarkGreen;

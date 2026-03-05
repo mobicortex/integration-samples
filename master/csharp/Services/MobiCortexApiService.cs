@@ -49,7 +49,11 @@ namespace SmartSdk.Services
             // Desabilita validação de SSL (o controlador usa certificado auto-assinado)
             var handler = new HttpClientHandler
             {
-                ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+                ServerCertificateCustomValidationCallback = (_, _, _, _) => true,
+                // Permite conexões com qualquer protocolo SSL/TLS
+                SslProtocols = System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Tls11 | System.Security.Authentication.SslProtocols.Tls,
+                // Desabilita verificação de revogação de certificado
+                CheckCertificateRevocationList = false
             };
             _http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(15) };
         }
@@ -68,6 +72,75 @@ namespace SmartSdk.Services
         {
             _baseUrl = url.TrimEnd('/');
             Log($"URL base: {_baseUrl}");
+        }
+
+        /// <summary>
+        /// Testa conectividade TCP básica antes de tentar HTTPS.
+        /// Útil para diagnosticar problemas de firewall/redirecionamento de porta.
+        /// </summary>
+        public async Task<(bool Success, string Message)> TestTcpConnectionAsync()
+        {
+            if (string.IsNullOrEmpty(_baseUrl))
+                return (false, "URL base não configurada");
+
+            try
+            {
+                var uri = new Uri(_baseUrl);
+                var host = uri.Host;
+                var port = uri.Port;
+
+                Log($"Testando conexão TCP com {host}:{port}...");
+
+                using var tcp = new System.Net.Sockets.TcpClient();
+                var connectTask = tcp.ConnectAsync(host, port);
+                var timeoutTask = Task.Delay(5000);
+
+                var completedTask = await Task.WhenAny(connectTask, timeoutTask);
+
+                if (completedTask == timeoutTask)
+                {
+                    var msg = $"Timeout: Não foi possível conectar a {host}:{port} em 5 segundos";
+                    Log($"  ERRO: {msg}");
+                    return (false, msg + "\n\nPossíveis causas:\n- IP/porta incorretos\n- Firewall bloqueando\n- Controlador offline");
+                }
+
+                await connectTask; // Propaga exceção se houver
+                Log($"  ✓ Conexão TCP OK");
+                return (true, $"Conexão TCP com {host}:{port} bem-sucedida");
+            }
+            catch (System.Net.Sockets.SocketException ex)
+            {
+                var msg = GetSocketErrorMessage(ex);
+                Log($"  ERRO: {msg}");
+                return (false, msg);
+            }
+            catch (Exception ex)
+            {
+                Log($"  ERRO: {ex.Message}");
+                return (false, ex.Message);
+            }
+        }
+
+        /// <summary>Traduz códigos de erro de socket para mensagens em português</summary>
+        private static string GetSocketErrorMessage(System.Net.Sockets.SocketException ex)
+        {
+            return ex.SocketErrorCode switch
+            {
+                System.Net.Sockets.SocketError.AccessDenied =>
+                    "Acesso negado pelo firewall ou antivírus.\n\nSoluções:\n" +
+                    "1. Execute o programa como Administrador\n" +
+                    "2. Adicione uma exceção no Windows Defender/Firewall\n" +
+                    "3. Desative temporariamente o antivírus para testar",
+                System.Net.Sockets.SocketError.ConnectionRefused =>
+                    "Conexão recusada - o controlador não está aceitando conexões nesta porta",
+                System.Net.Sockets.SocketError.TimedOut =>
+                    "Tempo esgotado - o controlador não respondeu",
+                System.Net.Sockets.SocketError.HostUnreachable =>
+                    "Host inalcançável - verifique o IP e a rota de rede",
+                System.Net.Sockets.SocketError.NetworkUnreachable =>
+                    "Rede inalcançável - verifique sua conexão de rede",
+                _ => $"Erro de socket ({ex.SocketErrorCode}): {ex.Message}"
+            };
         }
 
         // =====================================================================
@@ -177,10 +250,61 @@ namespace SmartSdk.Services
         }
 
         private static ApiResult<T> Ok<T>(T? data, string raw) =>
-            new() { Success = true, Data = data, RawResponse = raw };
+            new() { Success = true, Data = data, Message = ExtractBodyMessage(raw), RawResponse = raw };
 
         private static ApiResult<T> Fail<T>(string msg, string? raw = null) =>
-            new() { Success = false, Message = msg, RawResponse = raw };
+            new() { Success = false, Message = BuildErrorMessage(msg, raw), RawResponse = raw };
+
+        /// <summary>
+        /// Extrai e retorna apenas o campo de mensagem do body JSON, se existir.
+        /// Útil para capturar mensagens de erro retornadas com HTTP 200.
+        /// </summary>
+        private static string? ExtractBodyMessage(string? raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return null;
+            try
+            {
+                using var doc = JsonDocument.Parse(raw);
+                var root = doc.RootElement;
+                foreach (var field in new[] { "message", "msg", "error", "detail" })
+                    if (root.TryGetProperty(field, out var prop) &&
+                        prop.ValueKind == JsonValueKind.String)
+                    {
+                        var v = prop.GetString();
+                        if (!string.IsNullOrEmpty(v)) return v;
+                    }
+            }
+            catch { }
+            return null;
+        }
+
+        /// <summary>
+        /// Monta mensagem de erro detalhada combinando: código HTTP + descrição + mensagem do body JSON.
+        /// </summary>
+        private static string BuildErrorMessage(string httpCode, string? raw)
+        {
+            // Descrições amigáveis para os códigos HTTP mais comuns
+            var description = httpCode switch
+            {
+                "HTTP 400" => "Requisição inválida",
+                "HTTP 401" => "Não autorizado — sessão expirada ou senha incorreta",
+                "HTTP 403" => "Acesso negado",
+                "HTTP 404" => "Recurso não encontrado",
+                "HTTP 409" => "Conflito — registro já existe ou viola unicidade",
+                "HTTP 422" => "Dados inválidos ou incompletos",
+                "HTTP 429" => "Muitas requisições — aguarde e tente novamente",
+                "HTTP 500" => "Erro interno do servidor",
+                "HTTP 503" => "Serviço indisponível",
+                _ => ""
+            };
+
+            var bodyMsg = ExtractBodyMessage(raw) ?? "";
+
+            var parts = new List<string> { httpCode };
+            if (!string.IsNullOrEmpty(description)) parts.Add(description);
+            if (!string.IsNullOrEmpty(bodyMsg))      parts.Add(bodyMsg);
+            return string.Join(" — ", parts);
+        }
 
         private static string Truncate(string s, int max = 200) =>
             s.Length <= max ? s : s[..max] + "...";
@@ -290,10 +414,25 @@ namespace SmartSdk.Services
             return await GetAsync<Entidade>($"/entities?id={entityId}");
         }
 
-        /// <summary>Lista entidades de um cadastro</summary>
+        /// <summary>Lista entidades de um cadastro (retorna todas, sem paginação)</summary>
         public async Task<ApiResult<EntidadeListResponse>> ListarEntidadesAsync(uint cadastroId)
         {
             return await GetAsync<EntidadeListResponse>($"/entities?cadastro_id={cadastroId}");
+        }
+
+        /// <summary>
+        /// Lista entidades com paginação global e filtros server-side.
+        /// GET /entities?offset=X&amp;count=Y[&amp;name=filtro][&amp;doc=filtro][&amp;tipo=N]
+        /// </summary>
+        public async Task<ApiResult<EntidadeListResponse>> ListarEntidadesGlobalAsync(
+            int offset = 0, int count = 10,
+            string? nome = null, string? doc = null, int? tipo = null)
+        {
+            var q = $"/entities?offset={offset}&count={count}";
+            if (!string.IsNullOrEmpty(nome)) q += $"&name={Uri.EscapeDataString(nome)}";
+            if (!string.IsNullOrEmpty(doc))  q += $"&doc={Uri.EscapeDataString(doc)}";
+            if (tipo.HasValue)               q += $"&tipo={tipo}";
+            return await GetAsync<EntidadeListResponse>(q);
         }
 
         /// <summary>

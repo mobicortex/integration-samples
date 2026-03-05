@@ -9,7 +9,7 @@ O aplicativo usa uma arquitetura **multi-form launcher**:
 
 - **MainForm** — Tela de conexão (IP + senha) e launcher dos formulários de demonstração.
 - **FormCadastroCompleto** — Modelo completo de 3 níveis: Cadastro Central → Entidade → Mídia.
-- **FormCadastroSimplificado** — Modelo simplificado de 2 níveis: Entidade → Mídia (`createid=true`).
+- **FormCadastroSimples** — Modelo simplificado de 2 níveis: Entidade → Mídia (`createid=true`).
 - **FormMonitoramento** — Recebimento de eventos em tempo real via MQTT.
 - **FormRede** — Leitura e alteração da configuração de rede do controlador.
 - **FormDashboard** — Informações do dispositivo (versão, uptime, estatísticas).

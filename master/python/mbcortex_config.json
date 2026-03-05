@@ -1,0 +1,7 @@
+{
+  "ip": "192.168.0.21",
+  "port": 4449,
+  "username": "master",
+  "password": "1234",
+  "timeout": 10
+}

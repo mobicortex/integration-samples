@@ -26,8 +26,8 @@ Resources for **Edge Devices** — actuators and sensors for command execution o
 ### 💻 Integration by Language
 Within each category, samples are available in:
 * **/csharp**: .NET environments and Windows-based systems.
-* **/nodejs**: JavaScript and TypeScript server-side applications.
-* **/python**: Clean scripts using the `requests` library.
+* **/nodejs**: JavaScript and TypeScript server-side applications (fetch nativo).
+* **/python**: Clean scripts using only the Python standard library.
 * **/golang**: High-performance and scalable backends.
 * **/postman**: Ready-to-use collections for immediate API testing.
 

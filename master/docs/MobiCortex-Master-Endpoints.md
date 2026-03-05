@@ -10,6 +10,12 @@ https://<ip-da-controladora>:443   (modo produção ARM)
 http://<ip-da-controladora>:80     (redireciona para HTTPS)
 ```
 
+## Base Path
+
+```
+/mbcortex/master/api/v1
+```
+
 ## Autenticação
 
 A API utiliza autenticação por session key. Para obter uma session key, use o endpoint de login.
@@ -28,7 +34,7 @@ A session key é um token de 64 caracteres hexadecimais (SHA256) válido por 15 
 
 ### 1. Login
 
-**Endpoint:** `POST /master/api/v1/login`
+**Endpoint:** `POST /mbcortex/master/api/v1/login`
 
 Autentica o usuário e retorna uma session key.
 
@@ -60,7 +66,7 @@ Autentica o usuário e retorna uma session key.
 
 ### 2. Alterar Senha
 
-**Endpoint:** `PUT /master/api/v1/login`
+**Endpoint:** `PUT /mbcortex/master/api/v1/login`
 
 Altera a senha do usuário autenticado.
 
@@ -89,7 +95,7 @@ Authorization: Bearer <session_key>
 
 ### 3. Logout
 
-**Endpoint:** `DELETE /master/api/v1/login`
+**Endpoint:** `DELETE /mbcortex/master/api/v1/login`
 
 Invalida a session key atual.
 
@@ -116,7 +122,7 @@ Authorization: Bearer <session_key>
 
 ### 4. Tokens de API
 
-**Endpoint:** `GET /master/api/v1/token`
+**Endpoint:** `GET /mbcortex/master/api/v1/token`
 
 Lista todos os tokens de API salvos.
 
@@ -142,7 +148,7 @@ Authorization: Bearer <session_key>
 
 ---
 
-**Endpoint:** `POST /master/api/v1/token`
+**Endpoint:** `POST /mbcortex/master/api/v1/token`
 
 Cria um novo token de API.
 
@@ -172,7 +178,7 @@ Content-Type: application/json
 
 ---
 
-**Endpoint:** `DELETE /master/api/v1/token`
+**Endpoint:** `DELETE /mbcortex/master/api/v1/token`
 
 Remove um token de API.
 
@@ -195,7 +201,7 @@ Content-Type: application/json
 
 ### 5. Configuração Geral
 
-**Endpoint:** `GET /master/api/v1/config`
+**Endpoint:** `GET /mbcortex/master/api/v1/config`
 
 Retorna a configuração completa do dispositivo.
 
@@ -228,7 +234,7 @@ Authorization: Bearer <session_key>
 
 ---
 
-**Endpoint:** `POST /master/api/v1/config`
+**Endpoint:** `POST /mbcortex/master/api/v1/config`
 
 Atualiza a configuração do dispositivo.
 
@@ -244,7 +250,7 @@ Content-Type: application/json
 
 ### 6. Configuração de Rede Cabo
 
-**Endpoint:** `GET /master/api/v1/network-config-cable`
+**Endpoint:** `GET /mbcortex/master/api/v1/network-config-cable`
 
 Retorna configuração da interface Ethernet.
 
@@ -262,7 +268,7 @@ Retorna configuração da interface Ethernet.
 
 ---
 
-**Endpoint:** `POST /master/api/v1/network-config-cable`
+**Endpoint:** `POST /mbcortex/master/api/v1/network-config-cable`
 
 Atualiza configuração da interface Ethernet.
 
@@ -281,13 +287,13 @@ Use `"ip": "dhcp"` para configurar DHCP.
 
 ### 7. Configuração WiFi AP
 
-**Endpoint:** `GET /master/api/v1/network-config-wifi-ap`
+**Endpoint:** `GET /mbcortex/master/api/v1/network-config-wifi-ap`
 
 Retorna configuração do Access Point WiFi.
 
 ---
 
-**Endpoint:** `POST /master/api/v1/network-config-wifi-ap`
+**Endpoint:** `POST /mbcortex/master/api/v1/network-config-wifi-ap`
 
 Atualiza configuração do Access Point WiFi.
 
@@ -295,13 +301,13 @@ Atualiza configuração do Access Point WiFi.
 
 ### 8. Configuração WiFi Station
 
-**Endpoint:** `GET /master/api/v1/network-config-wifi-st`
+**Endpoint:** `GET /mbcortex/master/api/v1/network-config-wifi-st`
 
 Retorna configuração do cliente WiFi (station).
 
 ---
 
-**Endpoint:** `POST /master/api/v1/network-config-wifi-st`
+**Endpoint:** `POST /mbcortex/master/api/v1/network-config-wifi-st`
 
 Atualiza configuração do cliente WiFi (station).
 
@@ -309,25 +315,25 @@ Atualiza configuração do cliente WiFi (station).
 
 ### 9. Ferramentas de Rede
 
-**Endpoint:** `GET /master/api/v1/network-wifi-scan`
+**Endpoint:** `GET /mbcortex/master/api/v1/network-wifi-scan`
 
 Escaneia redes WiFi disponíveis.
 
 ---
 
-**Endpoint:** `GET /master/api/v1/network-wifi-clients`
+**Endpoint:** `GET /mbcortex/master/api/v1/network-wifi-clients`
 
 Lista clientes conectados ao AP.
 
 ---
 
-**Endpoint:** `GET /master/api/v1/network-interfaces`
+**Endpoint:** `GET /mbcortex/master/api/v1/network-interfaces`
 
 Lista interfaces de rede.
 
 ---
 
-**Endpoint:** `GET /master/api/v1/network-wifi-signal`
+**Endpoint:** `GET /mbcortex/master/api/v1/network-wifi-signal`
 
 Retorna qualidade do sinal WiFi.
 
@@ -337,19 +343,19 @@ Retorna qualidade do sinal WiFi.
 
 ### 10. Entidades
 
-**Endpoint:** `GET /master/api/v1/entities?id=<entity_id>`
+**Endpoint:** `GET /mbcortex/master/api/v1/entities?id=<entity_id>`
 
 Busca uma entidade específica por ID.
 
 ---
 
-**Endpoint:** `GET /master/api/v1/entities?cadastro_id=<cadastro_id>`
+**Endpoint:** `GET /mbcortex/master/api/v1/entities?cadastro_id=<cadastro_id>`
 
 Conta entidades de um cadastro.
 
 ---
 
-**Endpoint:** `POST /master/api/v1/entities`
+**Endpoint:** `POST /mbcortex/master/api/v1/entities`
 
 Cria uma nova entidade.
 
@@ -366,7 +372,7 @@ Cria uma nova entidade.
 
 ---
 
-**Endpoint:** `DELETE /master/api/v1/entities?id=<entity_id>`
+**Endpoint:** `DELETE /mbcortex/master/api/v1/entities?id=<entity_id>`
 
 Remove uma entidade.
 
@@ -376,19 +382,19 @@ Remove uma entidade.
 
 ### 11. Mídias
 
-**Endpoint:** `GET /master/api/v1/media?id=<media_id>`
+**Endpoint:** `GET /mbcortex/master/api/v1/media?id=<media_id>`
 
 Busca uma mídia específica por ID.
 
 ---
 
-**Endpoint:** `GET /master/api/v1/media?entity_id=<entity_id>`
+**Endpoint:** `GET /mbcortex/master/api/v1/media?entity_id=<entity_id>`
 
 Conta mídias de uma entidade.
 
 ---
 
-**Endpoint:** `POST /master/api/v1/media`
+**Endpoint:** `POST /mbcortex/master/api/v1/media`
 
 Cria uma nova mídia.
 
@@ -404,7 +410,7 @@ Cria uma nova mídia.
 
 ---
 
-**Endpoint:** `DELETE /master/api/v1/media?id=<media_id>`
+**Endpoint:** `DELETE /mbcortex/master/api/v1/media?id=<media_id>`
 
 Remove uma mídia.
 
@@ -414,7 +420,7 @@ Remove uma mídia.
 
 ### 12. Comandos
 
-**Endpoint:** `POST /master/api/v1/command`
+**Endpoint:** `POST /mbcortex/master/api/v1/command`
 
 Envia comandos para a controladora.
 
@@ -424,13 +430,13 @@ Envia comandos para a controladora.
 
 ### 13. Arquivos
 
-**Endpoint:** `GET /master/api/v1/files`
+**Endpoint:** `GET /mbcortex/master/api/v1/files`
 
 Lista arquivos do sistema.
 
 ---
 
-**Endpoint:** `POST /master/api/v1/files`
+**Endpoint:** `POST /mbcortex/master/api/v1/files`
 
 Envia arquivo para a controladora.
 
@@ -440,13 +446,13 @@ Envia arquivo para a controladora.
 
 ### 14. Webhook
 
-**Endpoint:** `GET /master/api/v1/webhook`
+**Endpoint:** `GET /mbcortex/master/api/v1/webhook`
 
 Retorna configuração do webhook.
 
 ---
 
-**Endpoint:** `POST /master/api/v1/webhook`
+**Endpoint:** `POST /mbcortex/master/api/v1/webhook`
 
 Atualiza configuração do webhook.
 
@@ -456,13 +462,13 @@ Atualiza configuração do webhook.
 
 ### 15. Fontes de Vídeo
 
-**Endpoint:** `GET /master/api/v1/video-source`
+**Endpoint:** `GET /mbcortex/master/api/v1/video-source`
 
 Retorna configuração das fontes de vídeo.
 
 ---
 
-**Endpoint:** `POST /master/api/v1/video-source`
+**Endpoint:** `POST /mbcortex/master/api/v1/video-source`
 
 Atualiza configuração das fontes de vídeo.
 
@@ -472,7 +478,7 @@ Atualiza configuração das fontes de vídeo.
 
 ### 16. Informações do Dispositivo
 
-**Endpoint:** `GET /master/api/v1/device-info`
+**Endpoint:** `GET /mbcortex/master/api/v1/device-info`
 
 Retorna informações do hardware.
 
@@ -482,13 +488,49 @@ Retorna informações do hardware.
 
 ### 17. Registro Central
 
-**Endpoint:** `GET /master/api/v1/central-registry`
+**Endpoint:** `GET /mbcortex/master/api/v1/central-registry?offset=0&count=20`
 
-Acessa o registro central.
+Lista cadastros com paginação.
 
 ---
 
-**Endpoint:** `GET /master/api/v1/central-registry/stats`
+**Endpoint:** `GET /mbcortex/master/api/v1/central-registry?id=<cadastro_id>`
+
+Busca cadastro por ID.
+
+---
+
+**Endpoint:** `GET /mbcortex/master/api/v1/central-registry?name=<filtro>`
+
+Filtra cadastros por nome.
+
+---
+
+**Endpoint:** `POST /mbcortex/master/api/v1/central-registry`
+
+Cria ou atualiza cadastro.
+
+#### Request Body
+```json
+{
+  "id": 0,
+  "name": "Cadastro Principal",
+  "enabled": 1,
+  "slots1": 0,
+  "slots2": 0,
+  "type": 0
+}
+```
+
+---
+
+**Endpoint:** `DELETE /mbcortex/master/api/v1/central-registry?id=<cadastro_id>`
+
+Remove cadastro.
+
+---
+
+**Endpoint:** `GET /mbcortex/master/api/v1/central-registry/stats`
 
 Retorna estatísticas do registro central.
 
@@ -498,19 +540,19 @@ Retorna estatísticas do registro central.
 
 ### 18. Slaves Smart
 
-**Endpoint:** `GET /master/api/v1/SlaveSmart.MCUT`
+**Endpoint:** `GET /mbcortex/master/api/v1/SlaveSmart.MCUT`
 
 Comunicação com slaves smart.
 
 ---
 
-**Endpoint:** `GET /master/api/v1/M1127.MCUT`
+**Endpoint:** `GET /mbcortex/master/api/v1/M1127.MCUT`
 
 Comunicação com módulo M1127.
 
 ---
 
-**Endpoint:** `GET /master/api/v1/SlaveSmartList.MCUT`
+**Endpoint:** `GET /mbcortex/master/api/v1/SlaveSmartList.MCUT`
 
 Lista slaves smart conectados.
 

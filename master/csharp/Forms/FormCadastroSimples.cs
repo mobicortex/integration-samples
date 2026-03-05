@@ -22,8 +22,8 @@ namespace SmartSdk.Forms
     //
     //  ENDPOINTS USADOS:
     //  - POST /entities  (com createid=true)
-    //  - GET  /entities?cadastro_id=X  (lista entidades)
-    //  - GET  /entities?id=X           (busca por ID)
+    //  - GET  /entities?offset=X&count=Y[&name=filtro]  (lista paginada global)
+    //  - GET  /entities?id=X                            (busca por ID)
     //  - GET/POST/DELETE /media
     // =============================================================================
 
@@ -32,14 +32,13 @@ namespace SmartSdk.Forms
         private readonly MobiCortexApiService _api;
         private Entidade? _entidadeSelecionada;
 
-        // Cache de todas as entidades carregadas da API
-        private List<Entidade> _todasEntidades = new();
-        // Lista filtrada (pode ser == _todasEntidades se sem filtro)
-        private List<Entidade> _entidadesFiltradas = new();
-
-        // Estado de paginação (client-side sobre _entidadesFiltradas)
+        // Estado de paginação server-side
         private int _currentOffset = 0;
-        private const int PageSize = 20;
+        private uint _totalEntidades = 0;
+        private const int PageSize = 10;
+
+        // Filtro de texto atual (enviado ao servidor)
+        private string _filtroNome = "";
 
         public FormCadastroSimples(MobiCortexApiService api)
         {
@@ -54,98 +53,35 @@ namespace SmartSdk.Forms
 
         private async void FormCadastroSimples_Load(object? sender, EventArgs e)
         {
-            await CarregarTodasEntidades();
+            await CarregarEntidades();
         }
 
         /// <summary>
-        /// Carrega TODAS as entidades do controlador (iterando por todos os cadastros).
-        /// Armazena em _todasEntidades e depois renderiza a página atual.
-        ///
-        /// A API não tem endpoint para listar todas as entidades diretamente.
-        /// Precisamos iterar: /central-registry (paginado) → /entities?cadastro_id=X
+        /// Carrega a página atual de entidades do servidor.
+        /// GET /entities?offset=X&amp;count=Y[&amp;name=filtro]
+        /// Uma única chamada HTTP — paginação e filtro são feitos no servidor.
         /// </summary>
-        private async Task CarregarTodasEntidades()
+        private async Task CarregarEntidades()
         {
             lblStatusEntidades.Text = "Carregando...";
-            _todasEntidades.Clear();
-            _entidadesFiltradas.Clear();
-            _currentOffset = 0;
             listEntidades.Items.Clear();
             listMidias.Items.Clear();
             _entidadeSelecionada = null;
 
-            // 1. Busca a primeira página de cadastros para saber o total
-            var primeiraPagina = await _api.ListarCadastrosAsync(0, PageSize);
-            if (!primeiraPagina.Success || primeiraPagina.Data == null)
+            var result = await _api.ListarEntidadesGlobalAsync(
+                _currentOffset, PageSize,
+                nome: string.IsNullOrEmpty(_filtroNome) ? null : _filtroNome);
+
+            if (!result.Success || result.Data == null)
             {
-                lblStatusEntidades.Text = $"Erro: {primeiraPagina.Message}";
+                lblStatusEntidades.Text = $"Erro: {result.Message}";
                 AtualizarPaginacao();
                 return;
             }
 
-            uint totalCadastros = primeiraPagina.Data.Total;
-            var todosCadastros = new List<CadastroCentral>(primeiraPagina.Data.Items);
+            _totalEntidades = result.Data.Total;
 
-            // 2. Busca as páginas restantes de cadastros
-            int offset = PageSize;
-            while (offset < totalCadastros)
-            {
-                var pagina = await _api.ListarCadastrosAsync(offset, PageSize);
-                if (pagina.Success && pagina.Data != null)
-                    todosCadastros.AddRange(pagina.Data.Items);
-                offset += PageSize;
-            }
-
-            // 3. Para cada cadastro, busca suas entidades
-            foreach (var cad in todosCadastros)
-            {
-                lblStatusEntidades.Text = $"Carregando entidades... ({_todasEntidades.Count} encontradas)";
-                var ents = await _api.ListarEntidadesAsync(cad.Id);
-                if (ents.Success && ents.Data != null)
-                    _todasEntidades.AddRange(ents.Data.Items);
-            }
-
-            Log($"{_todasEntidades.Count} entidade(s) carregada(s) de {todosCadastros.Count} cadastro(s)");
-            AplicarFiltroERenderizar();
-        }
-
-        /// <summary>
-        /// Aplica o filtro de texto sobre _todasEntidades,
-        /// atualiza _entidadesFiltradas e renderiza a página atual.
-        /// NÃO faz chamadas à API.
-        /// </summary>
-        private void AplicarFiltroERenderizar()
-        {
-            var filtro = txtFiltroEntidade.Text.Trim();
-
-            if (!string.IsNullOrEmpty(filtro) && !uint.TryParse(filtro, out _))
-            {
-                _entidadesFiltradas = _todasEntidades
-                    .Where(e => e.Name.Contains(filtro, StringComparison.OrdinalIgnoreCase)
-                             || e.Doc.Contains(filtro, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
-            else
-            {
-                _entidadesFiltradas = _todasEntidades;
-            }
-
-            RenderizarPagina();
-        }
-
-        /// <summary>
-        /// Renderiza a página atual de _entidadesFiltradas na ListView.
-        /// NÃO faz chamadas à API.
-        /// </summary>
-        private void RenderizarPagina()
-        {
-            listEntidades.Items.Clear();
-
-            var pagina = _entidadesFiltradas
-                .Skip(_currentOffset)
-                .Take(PageSize);
-
-            foreach (var ent in pagina)
+            foreach (var ent in result.Data.Items)
             {
                 var item = new ListViewItem(ent.EntityId.ToString());
                 item.SubItems.Add(ent.TipoNome);
@@ -199,14 +135,13 @@ namespace SmartSdk.Forms
         /// <summary>Atualiza label de status e botões de paginação</summary>
         private void AtualizarPaginacao()
         {
-            uint total = (uint)_entidadesFiltradas.Count;
-            int totalPages = (int)((total + PageSize - 1) / PageSize);
+            int totalPages = (int)((_totalEntidades + PageSize - 1) / PageSize);
             int currentPage = totalPages > 0 ? (_currentOffset / PageSize) + 1 : 0;
 
             lblPagina.Text = $"{currentPage}/{totalPages}";
             btnAnterior.Enabled = _currentOffset > 0;
-            btnProxima.Enabled = (_currentOffset + PageSize) < total;
-            lblStatusEntidades.Text = $"{total} entidade(s) encontrada(s)";
+            btnProxima.Enabled = (_currentOffset + PageSize) < _totalEntidades;
+            lblStatusEntidades.Text = $"{_totalEntidades} entidade(s) encontrada(s)";
         }
 
         /// <summary>Ao selecionar uma entidade, carrega suas mídias.</summary>
@@ -266,10 +201,15 @@ namespace SmartSdk.Forms
                 Log($"  → entity_id={result.Data.EntityId}, cadastro_id={result.Data.CadastroId}");
                 if (result.Data.CreatedCentral == 1)
                     Log($"  → Cadastro central criado automaticamente");
-                await CarregarTodasEntidades();
+                _currentOffset = 0;
+                await CarregarEntidades();
             }
             else
-                Log($"Erro ao criar entidade: {result.Message}");
+            {
+                var msg = $"Erro ao criar entidade:\n{result.Message}";
+                Log(msg);
+                Aviso(msg);
+            }
         }
 
         /// <summary>
@@ -289,10 +229,15 @@ namespace SmartSdk.Forms
             if (result.Success)
             {
                 Log($"Entidade excluída: {_entidadeSelecionada.Name}");
-                await CarregarTodasEntidades();
+                _currentOffset = 0;
+                await CarregarEntidades();
             }
             else
-                Log($"Erro: {result.Message}");
+            {
+                var msg = $"Erro ao excluir entidade:\n{result.Message}";
+                Log(msg);
+                Aviso(msg);
+            }
         }
 
         private async void btnBuscarEntidade_Click(object? sender, EventArgs e)
@@ -307,27 +252,21 @@ namespace SmartSdk.Forms
                 return;
             }
 
-            // Se cache vazio (ainda não carregou), carrega da API
-            if (_todasEntidades.Count == 0 && string.IsNullOrEmpty(filtro))
-            {
-                await CarregarTodasEntidades();
-                return;
-            }
-
-            // Filtro por nome ou limpar filtro — usa cache, sem API
-            AplicarFiltroERenderizar();
+            // Filtro por texto — enviado ao servidor
+            _filtroNome = filtro;
+            await CarregarEntidades();
         }
 
-        private void btnAnterior_Click(object? sender, EventArgs e)
+        private async void btnAnterior_Click(object? sender, EventArgs e)
         {
             _currentOffset = Math.Max(0, _currentOffset - PageSize);
-            RenderizarPagina();
+            await CarregarEntidades();
         }
 
-        private void btnProxima_Click(object? sender, EventArgs e)
+        private async void btnProxima_Click(object? sender, EventArgs e)
         {
             _currentOffset += PageSize;
-            RenderizarPagina();
+            await CarregarEntidades();
         }
 
         /// <summary>Enter no campo de busca dispara a pesquisa</summary>
@@ -345,13 +284,8 @@ namespace SmartSdk.Forms
                     return;
                 }
 
-                if (_todasEntidades.Count == 0 && string.IsNullOrEmpty(filtro))
-                {
-                    await CarregarTodasEntidades();
-                    return;
-                }
-
-                AplicarFiltroERenderizar();
+                _filtroNome = filtro;
+                await CarregarEntidades();
             }
         }
 
@@ -385,46 +319,38 @@ namespace SmartSdk.Forms
         }
 
         /// <summary>
-        /// Cria uma nova mídia vinculada à entidade selecionada.
-        /// Funciona igual ao modelo completo.
+        /// Abre o formulário de cadastro de mídia para criar uma nova mídia
+        /// vinculada à entidade selecionada.
         /// </summary>
         private async void btnNovaMidia_Click(object? sender, EventArgs e)
         {
             if (_entidadeSelecionada == null) { Aviso("Selecione uma entidade"); return; }
 
-            var tipos = new[] { "RFID Wiegand 26", "RFID Wiegand 34", "Placa (LPR)", "Facial" };
-            var tipoIdx = SelecionarOpcao("Tipo de Mídia", "Selecione o tipo:", tipos);
-            if (tipoIdx < 0) return;
-
-            int tipoMidia = tipoIdx switch
+            using var form = new FormCadastroMidia(_entidadeSelecionada.EntityId);
+            
+            if (form.ShowDialog(this) == DialogResult.OK)
             {
-                0 => TipoMidia.Wiegand26,
-                1 => TipoMidia.Wiegand34,
-                2 => TipoMidia.Lpr,
-                3 => TipoMidia.Facial,
-                _ => TipoMidia.Wiegand26
-            };
+                var request = new CriarMidiaRequest
+                {
+                    EntityId = _entidadeSelecionada.EntityId,
+                    CadastroId = _entidadeSelecionada.CadastroId,
+                    Tipo = form.TipoMidiaSelecionado,
+                    Descricao = form.DadosMidia
+                };
 
-            var descricao = InputBox("Nova Mídia",
-                tipoMidia == TipoMidia.Lpr ? "Placa (ex: ABC1D23):" : "Código/Descrição:");
-            if (string.IsNullOrEmpty(descricao)) return;
-
-            var request = new CriarMidiaRequest
-            {
-                EntityId = _entidadeSelecionada.EntityId,
-                CadastroId = _entidadeSelecionada.CadastroId,
-                Tipo = tipoMidia,
-                Descricao = descricao
-            };
-
-            var result = await _api.CriarMidiaAsync(request);
-            if (result.Success && result.Data?.Ret == 0)
-            {
-                Log($"Mídia criada: {descricao} (ID: {result.Data.MediaId})");
-                await CarregarMidias(_entidadeSelecionada.EntityId);
+                var result = await _api.CriarMidiaAsync(request);
+                if (result.Success && result.Data?.Ret == 0)
+                {
+                    Log($"Mídia criada: {form.TipoMidiaNome} - {form.DadosMidia} (ID: {result.Data.MediaId})");
+                    await CarregarMidias(_entidadeSelecionada.EntityId);
+                }
+                else
+                {
+                    var msg = $"Erro ao criar mídia:\n{result.Message}";
+                    Log(msg);
+                    Aviso(msg);
+                }
             }
-            else
-                Log($"Erro ao criar mídia: {result.Message}");
         }
 
         private async void btnExcluirMidia_Click(object? sender, EventArgs e)
@@ -442,7 +368,11 @@ namespace SmartSdk.Forms
                     await CarregarMidias(_entidadeSelecionada.EntityId);
             }
             else
-                Log($"Erro: {result.Message}");
+            {
+                var msg = $"Erro ao excluir mídia:\n{result.Message}";
+                Log(msg);
+                Aviso(msg);
+            }
         }
 
         // =====================================================================
