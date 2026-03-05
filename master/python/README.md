@@ -71,13 +71,17 @@ Você informa os IDs desejados (recomendado: >= 2.000.000).
 ### Opção [3] Cadastrar um carro ⭐ **RECOMENDADO**
 Modo flexível - digite **0** para IDs automáticos ou informe IDs específicos.
 
+**🆕 NOVO:** Se informar **0** no ID da Unidade:
+- **Veículo:** Cria cadastro central com o nome da **placa**
+- **Pessoa:** Cria cadastro central com o **nome da pessoa**
+
 ### Fluxo de perguntas:
 1. **IP/Hostname** da controladora
 2. **Porta** HTTPS (padrão: 443)
 3. **Usuário** (padrão: master) - informativo
 4. **Senha** (padrão: 1234)
 5. **Timeout** (padrão: 10s)
-6. **ID da Unidade** (0 = automático)
+6. **ID da Unidade** (0 = cria automático com nome da placa)
 7. **ID do Veículo** (0 = automático)
 8. **Placa** do veículo (padrão: ABC1234)
 9. **LPR** ativar? (padrão: sim)
@@ -110,10 +114,16 @@ ID do Veiculo [0]: 0          ← digite 0 para auto, ou um ID específico
 **Comportamento:**
 | Unidade | Veículo | Resultado |
 |---------|---------|-----------|
-| 0 | 0 | Ambos automáticos (controladora gera) |
-| 2000001 | 0 | Unidade fixa, veículo automático |
-| 0 | 3000001 | Unidade automática, veículo fixo |
+| 0 | 0 | Cadastro criado com nome da placa, veículo automático |
+| 2000001 | 0 | Unidade fixa existente, veículo automático |
+| 0 | 3000001 | Cadastro criado com nome da placa, veículo fixo |
 | 2000001 | 3000001 | Ambos fixos |
+
+> 💡 **Dica:** Quando informar **0** no ID da Unidade, o sistema cria automaticamente um cadastro central:
+> - Para **veículos**: usa a **placa** como nome do cadastro
+> - Para **pessoas**: usa o **nome** como nome do cadastro
+> 
+> Útil quando não quer associar a um cadastro existente!
 
 ---
 

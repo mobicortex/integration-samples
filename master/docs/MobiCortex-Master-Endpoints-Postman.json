@@ -1,26 +1,101 @@
 {
   "info": {
-    "_postman_id": "mobicortex-master-api-v1",
-    "name": "MobiCortex Master API",
-    "description": "Colecao de endpoints da API da Controladora Master MobiCortex",
+    "name": "MobiCortex Master API v1",
+    "description": "API completa da Controladora Master MobiCortex\n\n📋 **Base URL**: `https://192.168.0.21:4449`\n🔑 **Auth**: Bearer token (session_key)\n⏱️ **TTL**: 15 minutos (renovação automática)\n\n## Como Usar\n\n1. **Configure as variáveis**:\n   - `baseUrl`: IP/porta da controladora (ex: `https://192.168.0.21:4449`)\n   - `password`: Senha de acesso (padrão: `admin`)\n\n2. **Faça Login**:\n   - Execute a requisição `Login` na pasta `🔐 Autenticação`\n   - A `session_key` será extraída automaticamente e salva na variável `sessionKey`\n\n3. **Use os endpoints**:\n   - Todas as requisições subsequentes usarão automaticamente o token salvo\n   - Se a sessão expirar, execute `Login` novamente\n\n🔗 **Documentação**: `/integration-samples/master/docs/MobiCortex-Master-Endpoints.md`",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
-      "key": "base_url",
-      "value": "192.168.0.21:4449"
+      "key": "baseUrl",
+      "value": "https://192.168.0.21:4449",
+      "type": "string"
     },
     {
-      "key": "session_key",
-      "value": ""
+      "key": "sessionKey",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "cadastroId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "entityId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "mediaId",
+      "value": "",
+      "type": "string"
     }
   ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sessionKey}}",
+        "type": "string"
+      }
+    ]
+  },
   "item": [
     {
-      "name": "Autenticacao",
+      "name": "🔐 Autenticação",
+      "description": "Endpoints de login, logout e gestão de sessão",
       "item": [
         {
           "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// ======================================================",
+                  "// SCRIPT AUTOMÁTICO: Extrai session_key e salva na variável",
+                  "// ======================================================",
+                  "",
+                  "pm.test('Status code é 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    ",
+                  "    // Verifica se o login foi bem-sucedido",
+                  "    // NOTA: ret === 0 (numérico) indica sucesso, não 'OK'",
+                  "    if (body.ret === 0 && body.session_key) {",
+                  "        // Salva a session_key na variável da collection",
+                  "        pm.collectionVariables.set('sessionKey', body.session_key);",
+                  "        ",
+                  "        // Log para confirmação",
+                  "        console.log('✅ Login realizado com sucesso!');",
+                  "        console.log('🔑 Session Key: ' + body.session_key.substring(0, 16) + '...');",
+                  "        console.log('⏱️ Expira em: ' + body.expires_in + ' segundos');",
+                  "        ",
+                  "        // Notificação visual",
+                  "        pm.test('✅ Session Key salva automaticamente', function () {",
+                  "            pm.expect(body.session_key).to.have.lengthOf(64);",
+                  "        });",
+                  "    } else {",
+                  "        console.error('❌ Erro no login: ret=' + body.ret);",
+                  "        if (body.error) {",
+                  "            console.error('❌ Mensagem:', body.error);",
+                  "        }",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -31,25 +106,15 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"pass\": \"admin\"\n}"
+              "raw": "{\n  \"pass\": \"{{password}}\"\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/login",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "login"
-              ]
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "login"]
             },
-            "description": "Autentica e retorna session_key"
-          },
-          "response": []
+            "description": "Autentica o usuário e retorna uma session_key.\n\n**Nota**: A session_key é automaticamente salva na variável `sessionKey` para uso nas próximas requisições."
+          }
         },
         {
           "name": "Alterar Senha",
@@ -59,33 +124,19 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"pass_atual\": \"admin\",\n  \"pass_nova\": \"nova_senha\",\n  \"pass_nova2\": \"nova_senha\"\n}"
+              "raw": "{\n  \"pass_atual\": \"{{password}}\",\n  \"pass_nova\": \"nova_senha\",\n  \"pass_nova2\": \"nova_senha\"\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/login",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "login"
-              ]
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "login"]
             },
-            "description": "Altera a senha do usuario autenticado"
-          },
-          "response": []
+            "description": "Altera a senha do usuário autenticado."
+          }
         },
         {
           "name": "Logout",
@@ -95,100 +146,82 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"session_key\": \"{{session_key}}\"\n}"
+              "raw": "{\n  \"session_key\": \"{{sessionKey}}\"\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/login",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "login"
-              ]
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "login"]
             },
-            "description": "Invalida a session_key"
-          },
-          "response": []
+            "description": "Invalida a session_key atual."
+          }
         }
       ]
     },
     {
-      "name": "Tokens",
+      "name": "🔑 Tokens de API",
+      "description": "Gestão de tokens de API de longa duração",
       "item": [
         {
           "name": "Listar Tokens",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/token",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "token"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/token",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "token"]
+            },
+            "description": "Lista todos os tokens de API salvos."
+          }
         },
         {
-          "name": "Criar Token",
+          "name": "Criar Token (com TTL)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"label\": \"Integracao ERP\",\n  \"ttl_days\": 365\n}"
+              "raw": "{\n  \"label\": \"Token de Integração\",\n  \"ttl_days\": 365\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/token",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "token"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/token",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "token"]
+            },
+            "description": "Cria um novo token de API com validade de 365 dias."
+          }
+        },
+        {
+          "name": "Criar Token (permanente)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Token Permanente\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/token",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "token"]
+            },
+            "description": "Cria um token de API sem data de expiração."
+          }
         },
         {
           "name": "Remover Token",
@@ -198,427 +231,35 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"token\": \"TOKEN_A_REMOVER\"\n}"
+              "raw": "{\n  \"token\": \"cole_o_token_aqui\"\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/token",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "token"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/token",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "token"]
+            },
+            "description": "Remove um token de API."
+          }
         }
       ]
     },
     {
-      "name": "Configuracao",
-      "item": [
-        {
-          "name": "Obter Config",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/config",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "config"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Atualizar Config",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"master\": {\n    \"frase\": \"FRASE_DE_ACESSO\"\n  }\n}"
-            },
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/config",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "config"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Rede",
-      "item": [
-        {
-          "name": "Network Cable (GET)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/network-config-cable",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "network-config-cable"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Network Cable (POST)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"ip\": \"192.168.1.100\",\n  \"mask\": \"255.255.255.0\",\n  \"gw\": \"192.168.1.1\"\n}"
-            },
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/network-config-cable",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "network-config-cable"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "WiFi AP (GET)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/network-config-wifi-ap",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "network-config-wifi-ap"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "WiFi AP (POST)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"ssid\": \"MinhaRede\",\n  \"pass\": \"senha123\"\n}"
-            },
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/network-config-wifi-ap",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "network-config-wifi-ap"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "WiFi ST (GET)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/network-config-wifi-st",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "network-config-wifi-st"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "WiFi ST (POST)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"ssid\": \"MinhaRede\",\n  \"pass\": \"senha123\"\n}"
-            },
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/network-config-wifi-st",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "network-config-wifi-st"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "WiFi Scan",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/network-wifi-scan",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "network-wifi-scan"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "WiFi Clients",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/network-wifi-clients",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "network-wifi-clients"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Network Interfaces",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/network-interfaces",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "network-interfaces"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "WiFi Signal",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/network-wifi-signal",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "network-wifi-signal"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Central Registry",
+      "name": "📋 Central Registry",
+      "description": "Gestão de cadastros centrais",
       "item": [
         {
           "name": "Listar Cadastros",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/central-registry?offset=0&count=20",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "central-registry"
-              ],
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/central-registry?offset=0&count=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "central-registry"],
               "query": [
                 {
                   "key": "offset",
@@ -629,922 +270,1142 @@
                   "value": "20"
                 }
               ]
-            }
-          },
-          "response": []
+            },
+            "description": "Lista cadastros com paginação."
+          }
         },
         {
-          "name": "Buscar Cadastro por ID",
+          "name": "Buscar por ID",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/central-registry?id=1",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "central-registry"
-              ],
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/central-registry?id={{cadastroId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "central-registry"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{cadastroId}}"
                 }
               ]
-            }
-          },
-          "response": []
+            },
+            "description": "Busca cadastro específico por ID."
+          }
         },
         {
-          "name": "Buscar Cadastro por Nome",
+          "name": "Buscar por Nome",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/central-registry?name=Principal",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "central-registry"
-              ],
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/central-registry?name=filtro",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "central-registry"],
               "query": [
                 {
                   "key": "name",
-                  "value": "Principal"
+                  "value": "filtro"
                 }
               ]
-            }
-          },
-          "response": []
+            },
+            "description": "Filtra cadastros por nome."
+          }
         },
         {
-          "name": "Criar ou Atualizar Cadastro",
+          "name": "Criar Cadastro",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 0,\n  \"name\": \"Cadastro Principal\",\n  \"enabled\": 1,\n  \"slots1\": 0,\n  \"slots2\": 0,\n  \"type\": 0\n}"
+              "raw": "{\n  \"id\": 0,\n  \"name\": \"Novo Cadastro\",\n  \"enabled\": 1,\n  \"slots1\": 0,\n  \"slots2\": 0,\n  \"type\": 0\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/central-registry",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "central-registry"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/central-registry",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "central-registry"]
+            },
+            "description": "Cria um novo cadastro."
+          }
+        },
+        {
+          "name": "Atualizar Cadastro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{cadastroId}},\n  \"name\": \"Cadastro Atualizado\",\n  \"enabled\": 1,\n  \"slots1\": 10,\n  \"slots2\": 5,\n  \"type\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/central-registry",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "central-registry"]
+            },
+            "description": "Atualiza um cadastro existente."
+          }
         },
         {
           "name": "Remover Cadastro",
           "request": {
             "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/central-registry?id=1",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "central-registry"
-              ],
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/central-registry?id={{cadastroId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "central-registry"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{cadastroId}}"
                 }
               ]
-            }
-          },
-          "response": []
+            },
+            "description": "Remove um cadastro."
+          }
         },
         {
-          "name": "Central Registry Stats",
+          "name": "Estatísticas",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/central-registry/stats",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "central-registry",
-                "stats"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/central-registry/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "central-registry", "stats"]
+            },
+            "description": "Retorna estatísticas do registro central."
+          }
         }
       ]
     },
     {
-      "name": "Entidades",
+      "name": "👥 Entidades",
+      "description": "Gestão de entidades (pessoas/veículos)",
       "item": [
         {
-          "name": "Buscar Entidade por ID",
+          "name": "Listar Entidades",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/entities?id=1",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "entities"
-              ],
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/entities?offset=0&count=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "entities"],
+              "query": [
+                {
+                  "key": "offset",
+                  "value": "0"
+                },
+                {
+                  "key": "count",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Lista entidades com paginação."
+          }
+        },
+        {
+          "name": "Buscar por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/entities?id={{entityId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "entities"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{entityId}}"
                 }
               ]
-            }
-          },
-          "response": []
+            },
+            "description": "Busca entidade específica por ID."
+          }
         },
         {
-          "name": "Listar Entidades por Cadastro",
+          "name": "Listar por Cadastro",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/entities?cadastro_id=1",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "entities"
-              ],
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/entities?cadastro_id={{cadastroId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "entities"],
               "query": [
                 {
                   "key": "cadastro_id",
-                  "value": "1"
+                  "value": "{{cadastroId}}"
                 }
               ]
-            }
-          },
-          "response": []
+            },
+            "description": "Lista entidades de um cadastro específico."
+          }
         },
         {
-          "name": "Criar Entidade",
+          "name": "Criar Pessoa",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"cadastro_id\": 1,\n  \"tipo\": 2,\n  \"habilitado\": 1,\n  \"name\": \"Veiculo Teste\",\n  \"doc\": \"ABC1234\",\n  \"lpr_ativo\": 1\n}"
+              "raw": "{\n  \"cadastro_id\": {{cadastroId}},\n  \"tipo\": 1,\n  \"habilitado\": 1,\n  \"name\": \"João Silva\",\n  \"doc\": \"12345678900\"\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/entities",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "entities"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/entities",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "entities"]
+            },
+            "description": "Cria uma nova entidade do tipo pessoa."
+          }
+        },
+        {
+          "name": "Criar Veículo com LPR",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cadastro_id\": {{cadastroId}},\n  \"tipo\": 2,\n  \"habilitado\": 1,\n  \"name\": \"Civic Preto\",\n  \"doc\": \"ABC1D23\",\n  \"lpr_ativo\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/entities",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "entities"]
+            },
+            "description": "Cria uma entidade do tipo veículo com LPR ativo (cria mídia automaticamente)."
+          }
+        },
+        {
+          "name": "Criar com Auto-ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 0,\n  \"cadastro_id\": 0,\n  \"createid\": true,\n  \"tipo\": 1,\n  \"habilitado\": 1,\n  \"name\": \"Nova Entidade Auto-ID\",\n  \"doc\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/entities",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "entities"]
+            },
+            "description": "Cria entidade com geração automática de IDs."
+          }
+        },
+        {
+          "name": "Atualizar Entidade",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entity_id\": {{entityId}},\n  \"name\": \"Nome Atualizado\",\n  \"habilitado\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/entities",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "entities"]
+            },
+            "description": "Atualiza uma entidade existente."
+          }
         },
         {
           "name": "Remover Entidade",
           "request": {
             "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/entities?id=1",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "entities"
-              ],
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/entities?id={{entityId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "entities"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{entityId}}"
                 }
               ]
-            }
-          },
-          "response": []
+            },
+            "description": "Remove uma entidade e suas mídias vinculadas."
+          }
         }
       ]
     },
     {
-      "name": "Midias",
+      "name": "🎫 Mídias",
+      "description": "Gestão de mídias (RFID, LPR, biometria, etc)",
       "item": [
         {
-          "name": "Buscar Midia por ID",
+          "name": "Listar Mídias",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/media?id=1",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "media"
-              ],
-              "query": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Listar Midias por Entidade",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/media?entity_id=1",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "media"
-              ],
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/media?entity_id={{entityId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "media"],
               "query": [
                 {
                   "key": "entity_id",
-                  "value": "1"
+                  "value": "{{entityId}}"
                 }
               ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Criar Midia",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"entity_id\": 1,\n  \"cadastro_id\": 1,\n  \"tipo\": 10,\n  \"descricao\": \"ABC1234\"\n}"
             },
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/media",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "media"
-              ]
-            }
-          },
-          "response": []
+            "description": "Lista mídias de uma entidade."
+          }
         },
         {
-          "name": "Remover Midia",
+          "name": "Buscar por ID",
           "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
+            "method": "GET",
+            "header": [],
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/media?id=1",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "media"
-              ],
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/media?id={{mediaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "media"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{mediaId}}"
                 }
               ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Comandos",
-      "item": [
+            },
+            "description": "Busca mídia específica por ID."
+          }
+        },
         {
-          "name": "Enviar Comando",
+          "name": "Criar RFID Wiegand 26",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"cmd\": \"status\"\n}"
+              "raw": "{\n  \"entity_id\": {{entityId}},\n  \"cadastro_id\": {{cadastroId}},\n  \"tipo\": 21,\n  \"descricao\": \"123,45678\"\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/command",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "command"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Arquivos",
-      "item": [
-        {
-          "name": "Listar Arquivos",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/files",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "files"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/media",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "media"]
+            },
+            "description": "Cria mídia RFID Wiegand 26 bits. Formato: \"facility_code,card_number\""
+          }
         },
         {
-          "name": "Enviar Arquivo",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/files",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "files"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Webhook",
-      "item": [
-        {
-          "name": "Obter Webhook",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/webhook",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "webhook"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Atualizar Webhook",
+          "name": "Criar LPR (Placa)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"url\": \"https://webhook.exemplo\"\n}"
+              "raw": "{\n  \"entity_id\": {{entityId}},\n  \"cadastro_id\": {{cadastroId}},\n  \"tipo\": 17,\n  \"descricao\": \"ABC1D23\",\n  \"ns32_0\": 0,\n  \"ns32_1\": 0\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/webhook",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "webhook"
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/media",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "media"]
+            },
+            "description": "Cria mídia LPR (placa de veículo). ns32_0 e ns32_1 devem ser 0."
+          }
+        },
+        {
+          "name": "Atualizar Mídia",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"media_id\": {{mediaId}},\n  \"descricao\": \"124,45679\",\n  \"habilitado\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/media",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "media"]
+            },
+            "description": "Atualiza uma mídia existente."
+          }
+        },
+        {
+          "name": "Remover Mídia",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/media?id={{mediaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "media"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "{{mediaId}}"
+                }
               ]
-            }
-          },
-          "response": []
+            },
+            "description": "Remove uma mídia."
+          }
         }
       ]
     },
     {
-      "name": "Video Source",
+      "name": "⚙️ Configuração",
+      "description": "Configurações do dispositivo",
       "item": [
         {
-          "name": "Obter Video Source",
+          "name": "Obter Configuração",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/video-source",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "video-source"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/config",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "config"]
+            },
+            "description": "Retorna a configuração completa do dispositivo."
+          }
         },
         {
-          "name": "Atualizar Video Source",
+          "name": "Atualizar Configuração",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"sources\": []\n}"
+              "raw": "{\n  \"master\": {\n    \"frase\": \"NOVA_FRASE\"\n  }\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/video-source",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "video-source"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/config",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "config"]
+            },
+            "description": "Atualiza a configuração do dispositivo."
+          }
         }
       ]
     },
     {
-      "name": "Device Info",
+      "name": "🌐 Rede",
+      "description": "Configurações de rede",
       "item": [
         {
-          "name": "Obter Device Info",
+          "name": "Config Ethernet (GET)",
           "request": {
             "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/network-config-cable",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "network-config-cable"]
+            },
+            "description": "Retorna configuração da interface Ethernet."
+          }
+        },
+        {
+          "name": "Config Ethernet (DHCP)",
+          "request": {
+            "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ip\": \"dhcp\"\n}"
+            },
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/device-info",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "device-info"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/network-config-cable",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "network-config-cable"]
+            },
+            "description": "Configura Ethernet para DHCP."
+          }
+        },
+        {
+          "name": "Config Ethernet (Estático)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ip\": \"192.168.1.100\",\n  \"mask\": \"255.255.255.0\",\n  \"gw\": \"192.168.1.1\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/network-config-cable",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "network-config-cable"]
+            },
+            "description": "Configura Ethernet com IP estático."
+          }
+        },
+        {
+          "name": "Config WiFi AP (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/network-config-wifi-ap",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "network-config-wifi-ap"]
+            },
+            "description": "Retorna configuração do Access Point WiFi."
+          }
+        },
+        {
+          "name": "Config WiFi AP (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enabled\": 1,\n  \"ssid\": \"MobiCortex-AP\",\n  \"password\": \"senha123\",\n  \"channel\": 6\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/network-config-wifi-ap",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "network-config-wifi-ap"]
+            },
+            "description": "Atualiza configuração do Access Point WiFi."
+          }
+        },
+        {
+          "name": "Config WiFi Station (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/network-config-wifi-st",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "network-config-wifi-st"]
+            },
+            "description": "Retorna configuração do cliente WiFi."
+          }
+        },
+        {
+          "name": "Config WiFi Station (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enabled\": 1,\n  \"ssid\": \"Rede-WiFi\",\n  \"password\": \"senha123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/network-config-wifi-st",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "network-config-wifi-st"]
+            },
+            "description": "Atualiza configuração do cliente WiFi."
+          }
+        },
+        {
+          "name": "Scan WiFi",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/network-wifi-scan",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "network-wifi-scan"]
+            },
+            "description": "Escaneia redes WiFi disponíveis."
+          }
+        },
+        {
+          "name": "Clientes WiFi",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/network-wifi-clients",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "network-wifi-clients"]
+            },
+            "description": "Lista clientes conectados ao AP."
+          }
+        },
+        {
+          "name": "Interfaces de Rede",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/network-interfaces",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "network-interfaces"]
+            },
+            "description": "Lista interfaces de rede."
+          }
+        },
+        {
+          "name": "Sinal WiFi",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/network-wifi-signal",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "network-wifi-signal"]
+            },
+            "description": "Retorna qualidade do sinal WiFi."
+          }
         }
       ]
     },
     {
-      "name": "Smart Slaves",
+      "name": "📹 Video Source",
+      "description": "Configuração de fontes de vídeo",
       "item": [
         {
-          "name": "SlaveSmart",
+          "name": "Listar Fontes",
           "request": {
             "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/video-source",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "video-source"]
+            },
+            "description": "Retorna configuração das fontes de vídeo."
+          }
+        },
+        {
+          "name": "Criar Fonte",
+          "request": {
+            "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Camera 1\",\n  \"type\": \"rtsp\",\n  \"url\": \"rtsp://192.168.1.50:554/stream1\",\n  \"enabled\": 1\n}"
+            },
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/SlaveSmart.MCUT",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "SlaveSmart.MCUT"
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/video-source",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "video-source"]
+            },
+            "description": "Cria uma nova fonte de vídeo."
+          }
+        },
+        {
+          "name": "Atualizar Fonte",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 0,\n  \"name\": \"Camera 1 Atualizada\",\n  \"enabled\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/video-source",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "video-source"]
+            },
+            "description": "Atualiza uma fonte de vídeo existente."
+          }
+        },
+        {
+          "name": "Remover Fonte",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/video-source?id=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "video-source"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "0"
+                }
               ]
-            }
-          },
-          "response": []
+            },
+            "description": "Remove uma fonte de vídeo."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔗 Webhook",
+      "description": "Configuração de webhooks",
+      "item": [
+        {
+          "name": "Obter Configuração",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "webhook"]
+            },
+            "description": "Retorna configuração do webhook."
+          }
+        },
+        {
+          "name": "Criar/Atualizar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enabled\": 1,\n  \"url\": \"https://example.com/webhook\",\n  \"events\": [\"access_granted\", \"access_denied\"],\n  \"secret\": \"webhook_secret\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "webhook"]
+            },
+            "description": "Cria ou atualiza configuração do webhook."
+          }
+        },
+        {
+          "name": "Remover",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "webhook"]
+            },
+            "description": "Remove a configuração do webhook."
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Dashboard e Info",
+      "description": "Informações do sistema e dashboard",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "dashboard"]
+            },
+            "description": "Retorna estatísticas do sistema."
+          }
+        },
+        {
+          "name": "Device Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/device-info",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "device-info"]
+            },
+            "description": "Retorna informações do hardware."
+          }
+        },
+        {
+          "name": "System Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/info",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "info"]
+            },
+            "description": "Retorna informações gerais do sistema."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚗 Vehicle Drivers",
+      "description": "Gestão de motoristas de veículos",
+      "item": [
+        {
+          "name": "Listar Motoristas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/vehicle-drivers",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "vehicle-drivers"]
+            },
+            "description": "Retorna lista de motoristas vinculados a veículos."
+          }
+        },
+        {
+          "name": "Vincular Motorista",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicle_id\": 12345,\n  \"driver_id\": 67890\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/vehicle-drivers",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "vehicle-drivers"]
+            },
+            "description": "Vincula um motorista a um veículo."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔧 Smart Slaves",
+      "description": "Comunicação com slaves smart",
+      "item": [
+        {
+          "name": "Lista de Slaves",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/SlaveSmartList.MCUT",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "SlaveSmartList.MCUT"]
+            },
+            "description": "Lista slaves smart conectados."
+          }
+        },
+        {
+          "name": "Comunicar Slave",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/SlaveSmart.MCUT",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "SlaveSmart.MCUT"]
+            },
+            "description": "Comunicação com slaves smart."
+          }
         },
         {
           "name": "M1127",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/M1127.MCUT",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "M1127.MCUT"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "SlaveSmartList",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{session_key}}"
-              }
-            ],
-            "url": {
-              "raw": "https://{{base_url}}/mbcortex/master/api/v1/SlaveSmartList.MCUT",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "mbcortex",
-                "master",
-                "api",
-                "v1",
-                "SlaveSmartList.MCUT"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/M1127.MCUT",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "M1127.MCUT"]
+            },
+            "description": "Comunicação com módulo M1127."
+          }
         }
       ]
     },
     {
-      "name": "CTID Legacy",
+      "name": "📁 Arquivos",
+      "description": "Gestão de arquivos do sistema",
       "item": [
         {
-          "name": "CTID Login",
+          "name": "Listar Arquivos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/files",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "files"]
+            },
+            "description": "Lista arquivos do sistema."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧪 Teste",
+      "description": "Endpoints de teste e diagnóstico",
+      "item": [
+        {
+          "name": "Auditoria de Integridade",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/x-www-form-urlencoded"
+                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "user",
-                  "value": "admin"
-                },
-                {
-                  "key": "pass",
-                  "value": "admin"
-                }
-              ]
+              "mode": "raw",
+              "raw": "{\n  \"check_entities\": true,\n  \"check_media\": true,\n  \"check_indexes\": true\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/login.fcgi",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "login.fcgi"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/mbcortex/master/api/v1/test/data-integrity-audit",
+              "host": ["{{baseUrl}}"],
+              "path": ["mbcortex", "master", "api", "v1", "test", "data-integrity-audit"]
+            },
+            "description": "Executa auditoria de integridade dos dados."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔄 CTID Compatibility",
+      "description": "Endpoints compatíveis com ControlID",
+      "item": [
+        {
+          "name": "Login CTID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"admin\",\n  \"password\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login.fcgi",
+              "host": ["{{baseUrl}}"],
+              "path": ["login.fcgi"]
+            },
+            "description": "Login compatível com CTID."
+          }
         },
         {
-          "name": "CTID Create Objects",
+          "name": "Create Objects",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/x-www-form-urlencoded"
+                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "urlencoded",
-              "urlencoded": []
+              "mode": "raw",
+              "raw": "{\n  \"object\": \"users\",\n  \"values\": []\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/create_objects.fcgi",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "create_objects.fcgi"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/create_objects.fcgi",
+              "host": ["{{baseUrl}}"],
+              "path": ["create_objects.fcgi"]
+            },
+            "description": "Cria objetos (compatível CTID)."
+          }
         },
         {
-          "name": "CTID Load Objects",
+          "name": "Load Objects",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/x-www-form-urlencoded"
+                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "urlencoded",
-              "urlencoded": []
+              "mode": "raw",
+              "raw": "{\n  \"object\": \"users\"\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/load_objects.fcgi",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "load_objects.fcgi"
-              ]
-            }
-          },
-          "response": []
+              "raw": "{{baseUrl}}/load_objects.fcgi",
+              "host": ["{{baseUrl}}"],
+              "path": ["load_objects.fcgi"]
+            },
+            "description": "Carrega objetos (compatível CTID)."
+          }
         },
         {
-          "name": "CTID Destroy Objects",
+          "name": "Destroy Objects",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/x-www-form-urlencoded"
+                "value": "application/json"
               }
             ],
             "body": {
-              "mode": "urlencoded",
-              "urlencoded": []
+              "mode": "raw",
+              "raw": "{\n  \"object\": \"users\",\n  \"where\": {}\n}"
             },
             "url": {
-              "raw": "https://{{base_url}}/destroy_objects.fcgi",
-              "protocol": "https",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "destroy_objects.fcgi"
-              ]
-            }
+              "raw": "{{baseUrl}}/destroy_objects.fcgi",
+              "host": ["{{baseUrl}}"],
+              "path": ["destroy_objects.fcgi"]
+            },
+            "description": "Remove objetos (compatível CTID)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "📹 Hikvision ISAPI",
+      "description": "Endpoints compatíveis com Hikvision ISAPI (Digest Auth)",
+      "auth": {
+        "type": "digest",
+        "digest": [
+          {
+            "key": "username",
+            "value": "admin",
+            "type": "string"
           },
-          "response": []
+          {
+            "key": "password",
+            "value": "{{password}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "User Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ISAPI/Security/userCheck",
+              "host": ["{{baseUrl}}"],
+              "path": ["ISAPI", "Security", "userCheck"]
+            },
+            "description": "Verifica credenciais do usuário."
+          }
+        },
+        {
+          "name": "Access Control Capabilities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ISAPI/AccessControl/Capabilities",
+              "host": ["{{baseUrl}}"],
+              "path": ["ISAPI", "AccessControl", "Capabilities"]
+            },
+            "description": "Retorna capacidades de controle de acesso."
+          }
+        },
+        {
+          "name": "Security Capabilities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ISAPI/Security/capabilities",
+              "host": ["{{baseUrl}}"],
+              "path": ["ISAPI", "Security", "capabilities"]
+            },
+            "description": "Retorna capacidades de segurança."
+          }
+        },
+        {
+          "name": "User Info Search",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ISAPI/AccessControl/UserInfo/Search",
+              "host": ["{{baseUrl}}"],
+              "path": ["ISAPI", "AccessControl", "UserInfo", "Search"]
+            },
+            "description": "Busca usuários (formato Hikvision)."
+          }
         }
       ]
     }

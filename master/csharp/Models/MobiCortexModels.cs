@@ -255,6 +255,22 @@ namespace SmartSdk.Models
         [JsonPropertyName("doc")]
         public string Doc { get; set; } = string.Empty;
 
+        /// <summary>Marca do veículo (opcional, usado quando tipo=2)</summary>
+        [JsonPropertyName("brand")]
+        public string? Brand { get; set; }
+
+        /// <summary>Modelo do veículo (opcional, usado quando tipo=2)</summary>
+        [JsonPropertyName("model")]
+        public string? Model { get; set; }
+
+        /// <summary>Cor do veículo (opcional, usado quando tipo=2)</summary>
+        [JsonPropertyName("color")]
+        public string? Color { get; set; }
+
+        /// <summary>Observações livres (opcional)</summary>
+        [JsonPropertyName("obs")]
+        public string? Obs { get; set; }
+
         /// <summary>
         /// 1 = LPR ativo. Quando ativado, o controlador cria automaticamente
         /// uma mídia do tipo LPR usando o campo "doc" como placa.
@@ -291,6 +307,14 @@ namespace SmartSdk.Models
     public class CriarEntidadeRequest
     {
         /// <summary>
+        /// ID da entidade.
+        /// - 0: controlador gera automaticamente
+        /// - &gt;0: usa o ID informado
+        /// </summary>
+        [JsonPropertyName("id")]
+        public uint Id { get; set; }
+
+        /// <summary>
         /// ID do cadastro central ao qual vincular a entidade.
         /// Obrigatório no modelo MobiCortex. Ignorado se createid=true.
         /// </summary>
@@ -311,6 +335,26 @@ namespace SmartSdk.Models
         /// <summary>Documento (CPF, placa, etc)</summary>
         [JsonPropertyName("doc")]
         public string Doc { get; set; } = string.Empty;
+
+        /// <summary>Marca do veículo (opcional)</summary>
+        [JsonPropertyName("brand")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Brand { get; set; }
+
+        /// <summary>Modelo do veículo (opcional)</summary>
+        [JsonPropertyName("model")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Model { get; set; }
+
+        /// <summary>Cor do veículo (opcional)</summary>
+        [JsonPropertyName("color")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Color { get; set; }
+
+        /// <summary>Observações livres (opcional)</summary>
+        [JsonPropertyName("obs")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Obs { get; set; }
 
         /// <summary>1 = ativar reconhecimento de placa via LPR</summary>
         [JsonPropertyName("lpr_ativo")]
@@ -368,6 +412,22 @@ namespace SmartSdk.Models
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Doc { get; set; }
 
+        [JsonPropertyName("brand")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Brand { get; set; }
+
+        [JsonPropertyName("model")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Model { get; set; }
+
+        [JsonPropertyName("color")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Color { get; set; }
+
+        [JsonPropertyName("obs")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Obs { get; set; }
+
         [JsonPropertyName("lpr_ativo")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? LprAtivo { get; set; }
@@ -403,7 +463,15 @@ namespace SmartSdk.Models
     #region Mídias de Acesso - GET/POST/PUT/DELETE /media
 
     /// <summary>
-    /// Tipos de mídia de acesso suportados pelo controlador
+    /// Tipos de mídia de acesso suportados pelo controlador.
+    /// 
+    /// IMPORTANTE SOBRE LPR (PLACA):
+    /// - Tipo 17 = LPR (reconhecimento de placa de veículo)
+    /// - Ao criar uma mídia LPR manualmente via POST /media, é necessário enviar
+    ///   os campos ns32_0 e ns32_1 para evitar que o backend tente validar a placa
+    ///   como se fosse um formato RFID (Wiegand/CODE/HEX).
+    /// - A forma RECOMENDADA de criar LPR é usando lpr_ativo=1 no cadastro da entidade
+    ///   (veículo), pois o backend converte automaticamente a placa em dados binários.
     /// </summary>
     public static class TipoMidia
     {
@@ -414,7 +482,7 @@ namespace SmartSdk.Models
         public const int Bio2 = 12;            // Biometria 2
         public const int Mc = 14;              // Controle MC
         public const int Bio3 = 15;            // Biometria 3
-        public const int Lpr = 17;             // Placa (LPR)
+        public const int Lpr = 17;             // Placa (LPR) - veja nota acima
         public const int BioHikvision = 18;    // Biometria Hikvision
         public const int BioNiceWego = 19;     // Biometria Nice Wego
         public const int Facial = 20;          // Reconhecimento facial
@@ -474,6 +542,24 @@ namespace SmartSdk.Models
 
     /// <summary>
     /// POST /media - Criar mídia de acesso
+    /// 
+    /// COMO CADASTRAR DIFERENTES TIPOS DE MÍDIA:
+    /// 
+    /// 1. RFID (Wiegand/CODE/HEX):
+    ///    - Envie apenas entity_id, cadastro_id, tipo e descricao
+    ///    - O backend detecta automaticamente o formato (Wiegand 123,45678 / CODE / HEX)
+    ///    - Exemplo: descricao = "123,45678" ou "HEX: FF FF FF"
+    /// 
+    /// 2. LPR (Placa de veículo):
+    ///    - Envie entity_id, cadastro_id, tipo=17, descricao="ABC1D23"
+    ///    - IMPORTANTE: também envie ns32_0=0 e ns32_1=0
+    ///    - Sem ns32_0/ns32_1, o backend tenta validar a placa como RFID e dá erro
+    ///    - NOTA: A forma recomendada é usar lpr_ativo=1 no cadastro da entidade (veículo)
+    ///      pois o backend converte a placa automaticamente em dados binários
+    /// 
+    /// 3. Facial, Biometria, etc:
+    ///    - Envie entity_id, cadastro_id, tipo e descricao
+    ///    - Para evitar validação RFID, envie ns32_0=0 e ns32_1=0
     /// </summary>
     public class CriarMidiaRequest
     {
@@ -483,17 +569,42 @@ namespace SmartSdk.Models
         [JsonPropertyName("cadastro_id")]
         public uint CadastroId { get; set; }
 
-        /// <summary>Tipo da mídia (ver TipoMidia.*)</summary>
+        /// <summary>Tipo da mídia (ver constantes TipoMidia.*)</summary>
         [JsonPropertyName("tipo")]
         public int Tipo { get; set; } = TipoMidia.Wiegand26;
 
         /// <summary>
         /// Descrição/valor da mídia.
-        /// Para LPR: a placa (ex: "ABC1234")
-        /// Para RFID: o código do cartão
+        /// - RFID: código do cartão (ex: "123,45678" ou "HEX: FF FF FF")
+        /// - LPR: placa do veículo (ex: "ABC1D23")
+        /// - Facial/Outros: identificador descritivo
         /// </summary>
         [JsonPropertyName("descricao")]
         public string Descricao { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Valor numérico NS32_0 - usado internamente pelo backend para armazenar
+        /// dados binários da mídia (RFID, placa convertida, etc).
+        /// 
+        /// QUANDO USAR:
+        /// - RFID: não enviar (o backend calcula a partir da descricao)
+        /// - LPR/Facial/Outros: enviar 0 para evitar validação RFID
+        /// </summary>
+        [JsonPropertyName("ns32_0")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public uint? Ns32_0 { get; set; }
+
+        /// <summary>
+        /// Valor numérico NS32_1 - usado internamente pelo backend para armazenar
+        /// dados binários da mídia (parte alta de IDs longos).
+        /// 
+        /// QUANDO USAR:
+        /// - RFID: não enviar (o backend calcula a partir da descricao)
+        /// - LPR/Facial/Outros: enviar 0 para evitar validação RFID
+        /// </summary>
+        [JsonPropertyName("ns32_1")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public uint? Ns32_1 { get; set; }
     }
 
     /// <summary>

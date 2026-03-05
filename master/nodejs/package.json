@@ -1,0 +1,25 @@
+{
+  "name": "mobicortex-master-nodejs-sdk",
+  "version": "1.0.0",
+  "description": "SDK e exemplos para integração com API MobiCortex Master usando Node.js",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "cli": "node examples/cli.js",
+    "basic": "node examples/basic_usage.js",
+    "start": "node examples/cli.js",
+    "legacy": "node main.js"
+  },
+  "keywords": ["mobicortex", "master", "api", "sdk", "nodejs", "integration"],
+  "author": "MobiCortex",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./client": "./src/mbcortexClient.js",
+    "./models": "./src/models.js",
+    "./exceptions": "./src/exceptions.js"
+  }
+}

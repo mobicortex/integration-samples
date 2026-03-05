@@ -116,6 +116,16 @@
     <EmbeddedResource Update="Forms\FormCadastroEntidade.resx">
       <DependentUpon>FormCadastroEntidade.cs</DependentUpon>
     </EmbeddedResource>
+
+    <!-- FormSelecionarTipoEntidade -->
+    <Compile Update="Forms\FormSelecionarTipoEntidade.cs">
+      <SubType>Form</SubType>
+    </Compile>
+
+    <!-- FormCadastroVeiculo -->
+    <Compile Update="Forms\FormCadastroVeiculo.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 
 </Project>

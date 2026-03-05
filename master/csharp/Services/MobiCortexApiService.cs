@@ -442,7 +442,38 @@ namespace SmartSdk.Services
         /// </summary>
         public async Task<ApiResult<CriarEntidadeResponse>> CriarEntidadeAsync(CriarEntidadeRequest request)
         {
-            return await PostAsync<CriarEntidadeResponse>("/entities", request);
+            // Monta payload explicitamente para garantir envio do campo "id"
+            // (backend exige "id" quando createid!=true, inclusive quando id=0 para auto-geracao).
+            var payload = new Dictionary<string, object?>
+            {
+                ["id"] = request.Id,
+                ["tipo"] = request.Tipo,
+                ["habilitado"] = request.Habilitado,
+                ["name"] = request.Name,
+                ["doc"] = request.Doc,
+                ["lpr_ativo"] = request.LprAtivo
+            };
+
+            if (request.CadastroId.HasValue)
+                payload["cadastro_id"] = request.CadastroId.Value;
+
+            if (!string.IsNullOrWhiteSpace(request.Brand))
+                payload["brand"] = request.Brand;
+            if (!string.IsNullOrWhiteSpace(request.Model))
+                payload["model"] = request.Model;
+            if (!string.IsNullOrWhiteSpace(request.Color))
+                payload["color"] = request.Color;
+            if (!string.IsNullOrWhiteSpace(request.Obs))
+                payload["obs"] = request.Obs;
+
+            // Regra do backend: quando id=0, createid=true deve ser enviado obrigatoriamente.
+            var createIdEfetivo = request.Id == 0 ? true : request.CreateId;
+            if (createIdEfetivo.HasValue)
+                payload["createid"] = createIdEfetivo.Value;
+            if (request.Overwrite.HasValue)
+                payload["overwrite"] = request.Overwrite.Value;
+
+            return await PostAsync<CriarEntidadeResponse>("/entities", payload);
         }
 
         /// <summary>Atualiza uma entidade parcialmente (só os campos informados)</summary>

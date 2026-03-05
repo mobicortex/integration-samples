@@ -5,12 +5,25 @@ namespace SmartSdk.Forms
     /// <summary>
     /// Formulário de cadastro/edição de mídias de acesso.
     /// 
-    /// FORMATOS ACEITOS PELO BACKEND (ws_media6.cpp):
-    /// - WIEGAND: "123,45678" (facility,code) - máx: 65535,65535
-    /// - CODE SMART: "12345,123,12345" (5,3,5 dígitos)
-    /// - HEX: "HEX: FF FF FF" ou "FFFFFF" (3 bytes)
+    /// TIPOS DE MÍDIA E COMO USAR:
     /// 
-    /// O backend detecta automaticamente o formato e converte para ns32.
+    /// 1. RFID (Wiegand 26/34 bits):
+    ///    - Formatos aceitos: "123,45678" (facility,code) ou "HEX: FF FF FF"
+    ///    - O backend detecta automaticamente e converte para dados binários
+    ///    - Não requer campos adicionais além de tipo e descricao
+    /// 
+    /// 2. PLACA LPR (tipo 17):
+    ///    - Formato: placa do veículo (ex: "ABC1D23" - modelo Mercosul)
+    ///    - IMPORTANTE: Ao criar via API, enviar ns32_0=0 e ns32_1=0 para evitar
+    ///      que o backend tente validar a placa como formato RFID
+    ///    - A forma recomendada é usar lpr_ativo=1 no cadastro do veículo
+    /// 
+    /// 3. FACIAL (tipo 20), BIOMETRIA (tipo 5/15/18), etc:
+    ///    - Geralmente requerem integração com hardware específico
+    ///    - Envie o identificador no campo descricao
+    ///    - Para evitar validação RFID, envie ns32_0=0 e ns32_1=0
+    /// 
+    /// Referência backend: ws_media6.cpp (validação em media_try_apply_rfid_from_text)
     /// </summary>
     public partial class FormCadastroMidia : Form
     {
@@ -26,6 +39,7 @@ namespace SmartSdk.Forms
         // Dados para edição (opcional)
         private readonly MidiaAcesso? _midiaExistente;
         private readonly uint? _entityIdPadrao;
+        private readonly string? _placaPadraoLpr;
         
         /// <summary>
         /// Construtor para criar nova mídia
@@ -49,10 +63,11 @@ namespace SmartSdk.Forms
         /// <summary>
         /// Construtor com entity_id padrão pré-selecionado
         /// </summary>
-        public FormCadastroMidia(uint entityIdPadrao)
+        public FormCadastroMidia(uint entityIdPadrao, string? placaPadraoLpr = null)
         {
             InitializeComponent();
             _entityIdPadrao = entityIdPadrao;
+            _placaPadraoLpr = placaPadraoLpr;
             ModoEdicao = false;
         }
         
@@ -206,9 +221,21 @@ namespace SmartSdk.Forms
             {
                 lblFormatoAtual.Text = tipo.DescricaoFormato;
                 toolTip.SetToolTip(txtDadosMidia, tipo.DescricaoFormato);
-                
-                // Sugere um valor de exemplo no placeholder
-                txtDadosMidia.PlaceholderText = $"Ex: {tipo.Exemplo}";
+
+                // Em LPR, se ja temos a placa da entidade, reaproveita sem pedir de novo.
+                if (tipo.Valor == TipoMidia.Lpr && !string.IsNullOrWhiteSpace(_placaPadraoLpr))
+                {
+                    txtDadosMidia.Text = _placaPadraoLpr.Trim().ToUpper().Replace("-", "");
+                    txtDadosMidia.ReadOnly = true;
+                    txtDadosMidia.PlaceholderText = string.Empty;
+                    lblExemploFormato.Text = "Placa preenchida automaticamente a partir do veiculo.";
+                }
+                else
+                {
+                    txtDadosMidia.ReadOnly = false;
+                    txtDadosMidia.PlaceholderText = $"Ex: {tipo.Exemplo}";
+                    lblExemploFormato.Text = "Exemplo de formato:";
+                }
             }
         }
         

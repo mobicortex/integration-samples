@@ -16,231 +16,258 @@ namespace SmartSdk.Forms
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            
-            // Componentes principais
             lblTitulo = new Label();
             panelForm = new Panel();
-            
-            // Grupo Tipo de Mídia
+            grpDadosMidia = new GroupBox();
+            lblFormatoAtual = new Label();
+            lblExemploFormato = new Label();
+            txtDadosMidia = new TextBox();
+            lblDadosMidia = new Label();
+            grpIdMidia = new GroupBox();
+            lblIdInfo = new Label();
+            numIdMidia = new NumericUpDown();
+            lblIdMidia = new Label();
             grpTipoMidia = new GroupBox();
             cmbTipoMidia = new ComboBox();
             lblTipoMidia = new Label();
-            
-            // Grupo ID da Mídia
-            grpIdMidia = new GroupBox();
-            numIdMidia = new NumericUpDown();
-            lblIdMidia = new Label();
-            lblIdInfo = new Label();
-            
-            // Grupo Dados da Mídia
-            grpDadosMidia = new GroupBox();
-            txtDadosMidia = new TextBox();
-            lblDadosMidia = new Label();
-            lblExemploFormato = new Label();
-            lblFormatoAtual = new Label();
-            
-            // Painel de botões
             panelBotoes = new Panel();
             btnSalvar = new Button();
             btnCancelar = new Button();
-            
-            // ToolTip
             toolTip = new ToolTip(components);
-            
-            // SuspendLayout dos containers
-            SuspendLayout();
             panelForm.SuspendLayout();
-            grpTipoMidia.SuspendLayout();
+            grpDadosMidia.SuspendLayout();
             grpIdMidia.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numIdMidia).BeginInit();
-            grpDadosMidia.SuspendLayout();
+            grpTipoMidia.SuspendLayout();
             panelBotoes.SuspendLayout();
-            
-            // ====== lblTitulo ======
+            SuspendLayout();
+            // 
+            // lblTitulo
+            // 
+            lblTitulo.BackColor = Color.White;
             lblTitulo.Dock = DockStyle.Top;
             lblTitulo.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblTitulo.ForeColor = Color.FromArgb(0, 120, 60);
-            lblTitulo.BackColor = Color.White;
+            lblTitulo.Location = new Point(0, 0);
+            lblTitulo.Name = "lblTitulo";
+            lblTitulo.Padding = new Padding(15, 10, 10, 10);
+            lblTitulo.Size = new Size(450, 50);
+            lblTitulo.TabIndex = 2;
             lblTitulo.Text = "Cadastro de Mídia";
             lblTitulo.TextAlign = ContentAlignment.MiddleLeft;
-            lblTitulo.Padding = new Padding(15, 10, 10, 10);
-            lblTitulo.Height = 50;
-            lblTitulo.Name = "lblTitulo";
-            
-            // ====== panelForm ======
-            panelForm.Dock = DockStyle.Fill;
-            panelForm.BackColor = Color.White;
-            panelForm.Padding = new Padding(15);
+            // 
+            // panelForm
+            // 
             panelForm.AutoScroll = true;
+            panelForm.BackColor = Color.White;
+            panelForm.Controls.Add(grpDadosMidia);
+            panelForm.Controls.Add(grpIdMidia);
+            panelForm.Controls.Add(grpTipoMidia);
+            panelForm.Dock = DockStyle.Fill;
+            panelForm.Location = new Point(0, 50);
             panelForm.Name = "panelForm";
-            
-            // ====================================================================
-            // GRUPO: Tipo de Mídia
-            // ====================================================================
-            grpTipoMidia.Text = "Tipo de Mídia";
-            grpTipoMidia.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            grpTipoMidia.ForeColor = Color.FromArgb(0, 120, 60);
-            grpTipoMidia.Dock = DockStyle.Top;
-            grpTipoMidia.Height = 90;
-            grpTipoMidia.Margin = new Padding(0, 0, 0, 10);
-            grpTipoMidia.Name = "grpTipoMidia";
-            
-            lblTipoMidia.Text = "Selecione o tipo:";
-            lblTipoMidia.Font = new Font("Segoe UI", 9F);
-            lblTipoMidia.ForeColor = Color.Black;
-            lblTipoMidia.Location = new Point(15, 25);
-            lblTipoMidia.AutoSize = true;
-            lblTipoMidia.Name = "lblTipoMidia";
-            
-            cmbTipoMidia.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbTipoMidia.Font = new Font("Segoe UI", 10F);
-            cmbTipoMidia.Location = new Point(15, 45);
-            cmbTipoMidia.Size = new Size(380, 25);
-            cmbTipoMidia.Name = "cmbTipoMidia";
-            cmbTipoMidia.SelectedIndexChanged += cmbTipoMidia_SelectedIndexChanged;
-            
-            grpTipoMidia.Controls.Add(cmbTipoMidia);
-            grpTipoMidia.Controls.Add(lblTipoMidia);
-            
-            // ====================================================================
-            // GRUPO: ID da Mídia
-            // ====================================================================
-            grpIdMidia.Text = "ID da Mídia";
-            grpIdMidia.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            grpIdMidia.ForeColor = Color.FromArgb(0, 120, 60);
-            grpIdMidia.Dock = DockStyle.Top;
-            grpIdMidia.Height = 110;
-            grpIdMidia.Margin = new Padding(0, 0, 0, 10);
-            grpIdMidia.Name = "grpIdMidia";
-            
-            lblIdMidia.Text = "Informe o ID (0 = servidor gera automaticamente):";
-            lblIdMidia.Font = new Font("Segoe UI", 9F);
-            lblIdMidia.ForeColor = Color.Black;
-            lblIdMidia.Location = new Point(15, 25);
-            lblIdMidia.AutoSize = true;
-            lblIdMidia.Name = "lblIdMidia";
-            
-            numIdMidia.Font = new Font("Segoe UI", 10F);
-            numIdMidia.Location = new Point(15, 45);
-            numIdMidia.Size = new Size(180, 25);
-            numIdMidia.Minimum = 0;
-            numIdMidia.Maximum = 999999999;
-            numIdMidia.Name = "numIdMidia";
-            toolTip.SetToolTip(numIdMidia, "Digite 0 para que o servidor gere o ID automaticamente");
-            
-            lblIdInfo.Text = "💡 Dica: Informe 0 (zero) para que o servidor gere o ID automaticamente";
-            lblIdInfo.Font = new Font("Segoe UI", 8F, FontStyle.Italic);
-            lblIdInfo.ForeColor = Color.Gray;
-            lblIdInfo.Location = new Point(15, 75);
-            lblIdInfo.AutoSize = true;
-            lblIdInfo.Name = "lblIdInfo";
-            
-            grpIdMidia.Controls.Add(lblIdInfo);
-            grpIdMidia.Controls.Add(numIdMidia);
-            grpIdMidia.Controls.Add(lblIdMidia);
-            
-            // ====================================================================
-            // GRUPO: Dados da Mídia
-            // ====================================================================
-            grpDadosMidia.Text = "Dados da Mídia";
-            grpDadosMidia.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            grpDadosMidia.ForeColor = Color.FromArgb(0, 120, 60);
-            grpDadosMidia.Dock = DockStyle.Top;
-            grpDadosMidia.Height = 140;
-            grpDadosMidia.Margin = new Padding(0, 0, 0, 10);
-            grpDadosMidia.Name = "grpDadosMidia";
-            
-            lblDadosMidia.Text = "Informe os dados da mídia:";
-            lblDadosMidia.Font = new Font("Segoe UI", 9F);
-            lblDadosMidia.ForeColor = Color.Black;
-            lblDadosMidia.Location = new Point(15, 25);
-            lblDadosMidia.AutoSize = true;
-            lblDadosMidia.Name = "lblDadosMidia";
-            
-            txtDadosMidia.Font = new Font("Segoe UI", 11F);
-            txtDadosMidia.Location = new Point(15, 45);
-            txtDadosMidia.Size = new Size(380, 27);
-            txtDadosMidia.CharacterCasing = CharacterCasing.Upper;
-            txtDadosMidia.Name = "txtDadosMidia";
-            
-            lblExemploFormato.Text = "Formato esperado:";
-            lblExemploFormato.Font = new Font("Segoe UI", 8F, FontStyle.Bold);
-            lblExemploFormato.ForeColor = Color.DimGray;
-            lblExemploFormato.Location = new Point(15, 80);
-            lblExemploFormato.AutoSize = true;
-            lblExemploFormato.Name = "lblExemploFormato";
-            
-            lblFormatoAtual.Text = "Selecione um tipo de mídia";
-            lblFormatoAtual.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
-            lblFormatoAtual.ForeColor = Color.FromArgb(0, 120, 60);
-            lblFormatoAtual.Location = new Point(15, 98);
-            lblFormatoAtual.Size = new Size(380, 20);
-            lblFormatoAtual.Name = "lblFormatoAtual";
-            
+            panelForm.Padding = new Padding(15);
+            panelForm.Size = new Size(450, 437);
+            panelForm.TabIndex = 0;
+            // 
+            // grpDadosMidia
+            // 
             grpDadosMidia.Controls.Add(lblFormatoAtual);
             grpDadosMidia.Controls.Add(lblExemploFormato);
             grpDadosMidia.Controls.Add(txtDadosMidia);
             grpDadosMidia.Controls.Add(lblDadosMidia);
-            
-            // Adiciona grupos ao panelForm (ordem inversa para dock)
-            panelForm.Controls.Add(grpDadosMidia);
-            panelForm.Controls.Add(grpIdMidia);
-            panelForm.Controls.Add(grpTipoMidia);
-            
-            // ====================================================================
-            // PAINEL DE BOTÕES
-            // ====================================================================
-            panelBotoes.Dock = DockStyle.Bottom;
-            panelBotoes.Height = 60;
+            grpDadosMidia.Dock = DockStyle.Top;
+            grpDadosMidia.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            grpDadosMidia.ForeColor = Color.FromArgb(0, 120, 60);
+            grpDadosMidia.Location = new Point(15, 215);
+            grpDadosMidia.Margin = new Padding(0, 0, 0, 10);
+            grpDadosMidia.Name = "grpDadosMidia";
+            grpDadosMidia.Size = new Size(420, 209);
+            grpDadosMidia.TabIndex = 0;
+            grpDadosMidia.TabStop = false;
+            grpDadosMidia.Text = "Dados da Mídia";
+            // 
+            // lblFormatoAtual
+            // 
+            lblFormatoAtual.Font = new Font("Segoe UI", 9F, FontStyle.Italic);
+            lblFormatoAtual.ForeColor = Color.FromArgb(0, 120, 60);
+            lblFormatoAtual.Location = new Point(15, 98);
+            lblFormatoAtual.Name = "lblFormatoAtual";
+            lblFormatoAtual.Size = new Size(380, 20);
+            lblFormatoAtual.TabIndex = 0;
+            lblFormatoAtual.Text = "Selecione um tipo de mídia";
+            // 
+            // lblExemploFormato
+            // 
+            lblExemploFormato.AutoSize = true;
+            lblExemploFormato.Font = new Font("Segoe UI", 8F, FontStyle.Bold);
+            lblExemploFormato.ForeColor = Color.DimGray;
+            lblExemploFormato.Location = new Point(15, 80);
+            lblExemploFormato.Name = "lblExemploFormato";
+            lblExemploFormato.Size = new Size(105, 13);
+            lblExemploFormato.TabIndex = 1;
+            lblExemploFormato.Text = "Formato esperado:";
+            // 
+            // txtDadosMidia
+            // 
+            txtDadosMidia.CharacterCasing = CharacterCasing.Upper;
+            txtDadosMidia.Font = new Font("Segoe UI", 11F);
+            txtDadosMidia.Location = new Point(15, 45);
+            txtDadosMidia.Name = "txtDadosMidia";
+            txtDadosMidia.Size = new Size(380, 27);
+            txtDadosMidia.TabIndex = 2;
+            // 
+            // lblDadosMidia
+            // 
+            lblDadosMidia.AutoSize = true;
+            lblDadosMidia.Font = new Font("Segoe UI", 9F);
+            lblDadosMidia.ForeColor = Color.Black;
+            lblDadosMidia.Location = new Point(15, 25);
+            lblDadosMidia.Name = "lblDadosMidia";
+            lblDadosMidia.Size = new Size(151, 15);
+            lblDadosMidia.TabIndex = 3;
+            lblDadosMidia.Text = "Informe os dados da mídia:";
+            // 
+            // grpIdMidia
+            // 
+            grpIdMidia.Controls.Add(lblIdInfo);
+            grpIdMidia.Controls.Add(numIdMidia);
+            grpIdMidia.Controls.Add(lblIdMidia);
+            grpIdMidia.Dock = DockStyle.Top;
+            grpIdMidia.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            grpIdMidia.ForeColor = Color.FromArgb(0, 120, 60);
+            grpIdMidia.Location = new Point(15, 105);
+            grpIdMidia.Margin = new Padding(0, 0, 0, 10);
+            grpIdMidia.Name = "grpIdMidia";
+            grpIdMidia.Size = new Size(420, 110);
+            grpIdMidia.TabIndex = 1;
+            grpIdMidia.TabStop = false;
+            grpIdMidia.Text = "ID da Mídia";
+            // 
+            // lblIdInfo
+            // 
+            lblIdInfo.AutoSize = true;
+            lblIdInfo.Font = new Font("Segoe UI", 8F, FontStyle.Italic);
+            lblIdInfo.ForeColor = Color.Gray;
+            lblIdInfo.Location = new Point(15, 75);
+            lblIdInfo.Name = "lblIdInfo";
+            lblIdInfo.Size = new Size(347, 13);
+            lblIdInfo.TabIndex = 0;
+            lblIdInfo.Text = "💡 Dica: Informe 0 (zero) para que o servidor gere o ID automaticamente";
+            // 
+            // numIdMidia
+            // 
+            numIdMidia.Font = new Font("Segoe UI", 10F);
+            numIdMidia.Location = new Point(15, 45);
+            numIdMidia.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
+            numIdMidia.Name = "numIdMidia";
+            numIdMidia.Size = new Size(180, 25);
+            numIdMidia.TabIndex = 1;
+            toolTip.SetToolTip(numIdMidia, "Digite 0 para que o servidor gere o ID automaticamente");
+            // 
+            // lblIdMidia
+            // 
+            lblIdMidia.AutoSize = true;
+            lblIdMidia.Font = new Font("Segoe UI", 9F);
+            lblIdMidia.ForeColor = Color.Black;
+            lblIdMidia.Location = new Point(15, 25);
+            lblIdMidia.Name = "lblIdMidia";
+            lblIdMidia.Size = new Size(272, 15);
+            lblIdMidia.TabIndex = 2;
+            lblIdMidia.Text = "Informe o ID (0 = servidor gera automaticamente):";
+            // 
+            // grpTipoMidia
+            // 
+            grpTipoMidia.Controls.Add(cmbTipoMidia);
+            grpTipoMidia.Controls.Add(lblTipoMidia);
+            grpTipoMidia.Dock = DockStyle.Top;
+            grpTipoMidia.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            grpTipoMidia.ForeColor = Color.FromArgb(0, 120, 60);
+            grpTipoMidia.Location = new Point(15, 15);
+            grpTipoMidia.Margin = new Padding(0, 0, 0, 10);
+            grpTipoMidia.Name = "grpTipoMidia";
+            grpTipoMidia.Size = new Size(420, 90);
+            grpTipoMidia.TabIndex = 2;
+            grpTipoMidia.TabStop = false;
+            grpTipoMidia.Text = "Tipo de Mídia";
+            // 
+            // cmbTipoMidia
+            // 
+            cmbTipoMidia.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbTipoMidia.Font = new Font("Segoe UI", 10F);
+            cmbTipoMidia.Location = new Point(15, 45);
+            cmbTipoMidia.Name = "cmbTipoMidia";
+            cmbTipoMidia.Size = new Size(380, 25);
+            cmbTipoMidia.TabIndex = 0;
+            cmbTipoMidia.SelectedIndexChanged += cmbTipoMidia_SelectedIndexChanged;
+            // 
+            // lblTipoMidia
+            // 
+            lblTipoMidia.AutoSize = true;
+            lblTipoMidia.Font = new Font("Segoe UI", 9F);
+            lblTipoMidia.ForeColor = Color.Black;
+            lblTipoMidia.Location = new Point(15, 25);
+            lblTipoMidia.Name = "lblTipoMidia";
+            lblTipoMidia.Size = new Size(94, 15);
+            lblTipoMidia.TabIndex = 1;
+            lblTipoMidia.Text = "Selecione o tipo:";
+            // 
+            // panelBotoes
+            // 
             panelBotoes.BackColor = Color.FromArgb(240, 240, 240);
-            panelBotoes.Padding = new Padding(10);
-            panelBotoes.Name = "panelBotoes";
-            
-            btnCancelar.Text = "Cancelar";
-            btnCancelar.Font = new Font("Segoe UI", 9F);
-            btnCancelar.Size = new Size(100, 35);
-            btnCancelar.Location = new Point(310, 12);
-            btnCancelar.FlatStyle = FlatStyle.Flat;
-            btnCancelar.DialogResult = DialogResult.Cancel;
-            btnCancelar.Name = "btnCancelar";
-            
-            btnSalvar.Text = "Salvar";
-            btnSalvar.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            btnSalvar.Size = new Size(100, 35);
-            btnSalvar.Location = new Point(200, 12);
-            btnSalvar.BackColor = Color.FromArgb(0, 120, 60);
-            btnSalvar.ForeColor = Color.White;
-            btnSalvar.FlatStyle = FlatStyle.Flat;
-            btnSalvar.FlatAppearance.BorderSize = 0;
-            btnSalvar.Cursor = Cursors.Hand;
-            btnSalvar.DialogResult = DialogResult.OK;
-            btnSalvar.Name = "btnSalvar";
-            btnSalvar.Click += btnSalvar_Click;
-            
             panelBotoes.Controls.Add(btnSalvar);
             panelBotoes.Controls.Add(btnCancelar);
-            
-            // ====================================================================
-            // FORM
-            // ====================================================================
+            panelBotoes.Dock = DockStyle.Bottom;
+            panelBotoes.Location = new Point(0, 487);
+            panelBotoes.Name = "panelBotoes";
+            panelBotoes.Padding = new Padding(10);
+            panelBotoes.Size = new Size(450, 60);
+            panelBotoes.TabIndex = 1;
+            // 
+            // btnSalvar
+            // 
+            btnSalvar.BackColor = Color.FromArgb(0, 120, 60);
+            btnSalvar.Cursor = Cursors.Hand;
+            btnSalvar.DialogResult = DialogResult.OK;
+            btnSalvar.FlatAppearance.BorderSize = 0;
+            btnSalvar.FlatStyle = FlatStyle.Flat;
+            btnSalvar.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btnSalvar.ForeColor = Color.White;
+            btnSalvar.Location = new Point(200, 12);
+            btnSalvar.Name = "btnSalvar";
+            btnSalvar.Size = new Size(100, 35);
+            btnSalvar.TabIndex = 0;
+            btnSalvar.Text = "Salvar";
+            btnSalvar.UseVisualStyleBackColor = false;
+            btnSalvar.Click += btnSalvar_Click;
+            // 
+            // btnCancelar
+            // 
+            btnCancelar.DialogResult = DialogResult.Cancel;
+            btnCancelar.FlatStyle = FlatStyle.Flat;
+            btnCancelar.Font = new Font("Segoe UI", 9F);
+            btnCancelar.Location = new Point(310, 12);
+            btnCancelar.Name = "btnCancelar";
+            btnCancelar.Size = new Size(100, 35);
+            btnCancelar.TabIndex = 1;
+            btnCancelar.Text = "Cancelar";
+            // 
+            // FormCadastroMidia
+            // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(450, 520);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            StartPosition = FormStartPosition.CenterParent;
-            Text = "Cadastro de Mídia";
-            
+            ClientSize = new Size(450, 547);
             Controls.Add(panelForm);
             Controls.Add(panelBotoes);
             Controls.Add(lblTitulo);
-            
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
             Name = "FormCadastroMidia";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "Cadastro de Mídia";
             Load += FormCadastroMidia_Load;
-            
-            // ResumeLayout
-            panelBotoes.ResumeLayout(false);
+            panelForm.ResumeLayout(false);
             grpDadosMidia.ResumeLayout(false);
             grpDadosMidia.PerformLayout();
             grpIdMidia.ResumeLayout(false);
@@ -248,7 +275,7 @@ namespace SmartSdk.Forms
             ((System.ComponentModel.ISupportInitialize)numIdMidia).EndInit();
             grpTipoMidia.ResumeLayout(false);
             grpTipoMidia.PerformLayout();
-            panelForm.ResumeLayout(false);
+            panelBotoes.ResumeLayout(false);
             ResumeLayout(false);
         }
 

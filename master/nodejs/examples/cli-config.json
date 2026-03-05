@@ -1,0 +1,6 @@
+{
+  "baseUrl": "https://192.168.120.21:4449",
+  "username": "master",
+  "password": "admin",
+  "timeout": 10000
+}

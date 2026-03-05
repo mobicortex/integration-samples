@@ -169,29 +169,62 @@ namespace SmartSdk.Forms
         /// </summary>
         private async void btnNovaEntidade_Click(object? sender, EventArgs e)
         {
-            // Pergunta o tipo (pessoa ou veículo)
-            var tipoDlg = MessageBox.Show("Pessoa? (Sim = Pessoa, Não = Veículo)",
-                "Tipo de Entidade", MessageBoxButtons.YesNoCancel);
-            if (tipoDlg == DialogResult.Cancel) return;
-
-            int tipo = tipoDlg == DialogResult.Yes ? (int)TipoEntidade.Pessoa : (int)TipoEntidade.Veiculo;
+            // Seleciona o tipo em um formulario dedicado (mais claro do que Yes/No).
+            using var formTipo = new FormSelecionarTipoEntidade();
+            if (formTipo.ShowDialog(this) != DialogResult.OK) return;
+            int tipo = formTipo.TipoEntidadeSelecionado;
 
             var nome = InputBox("Nova Entidade",
-                tipo == 1 ? "Nome da pessoa:" : "Descrição do veículo:");
+                tipo == 1 ? "Nome da pessoa:" : "Nome do proprietário:");
             if (string.IsNullOrEmpty(nome)) return;
 
             var doc = InputBox("Documento",
                 tipo == 1 ? "CPF (opcional):" : "Placa (ex: ABC1D23):");
 
+            string? brand = null;
+            string? model = null;
+            string? color = null;
+            string? obs = null;
+            int lprAtivo = 0;
+
+            if (tipo == (int)TipoEntidade.Veiculo)
+            {
+                var placaNormalizada = (doc ?? string.Empty).Trim().ToUpper().Replace("-", "");
+                if (string.IsNullOrWhiteSpace(placaNormalizada))
+                {
+                    Aviso("Placa é obrigatória para veículo.");
+                    return;
+                }
+
+                if (!System.Text.RegularExpressions.Regex.IsMatch(placaNormalizada, @"^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$") &&
+                    !System.Text.RegularExpressions.Regex.IsMatch(placaNormalizada, @"^[A-Z]{3}[0-9]{4}$"))
+                {
+                    Aviso("Placa inválida. Formatos aceitos: ABC1234 ou ABC1D23.");
+                    return;
+                }
+
+                doc = placaNormalizada;
+                brand = InputBox("Opcional - Marca", "Marca do veículo (opcional):")?.Trim();
+                model = InputBox("Opcional - Modelo", "Modelo do veículo (opcional):")?.Trim();
+                color = InputBox("Opcional - Cor", "Cor do veículo (opcional):")?.Trim();
+                obs = InputBox("Opcional - Observações", "Observações (opcional):")?.Trim();
+                lprAtivo = ConfirmarSimNao("Ativar LPR automático para esta placa?", "LPR");
+            }
+
             // *** CREATEID = TRUE ***  ← Esta é a diferença principal!
             var request = new CriarEntidadeRequest
             {
                 // NÃO informamos cadastro_id (será gerado automaticamente)
+                Id = 0,
                 CreateId = true,     // ← Gera IDs automaticamente
                 Tipo = tipo,
                 Name = nome,
                 Doc = doc ?? "",
-                LprAtivo = (tipo == (int)TipoEntidade.Veiculo && !string.IsNullOrEmpty(doc)) ? 1 : 0
+                Brand = string.IsNullOrWhiteSpace(brand) ? null : brand,
+                Model = string.IsNullOrWhiteSpace(model) ? null : model,
+                Color = string.IsNullOrWhiteSpace(color) ? null : color,
+                Obs = string.IsNullOrWhiteSpace(obs) ? null : obs,
+                LprAtivo = lprAtivo
             };
 
             var result = await _api.CriarEntidadeAsync(request);
@@ -326,17 +359,45 @@ namespace SmartSdk.Forms
         {
             if (_entidadeSelecionada == null) { Aviso("Selecione uma entidade"); return; }
 
-            using var form = new FormCadastroMidia(_entidadeSelecionada.EntityId);
+            using var form = new FormCadastroMidia(_entidadeSelecionada.EntityId, _entidadeSelecionada.Doc);
             
             if (form.ShowDialog(this) == DialogResult.OK)
             {
+                // LPR só deve ser cadastrado para entidades do tipo veículo.
+                if (form.TipoMidiaSelecionado == TipoMidia.Lpr &&
+                    _entidadeSelecionada.Tipo != (int)TipoEntidade.Veiculo)
+                {
+                    Aviso("A mídia LPR (placa) só pode ser cadastrada para entidades do tipo Veículo.");
+                    return;
+                }
+
                 var request = new CriarMidiaRequest
                 {
                     EntityId = _entidadeSelecionada.EntityId,
                     CadastroId = _entidadeSelecionada.CadastroId,
                     Tipo = form.TipoMidiaSelecionado,
-                    Descricao = form.DadosMidia
+                    Descricao = form.TipoMidiaSelecionado == TipoMidia.Lpr &&
+                                !string.IsNullOrWhiteSpace(_entidadeSelecionada.Doc)
+                        ? _entidadeSelecionada.Doc
+                        : form.DadosMidia
                 };
+
+                // EXPLICAÇÃO: O backend valida o formato da mídia baseado no conteúdo
+                // do campo "descricao". Para RFID, ele aceita formatos Wiegand/CODE/HEX.
+                // Para LPR (placa), se enviarmos apenas a descricao, o backend tenta
+                // validar como RFID e retorna erro "formato RFID invalido".
+                // 
+                // SOLUÇÃO: Enviar ns32_0 e ns32_1 indica ao backend que os dados binários
+                // já foram processados, então ele não aplica a validação RFID.
+                // Para LPR manual, enviamos 0 em ambos (o backend ignora para LPR).
+                // 
+                // NOTA: A forma RECOMENDADA de criar LPR é usando lpr_ativo=1 no cadastro
+                // da entidade (veículo), não via POST /media manual.
+                if (form.TipoMidiaSelecionado == TipoMidia.Lpr)
+                {
+                    request.Ns32_0 = 0;
+                    request.Ns32_1 = 0;
+                }
 
                 var result = await _api.CriarMidiaAsync(request);
                 if (result.Success && result.Data?.Ret == 0)
@@ -415,6 +476,18 @@ namespace SmartSdk.Forms
             form.AcceptButton = btnOk;
             form.CancelButton = btnCancel;
             return form.ShowDialog() == DialogResult.OK ? combo.SelectedIndex : -1;
+        }
+
+        /// <summary>Exibe diálogo Sim/Não e retorna 1 (sim) ou 0 (não).</summary>
+        private int ConfirmarSimNao(string pergunta, string titulo)
+        {
+            var resposta = MessageBox.Show(
+                pergunta,
+                titulo,
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question,
+                MessageBoxDefaultButton.Button1);
+            return resposta == DialogResult.Yes ? 1 : 0;
         }
     }
 }

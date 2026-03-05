@@ -192,13 +192,47 @@ var request = new CriarMidiaRequest
 var result = await _api.CriarMidiaAsync(request);
 ```
 
+### Criar mídia LPR (Placa de veículo)
+
+**IMPORTANTE**: O backend valida o formato da mídia automaticamente. Para LPR (placa),
+é necessário enviar `ns32_0` e `ns32_1` para evitar que o backend tente validar
+a placa como se fosse um formato RFID.
+
+```csharp
+var request = new CriarMidiaRequest
+{
+    EntityId = 4294000123,
+    CadastroId = 42,
+    Tipo = TipoMidia.Lpr,        // Tipo 17
+    Descricao = "ABC1D23",       // Placa do veículo
+    Ns32_0 = 0,                  // Obrigatório para LPR (evita validação RFID)
+    Ns32_1 = 0                   // Obrigatório para LPR (evita validação RFID)
+};
+
+var result = await _api.CriarMidiaAsync(request);
+```
+
+**NOTA**: A forma recomendada de criar LPR é usando `lpr_ativo=1` no cadastro da
+entidade (veículo). O backend converte automaticamente a placa em dados binários:
+
+```csharp
+var request = new CriarEntidadeRequest
+{
+    CadastroId = 42,
+    Tipo = (int)TipoEntidade.Veiculo,
+    Name = "Civic Preto",
+    Doc = "ABC1D23",      // Placa
+    LprAtivo = 1          // Cria mídia LPR automaticamente
+};
+```
+
 ## Tipos de Mídia Suportados
 
 | Constante | Valor | Formato |
 |-----------|-------|---------|
 | `Wiegand26` | 1 | `Facility,Card` (ex: `123,45678`) |
 | `Wiegand34` | 2 | `Facility,Card` |
-| `Lpr` | 10 | Placa do veículo (ex: `ABC1D23`) |
+| `Lpr` | 17 | Placa do veículo (ex: `ABC1D23`) |
 | `Facial` | 20 | Imagem facial (base64) |
 
 ## Compilação
