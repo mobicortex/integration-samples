@@ -23,18 +23,25 @@ namespace SmartSdk
             txtUsuario = new TextBox();
             lblIP = new Label();
             txtIP = new TextBox();
+            btnAbrirInterfaceWeb = new Button();
             panelBotoes = new Panel();
             lblTituloDemos = new Label();
-            btnDashboard = new Button();
-            btnRede = new Button();
-            btnMonitoramento = new Button();
-            btnCadastroSimples = new Button();
             btnCadastroCompleto = new Button();
             lblDescCompleto = new Label();
+            btnCadastroSimples = new Button();
             lblDescSimples = new Label();
+            btnMonitoramento = new Button();
             lblDescMonitoramento = new Label();
+            btnRede = new Button();
             lblDescRede = new Label();
+            btnDashboard = new Button();
             lblDescDashboard = new Label();
+            btnMqttCliente = new Button();
+            lblDescMqttCliente = new Label();
+            btnMqttBroker = new Button();
+            lblDescMqttBroker = new Label();
+            btnWebhookServer = new Button();
+            lblDescWebhookServer = new Label();
             panelLog = new Panel();
             txtLog = new TextBox();
             btnLimparLog = new Button();
@@ -44,7 +51,7 @@ namespace SmartSdk
             panelLog.SuspendLayout();
             SuspendLayout();
             // 
-            // panelTop - Painel de conexão
+            // panelTop
             // 
             panelTop.BackColor = Color.FromArgb(240, 240, 240);
             panelTop.Controls.Add(lblStatus);
@@ -55,6 +62,7 @@ namespace SmartSdk
             panelTop.Controls.Add(txtUsuario);
             panelTop.Controls.Add(lblIP);
             panelTop.Controls.Add(txtIP);
+            panelTop.Controls.Add(btnAbrirInterfaceWeb);
             panelTop.Dock = DockStyle.Top;
             panelTop.Location = new Point(0, 0);
             panelTop.Name = "panelTop";
@@ -62,40 +70,29 @@ namespace SmartSdk
             panelTop.Size = new Size(784, 70);
             panelTop.TabIndex = 0;
             // 
-            // lblIP
+            // lblStatus
             // 
-            lblIP.AutoSize = true;
-            lblIP.Location = new Point(15, 15);
-            lblIP.Name = "lblIP";
-            lblIP.Size = new Size(87, 15);
-            lblIP.TabIndex = 0;
-            lblIP.Text = "IP do Controlador:";
+            lblStatus.AutoSize = true;
+            lblStatus.ForeColor = Color.Gray;
+            lblStatus.Location = new Point(449, 52);
+            lblStatus.Name = "lblStatus";
+            lblStatus.Size = new Size(88, 15);
+            lblStatus.TabIndex = 7;
+            lblStatus.Text = "Não conectado";
+            lblStatus.Click += lblStatus_Click;
             // 
-            // txtIP
+            // btnConectar
             // 
-            txtIP.Location = new Point(15, 35);
-            txtIP.Name = "txtIP";
-            txtIP.Size = new Size(200, 23);
-            txtIP.TabIndex = 1;
-            txtIP.Text = "192.168.120.45";
-            // 
-            // lblUsuario
-            // 
-            lblUsuario.AutoSize = true;
-            lblUsuario.Location = new Point(225, 15);
-            lblUsuario.Name = "lblUsuario";
-            lblUsuario.Size = new Size(50, 15);
-            lblUsuario.TabIndex = 2;
-            lblUsuario.Text = "Usuário:";
-            // 
-            // txtUsuario
-            // 
-            txtUsuario.Location = new Point(225, 35);
-            txtUsuario.Name = "txtUsuario";
-            txtUsuario.Size = new Size(100, 23);
-            txtUsuario.TabIndex = 3;
-            txtUsuario.Text = "master";
-            txtUsuario.Enabled = false;
+            btnConectar.BackColor = Color.FromArgb(0, 122, 204);
+            btnConectar.FlatStyle = FlatStyle.Flat;
+            btnConectar.ForeColor = Color.White;
+            btnConectar.Location = new Point(449, 12);
+            btnConectar.Name = "btnConectar";
+            btnConectar.Size = new Size(110, 28);
+            btnConectar.TabIndex = 6;
+            btnConectar.Text = "Conectar";
+            btnConectar.UseVisualStyleBackColor = false;
+            btnConectar.Click += btnConectar_Click;
             // 
             // lblSenha
             // 
@@ -115,31 +112,58 @@ namespace SmartSdk
             txtSenha.Text = "admin";
             txtSenha.UseSystemPasswordChar = true;
             // 
-            // btnConectar
+            // lblUsuario
             // 
-            btnConectar.BackColor = Color.FromArgb(0, 122, 204);
-            btnConectar.FlatStyle = FlatStyle.Flat;
-            btnConectar.ForeColor = Color.White;
-            btnConectar.Location = new Point(445, 33);
-            btnConectar.Name = "btnConectar";
-            btnConectar.Size = new Size(110, 28);
-            btnConectar.TabIndex = 6;
-            btnConectar.Text = "Conectar";
-            btnConectar.UseVisualStyleBackColor = false;
-            btnConectar.Click += btnConectar_Click;
+            lblUsuario.AutoSize = true;
+            lblUsuario.Location = new Point(225, 15);
+            lblUsuario.Name = "lblUsuario";
+            lblUsuario.Size = new Size(50, 15);
+            lblUsuario.TabIndex = 2;
+            lblUsuario.Text = "Usuário:";
             // 
-            // lblStatus
+            // txtUsuario
             // 
-            lblStatus.AutoSize = true;
-            lblStatus.ForeColor = Color.Gray;
-            lblStatus.Location = new Point(565, 38);
-            lblStatus.Name = "lblStatus";
-            lblStatus.Size = new Size(100, 15);
-            lblStatus.TabIndex = 7;
-            lblStatus.Text = "Não conectado";
+            txtUsuario.Enabled = false;
+            txtUsuario.Location = new Point(225, 35);
+            txtUsuario.Name = "txtUsuario";
+            txtUsuario.Size = new Size(100, 23);
+            txtUsuario.TabIndex = 3;
+            txtUsuario.Text = "master";
             // 
-            // panelBotoes - Painel com botões de demonstração
+            // lblIP
             // 
+            lblIP.AutoSize = true;
+            lblIP.Location = new Point(15, 15);
+            lblIP.Name = "lblIP";
+            lblIP.Size = new Size(104, 15);
+            lblIP.TabIndex = 0;
+            lblIP.Text = "IP do Controlador:";
+            // 
+            // txtIP
+            // 
+            txtIP.Location = new Point(15, 35);
+            txtIP.Name = "txtIP";
+            txtIP.Size = new Size(200, 23);
+            txtIP.TabIndex = 1;
+            txtIP.Text = "192.168.120.45";
+            // 
+            // btnAbrirInterfaceWeb
+            // 
+            btnAbrirInterfaceWeb.BackColor = Color.FromArgb(32, 201, 151);
+            btnAbrirInterfaceWeb.FlatStyle = FlatStyle.Flat;
+            btnAbrirInterfaceWeb.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btnAbrirInterfaceWeb.ForeColor = Color.White;
+            btnAbrirInterfaceWeb.Location = new Point(575, 12);
+            btnAbrirInterfaceWeb.Name = "btnAbrirInterfaceWeb";
+            btnAbrirInterfaceWeb.Size = new Size(130, 28);
+            btnAbrirInterfaceWeb.TabIndex = 8;
+            btnAbrirInterfaceWeb.Text = "🌐 Interface Web";
+            btnAbrirInterfaceWeb.UseVisualStyleBackColor = false;
+            btnAbrirInterfaceWeb.Click += btnAbrirInterfaceWeb_Click;
+            // 
+            // panelBotoes
+            // 
+            panelBotoes.AutoScroll = true;
             panelBotoes.Controls.Add(lblTituloDemos);
             panelBotoes.Controls.Add(btnCadastroCompleto);
             panelBotoes.Controls.Add(lblDescCompleto);
@@ -151,11 +175,17 @@ namespace SmartSdk
             panelBotoes.Controls.Add(lblDescRede);
             panelBotoes.Controls.Add(btnDashboard);
             panelBotoes.Controls.Add(lblDescDashboard);
+            panelBotoes.Controls.Add(btnMqttCliente);
+            panelBotoes.Controls.Add(lblDescMqttCliente);
+            panelBotoes.Controls.Add(btnMqttBroker);
+            panelBotoes.Controls.Add(lblDescMqttBroker);
+            panelBotoes.Controls.Add(btnWebhookServer);
+            panelBotoes.Controls.Add(lblDescWebhookServer);
             panelBotoes.Dock = DockStyle.Fill;
             panelBotoes.Location = new Point(0, 70);
             panelBotoes.Name = "panelBotoes";
             panelBotoes.Padding = new Padding(15);
-            panelBotoes.Size = new Size(784, 381);
+            panelBotoes.Size = new Size(784, 520);
             panelBotoes.TabIndex = 1;
             // 
             // lblTituloDemos
@@ -164,7 +194,7 @@ namespace SmartSdk
             lblTituloDemos.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblTituloDemos.Location = new Point(15, 15);
             lblTituloDemos.Name = "lblTituloDemos";
-            lblTituloDemos.Size = new Size(300, 21);
+            lblTituloDemos.Size = new Size(273, 21);
             lblTituloDemos.TabIndex = 0;
             lblTituloDemos.Text = "Exemplos de Integração com a API";
             // 
@@ -288,26 +318,87 @@ namespace SmartSdk
             lblDescDashboard.TabIndex = 10;
             lblDescDashboard.Text = "Exibe informações do controlador: modelo, firmware, CPU, memória, estatísticas de cadastros e mídias.";
             // 
-            // panelLog - Painel de log
+            // btnMqttCliente
+            // 
+            btnMqttCliente.BackColor = Color.FromArgb(111, 66, 193);
+            btnMqttCliente.Enabled = false;
+            btnMqttCliente.FlatStyle = FlatStyle.Flat;
+            btnMqttCliente.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnMqttCliente.ForeColor = Color.White;
+            btnMqttCliente.Location = new Point(15, 330);
+            btnMqttCliente.Name = "btnMqttCliente";
+            btnMqttCliente.Size = new Size(250, 40);
+            btnMqttCliente.TabIndex = 11;
+            btnMqttCliente.Text = "MQTT Cliente → Controladora";
+            btnMqttCliente.UseVisualStyleBackColor = false;
+            btnMqttCliente.Click += btnMqttCliente_Click;
+            // 
+            // lblDescMqttCliente
+            // 
+            lblDescMqttCliente.ForeColor = Color.Gray;
+            lblDescMqttCliente.Location = new Point(275, 330);
+            lblDescMqttCliente.Name = "lblDescMqttCliente";
+            lblDescMqttCliente.Size = new Size(490, 40);
+            lblDescMqttCliente.TabIndex = 12;
+            lblDescMqttCliente.Text = "Conecta como cliente MQTT ao broker da controladora. Recebe eventos em tempo real via WebSocket.";
+            // 
+            // btnMqttBroker
+            // 
+            btnMqttBroker.BackColor = Color.FromArgb(220, 53, 69);
+            btnMqttBroker.FlatStyle = FlatStyle.Flat;
+            btnMqttBroker.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnMqttBroker.ForeColor = Color.White;
+            btnMqttBroker.Location = new Point(15, 385);
+            btnMqttBroker.Name = "btnMqttBroker";
+            btnMqttBroker.Size = new Size(250, 40);
+            btnMqttBroker.TabIndex = 13;
+            btnMqttBroker.Text = "MQTT Broker (Embutido)";
+            btnMqttBroker.UseVisualStyleBackColor = false;
+            btnMqttBroker.Click += btnMqttBroker_Click;
+            // 
+            // lblDescMqttBroker
+            // 
+            lblDescMqttBroker.ForeColor = Color.Gray;
+            lblDescMqttBroker.Location = new Point(275, 385);
+            lblDescMqttBroker.Name = "lblDescMqttBroker";
+            lblDescMqttBroker.Size = new Size(490, 40);
+            lblDescMqttBroker.TabIndex = 14;
+            lblDescMqttBroker.Text = "Inicia um broker MQTT embutido. A controladora pode se conectar diretamente a este servidor.";
+            // 
+            // btnWebhookServer
+            // 
+            btnWebhookServer.BackColor = Color.FromArgb(253, 126, 20);
+            btnWebhookServer.FlatStyle = FlatStyle.Flat;
+            btnWebhookServer.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnWebhookServer.ForeColor = Color.White;
+            btnWebhookServer.Location = new Point(15, 440);
+            btnWebhookServer.Name = "btnWebhookServer";
+            btnWebhookServer.Size = new Size(250, 40);
+            btnWebhookServer.TabIndex = 15;
+            btnWebhookServer.Text = "Webhook Server (HTTP)";
+            btnWebhookServer.UseVisualStyleBackColor = false;
+            btnWebhookServer.Click += btnWebhookServer_Click;
+            // 
+            // lblDescWebhookServer
+            // 
+            lblDescWebhookServer.ForeColor = Color.Gray;
+            lblDescWebhookServer.Location = new Point(275, 440);
+            lblDescWebhookServer.Name = "lblDescWebhookServer";
+            lblDescWebhookServer.Size = new Size(490, 40);
+            lblDescWebhookServer.TabIndex = 16;
+            lblDescWebhookServer.Text = "Inicia um servidor HTTP para receber eventos via webhook. A controladora envia POST com eventos JSON.";
+            // 
+            // panelLog
             // 
             panelLog.Controls.Add(txtLog);
             panelLog.Controls.Add(btnLimparLog);
             panelLog.Controls.Add(lblLog);
             panelLog.Dock = DockStyle.Bottom;
-            panelLog.Location = new Point(0, 451);
+            panelLog.Location = new Point(0, 590);
             panelLog.Name = "panelLog";
             panelLog.Padding = new Padding(5);
             panelLog.Size = new Size(784, 110);
             panelLog.TabIndex = 2;
-            // 
-            // lblLog
-            // 
-            lblLog.Dock = DockStyle.Top;
-            lblLog.Location = new Point(5, 5);
-            lblLog.Name = "lblLog";
-            lblLog.Size = new Size(774, 18);
-            lblLog.TabIndex = 0;
-            lblLog.Text = "Log de Operações:";
             // 
             // txtLog
             // 
@@ -333,11 +424,20 @@ namespace SmartSdk
             btnLimparLog.Text = "Limpar Log";
             btnLimparLog.Click += btnLimparLog_Click;
             // 
+            // lblLog
+            // 
+            lblLog.Dock = DockStyle.Top;
+            lblLog.Location = new Point(5, 5);
+            lblLog.Name = "lblLog";
+            lblLog.Size = new Size(774, 18);
+            lblLog.TabIndex = 0;
+            lblLog.Text = "Log de Operações:";
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(784, 561);
+            ClientSize = new Size(784, 700);
             Controls.Add(panelBotoes);
             Controls.Add(panelLog);
             Controls.Add(panelTop);
@@ -364,6 +464,7 @@ namespace SmartSdk
         private Label lblSenha;
         private TextBox txtSenha;
         private Button btnConectar;
+        private Button btnAbrirInterfaceWeb;
         private Label lblStatus;
         private Panel panelBotoes;
         private Label lblTituloDemos;
@@ -377,6 +478,12 @@ namespace SmartSdk
         private Label lblDescRede;
         private Button btnDashboard;
         private Label lblDescDashboard;
+        private Button btnMqttCliente;
+        private Label lblDescMqttCliente;
+        private Button btnMqttBroker;
+        private Label lblDescMqttBroker;
+        private Button btnWebhookServer;
+        private Label lblDescWebhookServer;
         private Panel panelLog;
         private Label lblLog;
         private TextBox txtLog;

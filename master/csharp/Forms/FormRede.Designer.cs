@@ -1,4 +1,4 @@
-namespace SmartSdk.Forms
+namespace SmartSdk
 {
     partial class FormRede
     {

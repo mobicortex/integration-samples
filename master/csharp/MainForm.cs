@@ -1,6 +1,7 @@
 using System.Text.Json;
-using SmartSdk.Services;
-using SmartSdk.Forms;
+using MobiCortex.Sdk;
+using MobiCortex.Sdk.Services;
+using MobiCortex.Sdk.Models;
 
 namespace SmartSdk
 {
@@ -17,8 +18,8 @@ namespace SmartSdk
 
     public partial class MainForm : Form
     {
-        // Serviço da API - compartilhado entre todos os formulários
-        private readonly MobiCortexApiService _api;
+        // Cliente da API - compartilhado entre todos os formulários
+        private readonly MobiCortexClient _api;
 
         // Caminho do arquivo de configurações do usuário
         private static readonly string SettingsPath = Path.Combine(
@@ -27,8 +28,7 @@ namespace SmartSdk
 
         public MainForm()
         {
-            _api = new MobiCortexApiService();
-            _api.OnLog += Log;
+            _api = new MobiCortexClient();
             InitializeComponent();
             CarregarConfiguracoes();
         }
@@ -86,27 +86,14 @@ namespace SmartSdk
             try
             {
                 btnConectar.Enabled = false;
-                btnConectar.Text = "Testando...";
-                lblStatus.Text = "Testando conexão TCP...";
-                lblStatus.ForeColor = Color.DarkBlue;
-
-                // Primeiro testa conectividade TCP básica
-                var tcpTest = await _api.TestTcpConnectionAsync();
-                if (!tcpTest.Success)
-                {
-                    lblStatus.Text = "Falha na conexão TCP";
-                    lblStatus.ForeColor = Color.DarkRed;
-                    btnConectar.Text = "Conectar";
-                    btnConectar.Enabled = true;
-                    Erro(tcpTest.Message);
-                    return;
-                }
-
                 btnConectar.Text = "Conectando...";
                 lblStatus.Text = "Fazendo login...";
+                lblStatus.ForeColor = Color.DarkBlue;
 
                 // Faz login na API (POST /login com a senha)
+                Log($"DEBUG: Tentando login em {txtIP.Text.Trim()}");
                 var result = await _api.LoginAsync(txtSenha.Text);
+                Log($"DEBUG: Login result - Success={result.Success}, HTTP={(result.RawResponse?.Substring(0, Math.Min(100, result.RawResponse?.Length ?? 0)) ?? "N/A")}");
 
                 if (result.Success && result.Data?.Ret == 0)
                 {
@@ -144,6 +131,8 @@ namespace SmartSdk
             btnMonitoramento.Enabled = enabled;
             btnRede.Enabled = enabled;
             btnDashboard.Enabled = enabled;
+            btnMqttCliente.Enabled = enabled; // Precisa de conexão prévia para obter session key
+            // btnMqttBroker e btnWebhookServer não precisam de conexão - funcionam standalone
         }
 
         // =====================================================================
@@ -181,6 +170,52 @@ namespace SmartSdk
             new FormDashboard(_api).Show();
         }
 
+        private void btnMqttCliente_Click(object? sender, EventArgs e)
+        {
+            // Abre o formulário de teste MQTT Cliente (conecta ao broker da controladora)
+            new FormMqttCliente(_api).Show();
+        }
+
+        private void btnMqttBroker_Click(object? sender, EventArgs e)
+        {
+            // Abre o formulário de teste MQTT Broker (broker embutido)
+            new FormMqttBroker().Show();
+        }
+
+        private void btnWebhookServer_Click(object? sender, EventArgs e)
+        {
+            // Abre o formulário de teste Webhook Server (recebe eventos HTTP)
+            new FormWebhookServer(_api).Show();
+        }
+
+        private void btnAbrirInterfaceWeb_Click(object? sender, EventArgs e)
+        {
+            // Abre a interface web da controladora no navegador padrão
+            var ip = txtIP.Text.Trim();
+            if (string.IsNullOrEmpty(ip))
+            {
+                Erro("Informe o IP do controlador primeiro");
+                return;
+            }
+
+            // Monta a URL (usa https por padrão)
+            var url = ip.StartsWith("http") ? ip : $"https://{ip}";
+
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                });
+                Log($"Abrindo interface web: {url}");
+            }
+            catch (Exception ex)
+            {
+                Erro($"Erro ao abrir navegador: {ex.Message}");
+            }
+        }
+
         // =====================================================================
         //  LOG
         // =====================================================================
@@ -200,5 +235,11 @@ namespace SmartSdk
 
         private void Erro(string msg) =>
             MessageBox.Show(msg, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+        private void lblStatus_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
+

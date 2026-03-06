@@ -1,6 +1,6 @@
-using SmartSdk.Models;
+using MobiCortex.Sdk.Models;
 
-namespace SmartSdk.Forms
+namespace SmartSdk
 {
     /// <summary>
     /// Formulário de cadastro/edição de Entidade (Pessoa ou Veículo).
@@ -20,20 +20,29 @@ namespace SmartSdk.Forms
         
         // Modo edição
         public bool ModoEdicao { get; private set; }
-        public bool IsPessoa => TipoEntidade == (int)Models.TipoEntidade.Pessoa;
-        public bool IsVeiculo => TipoEntidade == (int)Models.TipoEntidade.Veiculo;
+        public bool IsPessoa => TipoEntidade == (int)MobiCortex.Sdk.Models.TipoEntidade.Pessoa;
+        public bool IsVeiculo => TipoEntidade == (int)MobiCortex.Sdk.Models.TipoEntidade.Veiculo;
         
         // Dados para edição
         private readonly Entidade? _entidadeExistente;
-        private readonly uint? _cadastroIdPadrao;
+        private uint? _cadastroIdPadrao;
+        
+        /// <summary>
+        /// Construtor padrão para o Designer do Visual Studio.
+        /// </summary>
+        public FormCadastroEntidade()
+        {
+            InitializeComponent();
+            _cadastroIdPadrao = 0;
+            ModoEdicao = false;
+        }
         
         /// <summary>
         /// Construtor para criar nova entidade
         /// </summary>
         /// <param name="cadastroId">ID do cadastro central vinculado</param>
-        public FormCadastroEntidade(uint cadastroId)
+        public FormCadastroEntidade(uint cadastroId) : this()
         {
-            InitializeComponent();
             _cadastroIdPadrao = cadastroId;
             ModoEdicao = false;
         }
@@ -41,9 +50,8 @@ namespace SmartSdk.Forms
         /// <summary>
         /// Construtor para editar entidade existente
         /// </summary>
-        public FormCadastroEntidade(Entidade entidade)
+        public FormCadastroEntidade(Entidade entidade) : this()
         {
-            InitializeComponent();
             _entidadeExistente = entidade;
             _cadastroIdPadrao = entidade.CadastroId;
             ModoEdicao = true;
@@ -80,17 +88,17 @@ namespace SmartSdk.Forms
             cmbTipoEntidade.Items.Add(new TipoEntidadeItem 
             { 
                 Nome = "Pessoa", 
-                Valor = (int)Models.TipoEntidade.Pessoa 
+                Valor = (int)MobiCortex.Sdk.Models.TipoEntidade.Pessoa 
             });
             cmbTipoEntidade.Items.Add(new TipoEntidadeItem 
             { 
                 Nome = "Veículo", 
-                Valor = (int)Models.TipoEntidade.Veiculo 
+                Valor = (int)MobiCortex.Sdk.Models.TipoEntidade.Veiculo 
             });
             cmbTipoEntidade.Items.Add(new TipoEntidadeItem 
             { 
                 Nome = "Animal", 
-                Valor = (int)Models.TipoEntidade.Animal 
+                Valor = (int)MobiCortex.Sdk.Models.TipoEntidade.Animal 
             });
             
             cmbTipoEntidade.DisplayMember = "Nome";

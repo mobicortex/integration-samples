@@ -1,4 +1,4 @@
-namespace SmartSdk.Forms
+namespace SmartSdk
 {
     partial class FormCadastroSimples
     {
@@ -299,6 +299,7 @@ namespace SmartSdk.Forms
             listMidias.TabIndex = 0;
             listMidias.UseCompatibleStateImageBehavior = false;
             listMidias.View = View.Details;
+            listMidias.DoubleClick += listMidias_DoubleClick;
             // 
             // colMidId
             // 

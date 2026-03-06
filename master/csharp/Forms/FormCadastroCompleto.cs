@@ -1,7 +1,9 @@
-using SmartSdk.Models;
-using SmartSdk.Services;
+using MobiCortex.Sdk;
+using MobiCortex.Sdk.Services;
+using MobiCortex.Sdk.Models;
+using MobiCortex.Sdk.Interfaces;
 
-namespace SmartSdk.Forms
+namespace SmartSdk
 {
     // =============================================================================
     //  CADASTRO COMPLETO - Modelo MobiCortex (3 Níveis)
@@ -33,7 +35,7 @@ namespace SmartSdk.Forms
 
     public partial class FormCadastroCompleto : Form
     {
-        private readonly MobiCortexApiService _api;
+        private IMobiCortexClient _api = null!;
 
         // Itens selecionados atualmente (para navegação hierárquica)
         private CadastroCentral? _cadastroSelecionado;
@@ -44,10 +46,26 @@ namespace SmartSdk.Forms
         private const int PageSize = 20;
         private uint _totalCadastros = 0;
 
-        public FormCadastroCompleto(MobiCortexApiService api)
+        /// <summary>
+        /// Serviço da API. Pode ser definido via propriedade para uso no designer.
+        /// </summary>
+        public IMobiCortexClient ApiService
+        {
+            get => _api;
+            set => _api = value;
+        }
+
+        /// <summary>
+        /// Construtor padrão para o Designer do Visual Studio.
+        /// </summary>
+        public FormCadastroCompleto()
+        {
+            InitializeComponent();
+        }
+
+        public FormCadastroCompleto(IMobiCortexClient api) : this()
         {
             _api = api;
-            InitializeComponent();
         }
 
         // =====================================================================
@@ -57,6 +75,8 @@ namespace SmartSdk.Forms
 
         private async void FormCadastroCompleto_Load(object? sender, EventArgs e)
         {
+            // No modo design do VS, _api pode ser null - não carregar dados
+            if (_api == null) return;
             await CarregarCadastros();
         }
 
@@ -77,7 +97,7 @@ namespace SmartSdk.Forms
             }
 
             // Busca paginada (com filtro por nome opcional)
-            var result = await _api.ListarCadastrosAsync(
+            var result = await _api.Cadastros.ListarAsync(
                 _currentOffset, PageSize,
                 string.IsNullOrEmpty(filtro) ? null : filtro);
 
@@ -121,7 +141,7 @@ namespace SmartSdk.Forms
             _cadastroSelecionado = null;
             _entidadeSelecionada = null;
 
-            var result = await _api.ObterCadastroAsync(id);
+            var result = await _api.Cadastros.ObterAsync(id);
 
             if (result.Success && result.Data != null)
             {
@@ -174,25 +194,83 @@ namespace SmartSdk.Forms
         }
 
         /// <summary>
-        /// Cria um novo cadastro central.
+        /// Cria um novo cadastro central usando o formulário completo.
         /// POST /central-registry com body: { "id": auto, "name": "...", "enabled": true }
         /// </summary>
         private async void btnNovoCadastro_Click(object? sender, EventArgs e)
         {
-            var nome = InputBox("Novo Cadastro", "Nome do cadastro (ex: Apt 101):");
-            if (string.IsNullOrEmpty(nome)) return;
+            using var form = new FormCadastroCentral();
+            if (form.ShowDialog(this) != DialogResult.OK) return;
 
-            var cadastro = new CadastroCentral { Name = nome, Enabled = true };
-            var result = await _api.SalvarCadastroAsync(cadastro);
+            var cadastro = new CadastroCentral
+            {
+                Id = form.IdCadastro,
+                Name = form.Nome,
+                Enabled = form.CadastroEnabled,
+                Field1 = form.Field1,
+                Field2 = form.Field2,
+                Field3 = form.Field3,
+                Field4 = form.Field4
+            };
+
+            var result = await _api.Cadastros.CriarAsync(cadastro);
 
             if (result.Success)
             {
-                Log($"Cadastro criado: {nome}");
+                Log($"Cadastro criado: {form.Nome}");
                 await CarregarCadastros();
             }
             else
             {
                 var msg = $"Erro ao criar cadastro:\n{result.Message}";
+                Log(msg);
+                Aviso(msg);
+            }
+        }
+
+        /// <summary>
+        /// Edita o cadastro selecionado ao dar duplo clique.
+        /// PUT /central-registry?id=X
+        /// </summary>
+        private async void listCadastros_DoubleClick(object? sender, EventArgs e)
+        {
+            // Obtém o item clicado diretamente (funciona mesmo se não estiver selecionado)
+            if (listCadastros.SelectedItems.Count == 0) return;
+            
+            var cadastro = listCadastros.SelectedItems[0].Tag as CadastroCentral;
+            if (cadastro == null) return;
+            
+            // Atualiza o cadastro selecionado
+            _cadastroSelecionado = cadastro;
+
+            using var form = new FormCadastroCentral(cadastro);
+            if (form.ShowDialog(this) != DialogResult.OK) return;
+
+            var cadastroAtualizado = new CadastroCentral
+            {
+                Id = form.IdCadastro,
+                Name = form.Nome,
+                Enabled = form.CadastroEnabled,
+                Field1 = form.Field1,
+                Field2 = form.Field2,
+                Field3 = form.Field3,
+                Field4 = form.Field4
+            };
+
+            // Log para debug
+            var jsonDebug = System.Text.Json.JsonSerializer.Serialize(cadastroAtualizado);
+            Log($"DEBUG: Atualizando cadastro ID={cadastroAtualizado.Id}, JSON={jsonDebug}");
+
+            var result = await _api.Cadastros.AtualizarAsync(cadastroAtualizado);
+
+            if (result.Success)
+            {
+                Log($"Cadastro atualizado: {form.Nome}");
+                await CarregarCadastros();
+            }
+            else
+            {
+                var msg = $"Erro ao atualizar cadastro:\n{result.Message}";
                 Log(msg);
                 Aviso(msg);
             }
@@ -211,7 +289,7 @@ namespace SmartSdk.Forms
                 "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
 
-            var result = await _api.ExcluirCadastroAsync(_cadastroSelecionado.Id);
+            var result = await _api.Cadastros.ExcluirAsync(_cadastroSelecionado.Id);
             if (result.Success)
             {
                 Log($"Cadastro excluído: {_cadastroSelecionado.Name}");
@@ -228,6 +306,11 @@ namespace SmartSdk.Forms
         private async void btnBuscarCadastro_Click(object? sender, EventArgs e)
         {
             _currentOffset = 0; // Nova busca sempre começa do início
+            await CarregarCadastros();
+        }
+
+        private async void btnRefreshCadastros_Click(object? sender, EventArgs e)
+        {
             await CarregarCadastros();
         }
 
@@ -268,7 +351,7 @@ namespace SmartSdk.Forms
             listMidias.Items.Clear();
             _entidadeSelecionada = null;
 
-            var result = await _api.ListarEntidadesAsync(cadastroId);
+            var result = await _api.Entidades.ListarPorCadastroAsync(cadastroId);
 
             if (result.Success && result.Data != null)
             {
@@ -300,6 +383,54 @@ namespace SmartSdk.Forms
 
             lblMidiasTitulo.Text = $"Mídias de: {_entidadeSelecionada.Name}";
             await CarregarMidias(_entidadeSelecionada.EntityId);
+        }
+
+        /// <summary>
+        /// Edita a entidade selecionada ao dar duplo clique.
+        /// </summary>
+        private async void listEntidades_DoubleClick(object? sender, EventArgs e)
+        {
+            if (listEntidades.SelectedItems.Count == 0) return;
+
+            var entidade = listEntidades.SelectedItems[0].Tag as Entidade;
+            if (entidade == null) return;
+
+            _entidadeSelecionada = entidade;
+
+            // Verifica o tipo de entidade
+            if (entidade.Tipo == (int)TipoEntidade.Veiculo)
+            {
+                Aviso("Edição de veículo ainda não implementada. Use o formulário de cadastro.");
+                return;
+            }
+
+            // Abre formulário de edição de pessoa
+            using var form = new FormCadastroPessoaEdit(entidade);
+            if (form.ShowDialog(this) != DialogResult.OK) return;
+
+            // Cria o request de atualização
+            var request = new AtualizarEntidadeRequest
+            {
+                EntityId = entidade.EntityId,
+                Name = form.Nome,
+                Doc = form.Documento,
+                Habilitado = form.Habilitado,
+                LprAtivo = form.LprAtivo
+            };
+
+            var result = await _api.Entidades.AtualizarAsync(entidade.EntityId, request);
+            if (result.Success)
+            {
+                Log($"Entidade atualizada: {form.Nome}");
+                if (_cadastroSelecionado != null)
+                    await CarregarEntidades(_cadastroSelecionado.Id);
+            }
+            else
+            {
+                var msg = $"Erro ao atualizar entidade:\n{result.Message}";
+                Log(msg);
+                Aviso(msg);
+            }
         }
 
         /// <summary>
@@ -343,25 +474,27 @@ namespace SmartSdk.Forms
             }
             else
             {
-                uint entityId = SolicitarIdOpcional("ID da Entidade", "Informe o ID da entidade (0 = automático):");
-                var nome = InputBox("Nova Entidade", "Nome da pessoa:");
-                if (string.IsNullOrEmpty(nome)) return;
-
-                var doc = InputBox("Documento", "CPF (opcional):");
+                using var formPessoa = new FormCadastroPessoa(_cadastroSelecionado.Id);
+                if (formPessoa.ShowDialog(this) != DialogResult.OK) return;
 
                 request = new CriarEntidadeRequest
                 {
-                    Id = entityId,
+                    Id = formPessoa.Id,
                     CadastroId = _cadastroSelecionado.Id,
                     Tipo = tipo,
-                    Name = nome,
-                    Doc = doc ?? "",
-                    LprAtivo = 0
+                    Name = formPessoa.Nome,
+                    Doc = formPessoa.Documento,
+                    LprAtivo = formPessoa.LprAtivo,
+                    Habilitado = formPessoa.Habilitado
                 };
-                nomeLog = nome;
+                nomeLog = formPessoa.Nome;
             }
 
-            var result = await _api.CriarEntidadeAsync(request);
+            // Log do JSON para debug
+            var jsonDebug = System.Text.Json.JsonSerializer.Serialize(request);
+            Log($"DEBUG JSON Entidade: {jsonDebug}");
+
+            var result = await _api.Entidades.CriarAsync(request);
             if (result.Success && result.Data?.Ret == 0)
             {
                 Log($"Entidade criada: {nomeLog} (ID: {result.Data.EntityId})");
@@ -369,7 +502,7 @@ namespace SmartSdk.Forms
             }
             else
             {
-                var msg = $"Erro ao criar entidade:\n{result.Message}";
+                var msg = $"Erro ao criar entidade:\n{result.Message}\nJSON: {jsonDebug}";
                 Log(msg);
                 Aviso(msg);
             }
@@ -388,7 +521,7 @@ namespace SmartSdk.Forms
                 "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
 
-            var result = await _api.ExcluirEntidadeAsync(_entidadeSelecionada.EntityId);
+            var result = await _api.Entidades.ExcluirAsync(_entidadeSelecionada.EntityId);
             if (result.Success)
             {
                 Log($"Entidade excluída: {_entidadeSelecionada.Name}");
@@ -403,6 +536,12 @@ namespace SmartSdk.Forms
             }
         }
 
+        private async void btnRefreshEntidades_Click(object? sender, EventArgs e)
+        {
+            if (_cadastroSelecionado != null)
+                await CarregarEntidades(_cadastroSelecionado.Id);
+        }
+
         // =====================================================================
         //  MÍDIAS DE ACESSO (Nível 3)
         //  Endpoint: GET /media?entity_id=X
@@ -413,7 +552,7 @@ namespace SmartSdk.Forms
         {
             listMidias.Items.Clear();
 
-            var result = await _api.ListarMidiasAsync(entityId);
+            var result = await _api.Midias.ListarPorEntidadeAsync(entityId);
 
             if (result.Success && result.Data != null)
             {
@@ -511,7 +650,11 @@ namespace SmartSdk.Forms
                 request.Ns32_1 = 0;
             }
 
-            var result = await _api.CriarMidiaAsync(request);
+            // Log do JSON para debug
+            var jsonDebug = System.Text.Json.JsonSerializer.Serialize(request);
+            Log($"DEBUG JSON Midia: {jsonDebug}");
+
+            var result = await _api.Midias.CriarAsync(request);
             if (result.Success && result.Data?.Ret == 0)
             {
                 Log($"Mídia criada: {descricao} (ID: {result.Data.MediaId})");
@@ -519,7 +662,7 @@ namespace SmartSdk.Forms
             }
             else
             {
-                var msg = $"Erro ao criar mídia:\n{result.Message}";
+                var msg = $"Erro ao criar mídia:\n{result.Message}\nJSON: {jsonDebug}";
                 Log(msg);
                 Aviso(msg);
             }
@@ -536,7 +679,15 @@ namespace SmartSdk.Forms
             var midia = listMidias.SelectedItems[0].Tag as MidiaAcesso;
             if (midia == null) return;
 
-            var result = await _api.ExcluirMidiaAsync(midia.MediaId);
+            // Confirmação antes de excluir
+            var confirm = MessageBox.Show(
+                $"Tem certeza que deseja excluir a mídia '{midia.Descricao}'?\n\nEsta ação não pode ser desfeita.",
+                "Confirmar Exclusão",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+            if (confirm != DialogResult.Yes) return;
+
+            var result = await _api.Midias.ExcluirAsync(midia.MediaId);
             if (result.Success)
             {
                 Log($"Mídia excluída: {midia.Descricao}");
@@ -548,6 +699,81 @@ namespace SmartSdk.Forms
                 var msg = $"Erro ao excluir mídia:\n{result.Message}";
                 Log(msg);
                 Aviso(msg);
+            }
+        }
+
+        private async void btnRefreshMidias_Click(object? sender, EventArgs e)
+        {
+            if (_entidadeSelecionada != null)
+                await CarregarMidias(_entidadeSelecionada.EntityId);
+        }
+
+        // =====================================================================
+        //  DETALHES DA MIDIA (Duplo clique)
+        // =====================================================================
+
+        /// <summary>
+        /// Abre o formulário de detalhes da mídia ao dar duplo clique.
+        /// </summary>
+        private async void listMidias_DoubleClick(object? sender, EventArgs e)
+        {
+            if (listMidias.SelectedItems.Count == 0) return;
+
+            var midia = listMidias.SelectedItems[0].Tag as MidiaAcesso;
+            if (midia == null) return;
+
+            using var form = new FormDetalheMidia(midia);
+            
+            if (form.ShowDialog(this) == DialogResult.OK && form.FoiModificada)
+            {
+                bool sucesso = true;
+                string mensagem = "";
+
+                // Atualiza o estado de habilitação se alterado
+                if (midia.Habilitado != form.NovoEstadoHabilitado)
+                {
+                    var result = await _api.Midias.AlterarStatusAsync(midia.MediaId, form.NovoEstadoHabilitado);
+                    if (!result.Success)
+                    {
+                        sucesso = false;
+                        mensagem = result.Message ?? "Erro ao alterar status";
+                    }
+                    else
+                    {
+                        var status = form.NovoEstadoHabilitado == 1 ? "liberada" : "bloqueada";
+                        Log($"Mídia {midia.Descricao} {status} com sucesso!");
+                    }
+                }
+
+                // Atualiza a data de permissao se alterada
+                if (sucesso && form.DataPermissaoAlterada)
+                {
+                    var result = await _api.Midias.AlterarDataBloqueioAsync(midia.MediaId, form.NovaDataPermissao);
+                    if (!result.Success)
+                    {
+                        sucesso = false;
+                        mensagem = result.Message ?? "Erro ao alterar data de permissao";
+                    }
+                    else
+                    {
+                        if (form.NovaDataPermissao > 0)
+                            Log($"Mídia {midia.Descricao} permitida até {DateTimeOffset.FromUnixTimeSeconds(form.NovaDataPermissao).LocalDateTime:dd/MM/yyyy HH:mm}");
+                        else
+                            Log($"Data limite removida da mídia {midia.Descricao}");
+                    }
+                }
+
+                // Se houve erro, mostra mensagem
+                if (!sucesso)
+                {
+                    var msg = $"Erro ao atualizar mídia:\n{mensagem}";
+                    Log(msg);
+                    Aviso(msg);
+                }
+
+                // Recarrega a lista em qualquer caso
+                if (_entidadeSelecionada != null)
+                    await CarregarMidias(_entidadeSelecionada.EntityId);
             }
         }
 

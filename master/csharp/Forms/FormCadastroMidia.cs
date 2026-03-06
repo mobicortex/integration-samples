@@ -1,6 +1,6 @@
-using SmartSdk.Models;
+using MobiCortex.Sdk.Models;
 
-namespace SmartSdk.Forms
+namespace SmartSdk
 {
     /// <summary>
     /// Formulário de cadastro/edição de mídias de acesso.

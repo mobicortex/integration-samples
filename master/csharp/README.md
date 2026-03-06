@@ -259,4 +259,8 @@ bin\Debug\net8.0-windows\SmartSdk.exe
 
 ## Licença
 
-Copyright (c) 2024 Plataforma MobiCortex. Todos os direitos reservados.
+Este projeto está licenciado sob a Licença MIT.
+
+Você pode usar o código C# como biblioteca embarcada na aplicação, desde que a integração seja realizada com hardwares homologados: Powered By Mobi Cortex.
+
+Para o texto completo da licença, consulte `LICENSE`.

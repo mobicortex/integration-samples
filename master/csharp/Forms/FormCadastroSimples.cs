@@ -1,7 +1,9 @@
-using SmartSdk.Models;
-using SmartSdk.Services;
+using MobiCortex.Sdk;
+using MobiCortex.Sdk.Services;
+using MobiCortex.Sdk.Models;
+using MobiCortex.Sdk.Interfaces;
 
-namespace SmartSdk.Forms
+namespace SmartSdk
 {
     // =============================================================================
     //  CADASTRO SIMPLIFICADO (2 Níveis)
@@ -29,7 +31,7 @@ namespace SmartSdk.Forms
 
     public partial class FormCadastroSimples : Form
     {
-        private readonly MobiCortexApiService _api;
+        private IMobiCortexClient _api = null!;
         private Entidade? _entidadeSelecionada;
 
         // Estado de paginação server-side
@@ -40,10 +42,26 @@ namespace SmartSdk.Forms
         // Filtro de texto atual (enviado ao servidor)
         private string _filtroNome = "";
 
-        public FormCadastroSimples(MobiCortexApiService api)
+        /// <summary>
+        /// Serviço da API. Pode ser definido via propriedade para uso no designer.
+        /// </summary>
+        public IMobiCortexClient ApiService
+        {
+            get => _api;
+            set => _api = value;
+        }
+
+        /// <summary>
+        /// Construtor padrão para o Designer do Visual Studio.
+        /// </summary>
+        public FormCadastroSimples()
+        {
+            InitializeComponent();
+        }
+
+        public FormCadastroSimples(IMobiCortexClient api) : this()
         {
             _api = api;
-            InitializeComponent();
         }
 
         // =====================================================================
@@ -53,6 +71,8 @@ namespace SmartSdk.Forms
 
         private async void FormCadastroSimples_Load(object? sender, EventArgs e)
         {
+            // No modo design do VS, _api pode ser null - não carregar dados
+            if (_api == null) return;
             await CarregarEntidades();
         }
 
@@ -68,7 +88,7 @@ namespace SmartSdk.Forms
             listMidias.Items.Clear();
             _entidadeSelecionada = null;
 
-            var result = await _api.ListarEntidadesGlobalAsync(
+            var result = await _api.Entidades.ListarTodosAsync(
                 _currentOffset, PageSize,
                 nome: string.IsNullOrEmpty(_filtroNome) ? null : _filtroNome);
 
@@ -105,7 +125,7 @@ namespace SmartSdk.Forms
             listMidias.Items.Clear();
             _entidadeSelecionada = null;
 
-            var result = await _api.ObterEntidadeAsync(entityId);
+            var result = await _api.Entidades.ObterAsync(entityId);
 
             if (result.Success && result.Data != null && result.Data.Ret == 0)
             {
@@ -227,7 +247,7 @@ namespace SmartSdk.Forms
                 LprAtivo = lprAtivo
             };
 
-            var result = await _api.CriarEntidadeAsync(request);
+            var result = await _api.Entidades.CriarAsync(request);
             if (result.Success && result.Data?.Ret == 0)
             {
                 Log($"Entidade criada: {nome}");
@@ -258,7 +278,7 @@ namespace SmartSdk.Forms
                 "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
 
-            var result = await _api.ExcluirEntidadeAsync(_entidadeSelecionada.EntityId);
+            var result = await _api.Entidades.ExcluirAsync(_entidadeSelecionada.EntityId);
             if (result.Success)
             {
                 Log($"Entidade excluída: {_entidadeSelecionada.Name}");
@@ -331,7 +351,7 @@ namespace SmartSdk.Forms
         {
             listMidias.Items.Clear();
 
-            var result = await _api.ListarMidiasAsync(entityId);
+            var result = await _api.Midias.ListarPorEntidadeAsync(entityId);
             if (result.Success && result.Data != null)
             {
                 lblStatusMidias.Text = $"{result.Data.Count} mídia(s)";
@@ -399,7 +419,7 @@ namespace SmartSdk.Forms
                     request.Ns32_1 = 0;
                 }
 
-                var result = await _api.CriarMidiaAsync(request);
+                var result = await _api.Midias.CriarAsync(request);
                 if (result.Success && result.Data?.Ret == 0)
                 {
                     Log($"Mídia criada: {form.TipoMidiaNome} - {form.DadosMidia} (ID: {result.Data.MediaId})");
@@ -421,7 +441,15 @@ namespace SmartSdk.Forms
             var midia = listMidias.SelectedItems[0].Tag as MidiaAcesso;
             if (midia == null) return;
 
-            var result = await _api.ExcluirMidiaAsync(midia.MediaId);
+            // Confirmação antes de excluir
+            var confirm = MessageBox.Show(
+                $"Tem certeza que deseja excluir a mídia '{midia.Descricao}'?\n\nEsta ação não pode ser desfeita.",
+                "Confirmar Exclusão",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+            if (confirm != DialogResult.Yes) return;
+
+            var result = await _api.Midias.ExcluirAsync(midia.MediaId);
             if (result.Success)
             {
                 Log($"Mídia excluída: {midia.Descricao}");
@@ -433,6 +461,75 @@ namespace SmartSdk.Forms
                 var msg = $"Erro ao excluir mídia:\n{result.Message}";
                 Log(msg);
                 Aviso(msg);
+            }
+        }
+
+        // =====================================================================
+        //  DETALHES DA MIDIA (Duplo clique)
+        // =====================================================================
+
+        /// <summary>
+        /// Abre o formulário de detalhes da mídia ao dar duplo clique.
+        /// </summary>
+        private async void listMidias_DoubleClick(object? sender, EventArgs e)
+        {
+            if (listMidias.SelectedItems.Count == 0) return;
+
+            var midia = listMidias.SelectedItems[0].Tag as MidiaAcesso;
+            if (midia == null) return;
+
+            using var form = new FormDetalheMidia(midia);
+            
+            if (form.ShowDialog(this) == DialogResult.OK && form.FoiModificada)
+            {
+                bool sucesso = true;
+                string mensagem = "";
+
+                // Atualiza o estado de habilitação se alterado
+                if (midia.Habilitado != form.NovoEstadoHabilitado)
+                {
+                    var result = await _api.Midias.AlterarStatusAsync(midia.MediaId, form.NovoEstadoHabilitado);
+                    if (!result.Success)
+                    {
+                        sucesso = false;
+                        mensagem = result.Message ?? "Erro ao alterar status";
+                    }
+                    else
+                    {
+                        var status = form.NovoEstadoHabilitado == 1 ? "liberada" : "bloqueada";
+                        Log($"Mídia {midia.Descricao} {status} com sucesso!");
+                    }
+                }
+
+                // Atualiza a data de permissao se alterada
+                if (sucesso && form.DataPermissaoAlterada)
+                {
+                    var result = await _api.Midias.AlterarDataBloqueioAsync(midia.MediaId, form.NovaDataPermissao);
+                    if (!result.Success)
+                    {
+                        sucesso = false;
+                        mensagem = result.Message ?? "Erro ao alterar data de permissao";
+                    }
+                    else
+                    {
+                        if (form.NovaDataPermissao > 0)
+                            Log($"Mídia {midia.Descricao} permitida até {DateTimeOffset.FromUnixTimeSeconds(form.NovaDataPermissao).LocalDateTime:dd/MM/yyyy HH:mm}");
+                        else
+                            Log($"Data limite removida da mídia {midia.Descricao}");
+                    }
+                }
+
+                // Se houve erro, mostra mensagem
+                if (!sucesso)
+                {
+                    var msg = $"Erro ao atualizar mídia:\n{mensagem}";
+                    Log(msg);
+                    Aviso(msg);
+                }
+
+                // Recarrega a lista em qualquer caso
+                if (_entidadeSelecionada != null)
+                    await CarregarMidias(_entidadeSelecionada.EntityId);
             }
         }
 

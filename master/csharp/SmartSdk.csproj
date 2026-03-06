@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -6,126 +6,26 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <DefaultItemExcludes>$(DefaultItemExcludes);MobiCortexSdkLib\**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MQTTnet" Version="4.3.7.1207" />
+    <PackageReference Include="MQTTnet" Version="5.0.0.1405" />
   </ItemGroup>
 
-  <!-- =========================================================
-       WinForms Designer: SubType + DependentUpon para todos os Forms
-       Necessário para que o VS 2022 exiba a aba "Design" e
-       permita edição visual (arrastar e soltar controles).
-       ========================================================= -->
+  <!-- WinForms Designer Support -->
   <ItemGroup>
-    <!-- MainForm -->
     <Compile Update="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Update="MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
-
-    <!-- FormCadastroCompleto -->
-    <Compile Update="Forms\FormCadastroCompleto.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Forms\FormCadastroCompleto.Designer.cs">
-      <DependentUpon>FormCadastroCompleto.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Update="Forms\FormCadastroCompleto.resx">
-      <DependentUpon>FormCadastroCompleto.cs</DependentUpon>
-    </EmbeddedResource>
-
-    <!-- FormCadastroSimples -->
-    <Compile Update="Forms\FormCadastroSimples.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Forms\FormCadastroSimples.Designer.cs">
-      <DependentUpon>FormCadastroSimples.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Update="Forms\FormCadastroSimples.resx">
-      <DependentUpon>FormCadastroSimples.cs</DependentUpon>
-    </EmbeddedResource>
-
-    <!-- FormDashboard -->
-    <Compile Update="Forms\FormDashboard.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Forms\FormDashboard.Designer.cs">
-      <DependentUpon>FormDashboard.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Update="Forms\FormDashboard.resx">
-      <DependentUpon>FormDashboard.cs</DependentUpon>
-    </EmbeddedResource>
-
-    <!-- FormMonitoramento -->
-    <Compile Update="Forms\FormMonitoramento.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Forms\FormMonitoramento.Designer.cs">
-      <DependentUpon>FormMonitoramento.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Update="Forms\FormMonitoramento.resx">
-      <DependentUpon>FormMonitoramento.cs</DependentUpon>
-    </EmbeddedResource>
-
-    <!-- FormRede -->
-    <Compile Update="Forms\FormRede.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Forms\FormRede.Designer.cs">
-      <DependentUpon>FormRede.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Update="Forms\FormRede.resx">
-      <DependentUpon>FormRede.cs</DependentUpon>
-    </EmbeddedResource>
-
-    <!-- FormCadastroMidia -->
-    <Compile Update="Forms\FormCadastroMidia.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Forms\FormCadastroMidia.Designer.cs">
-      <DependentUpon>FormCadastroMidia.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Update="Forms\FormCadastroMidia.resx">
-      <DependentUpon>FormCadastroMidia.cs</DependentUpon>
-    </EmbeddedResource>
-
-    <!-- FormCadastroCentral -->
-    <Compile Update="Forms\FormCadastroCentral.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Forms\FormCadastroCentral.Designer.cs">
-      <DependentUpon>FormCadastroCentral.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Update="Forms\FormCadastroCentral.resx">
-      <DependentUpon>FormCadastroCentral.cs</DependentUpon>
-    </EmbeddedResource>
-
-    <!-- FormCadastroEntidade -->
-    <Compile Update="Forms\FormCadastroEntidade.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Forms\FormCadastroEntidade.Designer.cs">
-      <DependentUpon>FormCadastroEntidade.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Update="Forms\FormCadastroEntidade.resx">
-      <DependentUpon>FormCadastroEntidade.cs</DependentUpon>
-    </EmbeddedResource>
-
-    <!-- FormSelecionarTipoEntidade -->
-    <Compile Update="Forms\FormSelecionarTipoEntidade.cs">
-      <SubType>Form</SubType>
-    </Compile>
-
-    <!-- FormCadastroVeiculo -->
-    <Compile Update="Forms\FormCadastroVeiculo.cs">
+    <Compile Update="Forms\*.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="MobiCortexSdkLib\MobiCortex.Sdk.csproj" />
+  </ItemGroup>
+
 
 </Project>

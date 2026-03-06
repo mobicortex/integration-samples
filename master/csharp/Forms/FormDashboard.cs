@@ -1,7 +1,9 @@
-using SmartSdk.Models;
-using SmartSdk.Services;
+using MobiCortex.Sdk;
+using MobiCortex.Sdk.Services;
+using MobiCortex.Sdk.Models;
+using MobiCortex.Sdk.Interfaces;
 
-namespace SmartSdk.Forms
+namespace SmartSdk
 {
     // =============================================================================
     //  DASHBOARD - Informações do Controlador
@@ -19,12 +21,28 @@ namespace SmartSdk.Forms
 
     public partial class FormDashboard : Form
     {
-        private readonly MobiCortexApiService _api;
+        private IMobiCortexClient _api = null!;
 
-        public FormDashboard(MobiCortexApiService api)
+        /// <summary>
+        /// Serviço da API. Pode ser definido via propriedade para uso no designer.
+        /// </summary>
+        public IMobiCortexClient ApiService
+        {
+            get => _api;
+            set => _api = value;
+        }
+
+        /// <summary>
+        /// Construtor padrão para o Designer do Visual Studio.
+        /// </summary>
+        public FormDashboard()
+        {
+            InitializeComponent();
+        }
+
+        public FormDashboard(IMobiCortexClient api) : this()
         {
             _api = api;
-            InitializeComponent();
         }
 
         // =====================================================================
@@ -33,6 +51,8 @@ namespace SmartSdk.Forms
 
         private async void FormDashboard_Load(object? sender, EventArgs e)
         {
+            // No modo design do VS, _api pode ser null - não carregar dados
+            if (_api == null) return;
             await CarregarTudo();
         }
 
@@ -44,9 +64,9 @@ namespace SmartSdk.Forms
             Log("Carregando informações do controlador...");
 
             // Executa as 3 chamadas em paralelo para eficiência
-            var taskDevice = _api.ObterDeviceInfoAsync();
-            var taskDashboard = _api.ObterDashboardAsync();
-            var taskStats = _api.ObterEstatisticasAsync();
+            var taskDevice = _api.Sistema.ObterDeviceInfoAsync();
+            var taskDashboard = _api.Sistema.ObterDashboardAsync();
+            var taskStats = _api.Cadastros.ObterEstatisticasAsync();
 
             await Task.WhenAll(taskDevice, taskDashboard, taskStats);
 

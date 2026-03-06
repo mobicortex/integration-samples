@@ -1,61 +1,34 @@
-using MQTTnet;
-using MQTTnet.Client;
-using SmartSdk.Services;
+using MobiCortex.Sdk;
+using MobiCortex.Sdk.Services;
+using MobiCortex.Sdk.Interfaces;
 
-namespace SmartSdk.Forms
+namespace SmartSdk
 {
-    // =============================================================================
-    //  MONITORAMENTO - MQTT sobre WebSocket
-    //
-    //  Este formulário demonstra como receber eventos em tempo real do controlador
-    //  usando o protocolo MQTT sobre WebSocket (WSS).
-    //
-    //  O controlador expõe um broker MQTT acessível via WebSocket:
-    //  wss://<host>/mbcortex/master/api/v1/mqtt
-    //
-    //  AUTENTICAÇÃO MQTT:
-    //  - Username: qualquer valor (não é verificado)
-    //  - Password: session_key obtido no login HTTP
-    //
-    //  TÓPICOS DISPONÍVEIS:
-    //  - mbcortex/master/events/#     → Eventos de acesso (registrado/não registrado)
-    //  - mbcortex/master/logs/#       → Logs do sistema
-    //  - mbcortex/master/sensors/#    → Eventos de sensores (portas, botões)
-    //  - mbcortex/master/status/#     → Status do controlador
-    //  - #                            → Todos os tópicos
-    //
-    //  BIBLIOTECA: MQTTnet 4.x (NuGet)
-    //
-    //  FLUXO:
-    //  1. Fazer login HTTP normal (obter session_key)
-    //  2. Conectar via WebSocket usando o session_key como senha MQTT
-    //  3. Subscrever nos tópicos desejados
-    //  4. Receber mensagens em tempo real
-    // =============================================================================
-
+    /// <summary>
+    /// Formulário de Monitoramento MQTT - conecta ao broker da controladora.
+    /// </summary>
     public partial class FormMonitoramento : Form
     {
-        private readonly MobiCortexApiService _api;
-        private IMqttClient? _mqttClient;
+        private IMobiCortexClient _api = null!;
+        private IMqttClientService? _mqttClient;
+        private int _msgCount;
 
-        public FormMonitoramento(MobiCortexApiService api)
+        public FormMonitoramento()
         {
-            _api = api;
             InitializeComponent();
         }
 
-        // =====================================================================
-        //  CONEXÃO MQTT
-        // =====================================================================
+        public FormMonitoramento(IMobiCortexClient api) : this()
+        {
+            _api = api;
+        }
 
-        /// <summary>
-        /// Conecta ao broker MQTT do controlador via WebSocket.
-        ///
-        /// A URL do WebSocket é:
-        ///   wss://{host}/mbcortex/master/api/v1/mqtt
-        ///
-        /// A autenticação usa o session_key do login HTTP como senha MQTT.
-        /// </summary>
+        public IMobiCortexClient ApiService
+        {
+            get => _api;
+            set => _api = value;
+        }
+
         private async void btnConectar_Click(object? sender, EventArgs e)
         {
             if (_mqttClient?.IsConnected == true)
@@ -75,8 +48,6 @@ namespace SmartSdk.Forms
                 btnConectar.Enabled = false;
                 Log("Conectando ao MQTT via WebSocket...");
 
-                // Monta a URL do WebSocket MQTT
-                // Exemplo: wss://192.168.0.100:4449/mbcortex/master/api/v1/mqtt
                 var wsUrl = _api.BaseUrl
                     .Replace("https://", "wss://")
                     .Replace("http://", "ws://")
@@ -84,37 +55,29 @@ namespace SmartSdk.Forms
 
                 Log($"URL: {wsUrl}");
 
-                // Cria o cliente MQTT usando MQTTnet
-                var factory = new MqttFactory();
-                _mqttClient = factory.CreateMqttClient();
+                _mqttClient = new MqttClientService();
+                _mqttClient.MessageReceived += OnMensagemRecebida;
+                _mqttClient.Disconnected += OnDesconectado;
 
-                // Configura para receber mensagens
-                _mqttClient.ApplicationMessageReceivedAsync += OnMensagemRecebida;
-                _mqttClient.DisconnectedAsync += OnDesconectado;
+                var topico = txtTopico.Text.Trim();
+                if (string.IsNullOrEmpty(topico)) topico = "#";
 
-                // Opções de conexão via WebSocket
-                var options = new MqttClientOptionsBuilder()
-                    .WithWebSocketServer(o => o.WithUri(wsUrl))
-                    .WithCredentials("sdk", _api.SessionKey) // Senha = session_key
-                    .WithTlsOptions(o =>
-                    {
-                        // Aceita certificado auto-assinado do controlador
-                        o.WithCertificateValidationHandler(_ => true);
-                    })
-                    .WithClientId($"SmartSdk-{Environment.MachineName}")
-                    .WithCleanSession(true)
-                    .Build();
+                var connected = await _mqttClient.ConnectAsync(wsUrl, _api.SessionKey, new[] { topico });
 
-                await _mqttClient.ConnectAsync(options);
-                Log("Conectado ao MQTT!");
+                if (connected)
+                {
+                    Log("Conectado ao MQTT!");
+                    Log($"Inscrito no tópico: {topico}");
 
-                // Subscreve no tópico padrão
-                await SubscreverTopico();
-
-                btnConectar.Text = "Desconectar";
-                btnConectar.BackColor = Color.FromArgb(220, 53, 69);
-                lblStatus.Text = "Conectado";
-                lblStatus.ForeColor = Color.Green;
+                    btnConectar.Text = "Desconectar";
+                    btnConectar.BackColor = Color.FromArgb(220, 53, 69);
+                    lblStatus.Text = "Conectado";
+                    lblStatus.ForeColor = Color.Green;
+                }
+                else
+                {
+                    Log("Falha ao conectar ao MQTT");
+                }
             }
             catch (Exception ex)
             {
@@ -126,28 +89,6 @@ namespace SmartSdk.Forms
             }
         }
 
-        /// <summary>
-        /// Subscreve no tópico configurado no campo txtTopico.
-        /// Use "#" para receber todas as mensagens.
-        /// </summary>
-        private async Task SubscreverTopico()
-        {
-            if (_mqttClient?.IsConnected != true) return;
-
-            var topico = txtTopico.Text.Trim();
-            if (string.IsNullOrEmpty(topico)) topico = "#";
-
-            var subscribeOptions = new MqttClientSubscribeOptionsBuilder()
-                .WithTopicFilter(topico)
-                .Build();
-
-            await _mqttClient.SubscribeAsync(subscribeOptions);
-            Log($"Inscrito no tópico: {topico}");
-        }
-
-        /// <summary>
-        /// Altera a assinatura para um novo tópico.
-        /// </summary>
         private async void btnSubscrever_Click(object? sender, EventArgs e)
         {
             if (_mqttClient?.IsConnected != true)
@@ -158,11 +99,11 @@ namespace SmartSdk.Forms
 
             try
             {
-                // Remove assinatura anterior (unsubscribe de tudo)
-                await _mqttClient.UnsubscribeAsync(new MqttClientUnsubscribeOptionsBuilder()
-                    .WithTopicFilter("#").Build());
+                var topico = txtTopico.Text.Trim();
+                if (string.IsNullOrEmpty(topico)) topico = "#";
 
-                await SubscreverTopico();
+                await _mqttClient.SubscribeAsync(topico);
+                Log($"Inscrito no tópico: {topico}");
             }
             catch (Exception ex)
             {
@@ -170,48 +111,35 @@ namespace SmartSdk.Forms
             }
         }
 
-        /// <summary>
-        /// Callback: mensagem MQTT recebida.
-        /// Cada mensagem contém o tópico e o payload (JSON geralmente).
-        /// </summary>
-        private Task OnMensagemRecebida(MqttApplicationMessageReceivedEventArgs e)
+        private void OnMensagemRecebida(object? sender, MqttMessageReceivedEventArgs e)
         {
-            var topico = e.ApplicationMessage.Topic;
-            var payload = System.Text.Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
-
-            // Atualiza o log na thread da UI
             Invoke(() =>
             {
-                Log($"[{topico}] {payload}");
-
-                // Incrementa contador de mensagens
+                Log($"[{e.Topic}] {e.Payload}");
                 _msgCount++;
                 lblContador.Text = $"Mensagens: {_msgCount}";
             });
-
-            return Task.CompletedTask;
         }
 
-        private int _msgCount;
-
-        private Task OnDesconectado(MqttClientDisconnectedEventArgs e)
+        private void OnDesconectado(object? sender, EventArgs e)
         {
             Invoke(() =>
             {
-                Log($"Desconectado: {e.Reason}");
+                Log("Desconectado do MQTT");
                 btnConectar.Text = "Conectar MQTT";
                 btnConectar.BackColor = Color.FromArgb(0, 123, 255);
                 lblStatus.Text = "Desconectado";
                 lblStatus.ForeColor = Color.Red;
             });
-            return Task.CompletedTask;
         }
 
         private async Task Desconectar()
         {
-            if (_mqttClient?.IsConnected == true)
+            if (_mqttClient != null)
             {
                 await _mqttClient.DisconnectAsync();
+                (_mqttClient as IDisposable)?.Dispose();
+                _mqttClient = null;
                 Log("Desconectado do MQTT");
             }
         }
@@ -223,20 +151,11 @@ namespace SmartSdk.Forms
             lblContador.Text = "Mensagens: 0";
         }
 
-        // =====================================================================
-        //  CLEANUP
-        // =====================================================================
-
         protected override async void OnFormClosing(FormClosingEventArgs e)
         {
             await Desconectar();
-            _mqttClient?.Dispose();
             base.OnFormClosing(e);
         }
-
-        // =====================================================================
-        //  HELPERS
-        // =====================================================================
 
         private void Log(string msg)
         {

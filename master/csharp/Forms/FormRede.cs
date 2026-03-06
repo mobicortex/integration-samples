@@ -1,7 +1,9 @@
-using SmartSdk.Models;
-using SmartSdk.Services;
+using MobiCortex.Sdk;
+using MobiCortex.Sdk.Services;
+using MobiCortex.Sdk.Models;
+using MobiCortex.Sdk.Interfaces;
 
-namespace SmartSdk.Forms
+namespace SmartSdk
 {
     // =============================================================================
     //  CONFIGURAÇÃO DE REDE
@@ -23,12 +25,28 @@ namespace SmartSdk.Forms
 
     public partial class FormRede : Form
     {
-        private readonly MobiCortexApiService _api;
+        private IMobiCortexClient _api = null!;
 
-        public FormRede(MobiCortexApiService api)
+        /// <summary>
+        /// Serviço da API. Pode ser definido via propriedade para uso no designer.
+        /// </summary>
+        public IMobiCortexClient ApiService
+        {
+            get => _api;
+            set => _api = value;
+        }
+
+        /// <summary>
+        /// Construtor padrão para o Designer do Visual Studio.
+        /// </summary>
+        public FormRede()
+        {
+            InitializeComponent();
+        }
+
+        public FormRede(IMobiCortexClient api) : this()
         {
             _api = api;
-            InitializeComponent();
         }
 
         // =====================================================================
@@ -37,6 +55,8 @@ namespace SmartSdk.Forms
 
         private async void FormRede_Load(object? sender, EventArgs e)
         {
+            // No modo design do VS, _api pode ser null - não carregar dados
+            if (_api == null) return;
             await CarregarConfiguracao();
         }
 
@@ -47,7 +67,7 @@ namespace SmartSdk.Forms
         private async Task CarregarConfiguracao()
         {
             Log("Lendo configuração de rede...");
-            var result = await _api.ObterRedeAsync();
+            var result = await _api.Sistema.ObterConfiguracaoRedeAsync();
 
             if (result.Success && result.Data != null)
             {
@@ -117,7 +137,7 @@ namespace SmartSdk.Forms
             };
 
             Log("Salvando configuração...");
-            var result = await _api.SalvarRedeAsync(config);
+            var result = await _api.Sistema.SalvarConfiguracaoRedeAsync(config);
 
             if (result.Success)
                 Log("Configuração salva com sucesso! A rede será reiniciada.");

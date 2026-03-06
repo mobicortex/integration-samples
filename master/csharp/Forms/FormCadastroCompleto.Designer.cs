@@ -1,4 +1,4 @@
-namespace SmartSdk.Forms
+namespace SmartSdk
 {
     partial class FormCadastroCompleto
     {
@@ -131,6 +131,7 @@ namespace SmartSdk.Forms
             // 
             panelCadastrosBotoes.Controls.Add(txtFiltroCadastro);
             panelCadastrosBotoes.Controls.Add(btnBuscarCadastro);
+            panelCadastrosBotoes.Controls.Add(btnRefreshCadastros);
             panelCadastrosBotoes.Controls.Add(btnNovoCadastro);
             panelCadastrosBotoes.Controls.Add(btnExcluirCadastro);
             panelCadastrosBotoes.Dock = DockStyle.Top;
@@ -159,13 +160,23 @@ namespace SmartSdk.Forms
             // 
             // btnNovoCadastro
             // 
+            btnRefreshCadastros = new Button();
+            btnRefreshCadastros.Location = new Point(161, 3);
+            btnRefreshCadastros.Name = "btnRefreshCadastros";
+            btnRefreshCadastros.Size = new Size(25, 25);
+            btnRefreshCadastros.TabIndex = 2;
+            btnRefreshCadastros.Text = "🔄";
+            btnRefreshCadastros.Click += btnRefreshCadastros_Click;
+            // 
+            // btnNovoCadastro
+            // 
             btnNovoCadastro.BackColor = Color.FromArgb(40, 167, 69);
             btnNovoCadastro.FlatStyle = FlatStyle.Flat;
             btnNovoCadastro.ForeColor = Color.White;
-            btnNovoCadastro.Location = new Point(161, 3);
+            btnNovoCadastro.Location = new Point(190, 3);
             btnNovoCadastro.Name = "btnNovoCadastro";
             btnNovoCadastro.Size = new Size(60, 25);
-            btnNovoCadastro.TabIndex = 2;
+            btnNovoCadastro.TabIndex = 3;
             btnNovoCadastro.Text = "+ Novo";
             btnNovoCadastro.UseVisualStyleBackColor = false;
             btnNovoCadastro.Click += btnNovoCadastro_Click;
@@ -175,7 +186,7 @@ namespace SmartSdk.Forms
             btnExcluirCadastro.BackColor = Color.FromArgb(220, 53, 69);
             btnExcluirCadastro.FlatStyle = FlatStyle.Flat;
             btnExcluirCadastro.ForeColor = Color.White;
-            btnExcluirCadastro.Location = new Point(224, 3);
+            btnExcluirCadastro.Location = new Point(253, 3);
             btnExcluirCadastro.Name = "btnExcluirCadastro";
             btnExcluirCadastro.Size = new Size(60, 25);
             btnExcluirCadastro.TabIndex = 3;
@@ -240,6 +251,7 @@ namespace SmartSdk.Forms
             listCadastros.UseCompatibleStateImageBehavior = false;
             listCadastros.View = View.Details;
             listCadastros.SelectedIndexChanged += listCadastros_SelectedIndexChanged;
+            listCadastros.DoubleClick += listCadastros_DoubleClick;
             // 
             // colCadId
             // 
@@ -295,6 +307,7 @@ namespace SmartSdk.Forms
             // 
             // panelEntidadesBotoes
             // 
+            panelEntidadesBotoes.Controls.Add(btnRefreshEntidades);
             panelEntidadesBotoes.Controls.Add(btnNovaEntidade);
             panelEntidadesBotoes.Controls.Add(btnExcluirEntidade);
             panelEntidadesBotoes.Dock = DockStyle.Top;
@@ -303,15 +316,23 @@ namespace SmartSdk.Forms
             panelEntidadesBotoes.Size = new Size(336, 32);
             panelEntidadesBotoes.TabIndex = 2;
             // 
+            btnRefreshEntidades = new Button();
+            btnRefreshEntidades.Location = new Point(0, 3);
+            btnRefreshEntidades.Name = "btnRefreshEntidades";
+            btnRefreshEntidades.Size = new Size(25, 25);
+            btnRefreshEntidades.TabIndex = 0;
+            btnRefreshEntidades.Text = "🔄";
+            btnRefreshEntidades.Click += btnRefreshEntidades_Click;
+            // 
             // btnNovaEntidade
             // 
             btnNovaEntidade.BackColor = Color.FromArgb(40, 167, 69);
             btnNovaEntidade.FlatStyle = FlatStyle.Flat;
             btnNovaEntidade.ForeColor = Color.White;
-            btnNovaEntidade.Location = new Point(0, 3);
+            btnNovaEntidade.Location = new Point(28, 3);
             btnNovaEntidade.Name = "btnNovaEntidade";
             btnNovaEntidade.Size = new Size(100, 25);
-            btnNovaEntidade.TabIndex = 0;
+            btnNovaEntidade.TabIndex = 1;
             btnNovaEntidade.Text = "+ Pessoa/Veíc.";
             btnNovaEntidade.UseVisualStyleBackColor = false;
             btnNovaEntidade.Click += btnNovaEntidade_Click;
@@ -321,7 +342,7 @@ namespace SmartSdk.Forms
             btnExcluirEntidade.BackColor = Color.FromArgb(220, 53, 69);
             btnExcluirEntidade.FlatStyle = FlatStyle.Flat;
             btnExcluirEntidade.ForeColor = Color.White;
-            btnExcluirEntidade.Location = new Point(103, 3);
+            btnExcluirEntidade.Location = new Point(131, 3);
             btnExcluirEntidade.Name = "btnExcluirEntidade";
             btnExcluirEntidade.Size = new Size(70, 25);
             btnExcluirEntidade.TabIndex = 1;
@@ -343,6 +364,7 @@ namespace SmartSdk.Forms
             listEntidades.UseCompatibleStateImageBehavior = false;
             listEntidades.View = View.Details;
             listEntidades.SelectedIndexChanged += listEntidades_SelectedIndexChanged;
+            listEntidades.DoubleClick += listEntidades_DoubleClick;
             // 
             // colEntId
             // 
@@ -403,6 +425,7 @@ namespace SmartSdk.Forms
             // 
             // panelMidiasBotoes
             // 
+            panelMidiasBotoes.Controls.Add(btnRefreshMidias);
             panelMidiasBotoes.Controls.Add(btnNovaMidia);
             panelMidiasBotoes.Controls.Add(btnExcluirMidia);
             panelMidiasBotoes.Dock = DockStyle.Top;
@@ -411,15 +434,23 @@ namespace SmartSdk.Forms
             panelMidiasBotoes.Size = new Size(386, 32);
             panelMidiasBotoes.TabIndex = 2;
             // 
+            btnRefreshMidias = new Button();
+            btnRefreshMidias.Location = new Point(0, 3);
+            btnRefreshMidias.Name = "btnRefreshMidias";
+            btnRefreshMidias.Size = new Size(25, 25);
+            btnRefreshMidias.TabIndex = 0;
+            btnRefreshMidias.Text = "🔄";
+            btnRefreshMidias.Click += btnRefreshMidias_Click;
+            // 
             // btnNovaMidia
             // 
             btnNovaMidia.BackColor = Color.FromArgb(40, 167, 69);
             btnNovaMidia.FlatStyle = FlatStyle.Flat;
             btnNovaMidia.ForeColor = Color.White;
-            btnNovaMidia.Location = new Point(0, 3);
+            btnNovaMidia.Location = new Point(28, 3);
             btnNovaMidia.Name = "btnNovaMidia";
             btnNovaMidia.Size = new Size(90, 25);
-            btnNovaMidia.TabIndex = 0;
+            btnNovaMidia.TabIndex = 1;
             btnNovaMidia.Text = "+ Mídia";
             btnNovaMidia.UseVisualStyleBackColor = false;
             btnNovaMidia.Click += btnNovaMidia_Click;
@@ -429,7 +460,7 @@ namespace SmartSdk.Forms
             btnExcluirMidia.BackColor = Color.FromArgb(220, 53, 69);
             btnExcluirMidia.FlatStyle = FlatStyle.Flat;
             btnExcluirMidia.ForeColor = Color.White;
-            btnExcluirMidia.Location = new Point(93, 3);
+            btnExcluirMidia.Location = new Point(121, 3);
             btnExcluirMidia.Name = "btnExcluirMidia";
             btnExcluirMidia.Size = new Size(70, 25);
             btnExcluirMidia.TabIndex = 1;
@@ -450,6 +481,7 @@ namespace SmartSdk.Forms
             listMidias.TabIndex = 3;
             listMidias.UseCompatibleStateImageBehavior = false;
             listMidias.View = View.Details;
+            listMidias.DoubleClick += listMidias_DoubleClick;
             // 
             // colMidId
             // 
@@ -552,6 +584,9 @@ namespace SmartSdk.Forms
         private FlowLayoutPanel panelMidiasBotoes;
         private Button btnNovaMidia;
         private Button btnExcluirMidia;
+        private Button btnRefreshCadastros;
+        private Button btnRefreshEntidades;
+        private Button btnRefreshMidias;
         private ListView listMidias;
         private ColumnHeader colMidId;
         private ColumnHeader colMidTipo;
