@@ -409,7 +409,7 @@ namespace SmartSdk
                 {
                     Name = formVeiculo.NomeEntidadeGerado,
                     Doc = formVeiculo.Placa,
-                    Enabled = formVeiculo.EntidadeEnabled,
+                    Habilitado = formVeiculo.EntidadeHabilitado,
                     Brand = string.IsNullOrWhiteSpace(formVeiculo.Marca) ? null : formVeiculo.Marca,
                     Model = string.IsNullOrWhiteSpace(formVeiculo.Modelo) ? null : formVeiculo.Modelo,
                     Color = string.IsNullOrWhiteSpace(formVeiculo.Cor) ? null : formVeiculo.Cor,
@@ -447,10 +447,10 @@ namespace SmartSdk
             {
                 Name = form.Nome,
                 Doc = docLimpo, // null se vazio (não será enviado no JSON)
-                Enabled = form.EntidadeEnabled,
+                Habilitado = form.EntidadeHabilitado,
                 // Pessoas (tipo 1) não usam LPR - não envia o campo (null)
                 // Veículos (tipo 2) enviam 0 ou 1
-                LprAtivo = entidade.Tipo == 1 ? null : (form.EntidadeEnabled ? 1 : 0)
+                LprAtivo = entidade.Tipo == 1 ? null : form.EntidadeHabilitado
             };
 
             // DEBUG: Log do JSON sendo enviado
@@ -524,7 +524,7 @@ namespace SmartSdk
                     Name = formPessoa.Nome,
                     Doc = formPessoa.Documento,
                     LprAtivo = formPessoa.LprAtivo,
-                    Enabled = formPessoa.EntidadeEnabled
+                    Habilitado = formPessoa.EntidadeHabilitado
                 };
                 nomeLog = formPessoa.Nome;
             }

@@ -282,9 +282,9 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("tipo")]
         public int Tipo { get; set; }
 
-        /// <summary>true=habilitado, false=desabilitado. API retorna boolean.</summary>
-        [JsonPropertyName("enabled")]
-        public bool Enabled { get; set; } = true;
+        /// <summary>1=habilitado, 0=desabilitado. API usa inteiro.</summary>
+        [JsonPropertyName("habilitado")]
+        public int Habilitado { get; set; } = 1;
 
         [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;
@@ -373,8 +373,8 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("tipo")]
         public int Tipo { get; set; } = 1;
 
-        [JsonPropertyName("enabled")]
-        public bool Enabled { get; set; } = true;
+        [JsonPropertyName("habilitado")]
+        public int Habilitado { get; set; } = 1;
 
         [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;
@@ -453,9 +453,9 @@ namespace MobiCortex.Sdk.Models
     /// </summary>
     public class AtualizarEntidadeRequest
     {
-        [JsonPropertyName("enabled")]
+        [JsonPropertyName("habilitado")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public bool? Enabled { get; set; }
+        public int? Habilitado { get; set; }
 
         [JsonPropertyName("name")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
