@@ -1,143 +1,147 @@
-# SmartSdk — Exemplo de Integração MobiCortex (C# / WinForms)
+# SmartSdk - MobiCortex Integration Sample (C# / WinForms)
 
-Aplicação Windows Forms que demonstra a integração com a API REST do controlador MobiCortex.
-O projeto é um **exemplo de referência** para integradores que desejam gerenciar cadastros, entidades, mídias, monitoramento MQTT e configuração de rede via API.
+Windows Forms application that demonstrates integration with the MobiCortex controller REST API.
+This project is a reference sample for integrators who need to manage registries, entities, media, MQTT monitoring, and network settings through the MobiCortex platform.
 
-## Arquitetura
+The repository also includes the MobiCortex .NET SDK library used by the sample application. You may freely use, copy, modify, and distribute the SDK/library in your own customer projects under the MIT License, provided the integration is used with MobiCortex devices.
 
-O aplicativo usa uma arquitetura **multi-form launcher**:
+## Architecture
 
-- **MainForm** — Tela de conexão (IP + senha) e launcher dos formulários de demonstração.
-- **FormCadastroCompleto** — Modelo completo de 3 níveis: Cadastro Central → Entidade → Mídia.
-- **FormCadastroSimples** — Modelo simplificado de 2 níveis: Entidade → Mídia (`createid=true`).
-- **FormMonitoramento** — Recebimento de eventos em tempo real via MQTT.
-- **FormRede** — Leitura e alteração da configuração de rede do controlador.
-- **FormDashboard** — Informações do dispositivo (versão, uptime, estatísticas).
+The application uses a multi-form launcher architecture:
 
-Todos os formulários compartilham uma instância única de `MobiCortexApiService`.
+- MainForm - Connection screen (IP + password) and launcher for the demo forms.
+- FormCadastroCompleto - Complete 3-level model: Central Registry -> Entity -> Media.
+- FormCadastroSimples - Simplified 2-level model: Entity -> Media (`createid=true`).
+- FormMonitoramento - Real-time event monitoring through MQTT.
+- FormRede - Read and update controller network settings.
+- FormDashboard - Device information, uptime, and statistics.
 
-## Funcionalidades
+All forms share a single `MobiCortexApiService` instance.
 
-### Cadastro Completo (3 níveis)
-- CRUD de Cadastros Centrais com paginação (20 itens/página)
-- CRUD de Entidades vinculadas a um cadastro
-- CRUD de Mídias vinculadas a uma entidade
-- Busca por ID (numérico) ou por nome (texto)
+## Features
 
-### Cadastro Simplificado (2 níveis)
-- Criação de entidades com `createid=true` — o controlador gera IDs automaticamente
-- Não é necessário criar cadastro central previamente
-- CRUD de Mídias vinculadas a uma entidade
-- Busca por entity_id ou por nome, com paginação
+### Complete Registry Flow (3 levels)
+- CRUD for Central Registries with pagination (20 items per page)
+- CRUD for Entities linked to a registry
+- CRUD for Media linked to an entity
+- Search by ID (numeric) or by name (text)
 
-### Monitoramento (MQTT)
-- Conexão MQTT ao controlador (porta 1883)
-- Recebimento de eventos de acesso em tempo real
-- Exibição de eventos formatados em console
+### Simplified Registry Flow (2 levels)
+- Entity creation with `createid=true` so the controller generates IDs automatically
+- No need to create a central registry in advance
+- CRUD for Media linked to an entity
+- Search by `entity_id` or by name, with pagination
 
-### Rede
-- Leitura da configuração de rede atual (IP, máscara, gateway, DNS, DHCP)
-- Alteração e envio de nova configuração
+### Monitoring (MQTT)
+- MQTT connection to the controller (port 1883)
+- Real-time access events
+- Formatted event output in the console
+
+### Network
+- Read current network settings (IP, mask, gateway, DNS, DHCP)
+- Update and submit a new network configuration
 
 ### Dashboard
-- Informações do dispositivo (modelo, versão de firmware, MAC)
-- Estatísticas de cadastros e entidades
+- Device information (model, firmware version, MAC)
+- Registry and entity statistics
 
-## Requisitos
+## Requirements
 
-- Windows 10 ou superior
+- Windows 10 or later
 - .NET 8.0 SDK/Runtime
-- Acesso à rede onde o controlador MobiCortex está instalado
+- Network access to the MobiCortex controller
 
-## Como Usar
+## How To Use
 
-1. Execute o aplicativo `SmartSdk.exe`
-2. Informe o IP do controlador (ex: `192.168.120.45`)
-3. Informe a senha (padrão: `admin`)
-4. Clique em **Conectar**
-5. Após conectar, clique em qualquer botão para abrir o formulário de demonstração
+1. Run the `SmartSdk.exe` application.
+2. Enter the controller IP address, for example `192.168.120.45`.
+3. Enter the password (default: `admin`).
+4. Click **Connect**.
+5. After connecting, open any demo form from the main launcher.
 
-## Estrutura do Projeto
+## Project Structure
 
-```
+```text
 SmartSdk/
-├── Forms/
-│   ├── FormCadastroCompleto.cs/.Designer.cs   # Modelo completo (3 níveis)
-│   ├── FormCadastroSimples.cs/.Designer.cs    # Modelo simplificado (2 níveis)
-│   ├── FormMonitoramento.cs/.Designer.cs      # Eventos MQTT em tempo real
-│   ├── FormRede.cs/.Designer.cs               # Configuração de rede
-│   └── FormDashboard.cs/.Designer.cs          # Informações do dispositivo
-├── Models/
-│   └── MobiCortexModels.cs    # Todos os modelos (request/response/entidades)
-├── Services/
-│   └── MobiCortexApiService.cs # Serviço HTTP + autenticação + helpers
-├── MainForm.cs / .Designer.cs # Launcher principal
-├── Program.cs                 # Ponto de entrada
-├── SmartSdk.csproj            # Projeto .NET 8.0 (WinForms + MQTTnet)
-└── README.md                  # Este arquivo
+|-- Forms/
+|   |-- FormCadastroCompleto.cs/.Designer.cs
+|   |-- FormCadastroSimples.cs/.Designer.cs
+|   |-- FormMonitoramento.cs/.Designer.cs
+|   |-- FormRede.cs/.Designer.cs
+|   `-- FormDashboard.cs/.Designer.cs
+|-- Models/
+|   `-- MobiCortexModels.cs
+|-- Services/
+|   `-- MobiCortexApiService.cs
+|-- MobiCortexSdkLib/
+|   `-- MobiCortex.Sdk.csproj
+|-- MainForm.cs / .Designer.cs
+|-- Program.cs
+|-- SmartSdk.csproj
+`-- README.md
 ```
 
-## API REST
+## REST API Overview
 
-O serviço se comunica com a API REST do controlador via HTTPS (porta 4449, certificado auto-assinado).
+The service communicates with the controller REST API over HTTPS (port 4449, self-signed certificate).
 
-Prefixo de todas as rotas: `/mbcortex/master/api/v1`
+Base route prefix: `/mbcortex/master/api/v1`
 
-### Autenticação
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| POST | `/login` | Login com senha → retorna `session_key` (Bearer token, 900s TTL) |
-| POST | `/logout` | Encerra a sessão |
-| PUT | `/password` | Altera a senha do dispositivo |
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/login` | Login with password and receive `session_key` (Bearer token, 900s TTL) |
+| POST | `/logout` | End the current session |
+| PUT | `/password` | Change the device password |
 
-### Cadastro Central
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/central-registry?offset=0&count=20` | Lista cadastros paginados |
-| GET | `/central-registry?id={id}` | Busca cadastro por ID |
-| GET | `/central-registry?name={filtro}` | Filtra cadastros por nome |
-| POST | `/central-registry` | Cria ou atualiza cadastro |
-| DELETE | `/central-registry?id={id}` | Remove cadastro |
+### Central Registry
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/central-registry?offset=0&count=20` | List registries with pagination |
+| GET | `/central-registry?id={id}` | Get registry by ID |
+| GET | `/central-registry?name={filter}` | Filter registries by name |
+| POST | `/central-registry` | Create or update a registry |
+| DELETE | `/central-registry?id={id}` | Delete a registry |
 
-### Entidades
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/entities?id={entity_id}` | Busca entidade por ID |
-| GET | `/entities?cadastro_id={id}` | Lista entidades de um cadastro |
-| POST | `/entities` | Cria entidade (com suporte a `createid=true`) |
-| PUT | `/entities?id={entity_id}` | Atualiza entidade |
-| DELETE | `/entities?id={entity_id}` | Remove entidade e mídias vinculadas |
+### Entities
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/entities?id={entity_id}` | Get entity by ID |
+| GET | `/entities?cadastro_id={id}` | List entities from a registry |
+| POST | `/entities` | Create an entity, including `createid=true` support |
+| PUT | `/entities?id={entity_id}` | Update an entity |
+| DELETE | `/entities?id={entity_id}` | Delete an entity and related media |
 
-### Mídias
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/media?entity_id={id}` | Lista mídias de uma entidade |
-| GET | `/media?id={media_id}` | Busca mídia por ID |
-| POST | `/media` | Cria mídia (RFID, placa, facial, etc.) |
-| DELETE | `/media?id={media_id}` | Remove mídia |
+### Media
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/media?entity_id={id}` | List media for an entity |
+| GET | `/media?id={media_id}` | Get media by ID |
+| POST | `/media` | Create media (RFID, plate, facial, and others) |
+| DELETE | `/media?id={media_id}` | Delete media |
 
-### Rede
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/network/cable` | Lê configuração de rede |
-| POST | `/network/cable` | Altera configuração de rede |
+### Network
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/network/cable` | Read network configuration |
+| POST | `/network/cable` | Update network configuration |
 
 ### Dashboard
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/dashboard` | Estatísticas do dispositivo |
-| GET | `/device-info` | Informações de hardware/firmware |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/dashboard` | Device statistics |
+| GET | `/device-info` | Hardware and firmware information |
 
-## Exemplos de Código
+## Code Examples
 
-### Criar entidade no modelo simplificado (`createid=true`)
+### Create an entity in the simplified flow (`createid=true`)
 
 ```csharp
 var request = new CriarEntidadeRequest
 {
-    CreateId = true,     // Controlador gera entity_id e cadastro_id
+    CreateId = true,
     Tipo = (int)TipoEntidade.Pessoa,
-    Name = "João Silva",
+    Name = "John Doe",
     Doc = "123.456.789-00"
 };
 
@@ -148,28 +152,26 @@ if (result.Success && result.Data?.Ret == 0)
 }
 ```
 
-### Criar entidade no modelo completo (informando cadastro_id)
+### Create an entity in the complete flow (informing `cadastro_id`)
 
 ```csharp
 var request = new CriarEntidadeRequest
 {
-    CadastroId = 42,       // Cadastro central previamente criado
+    CadastroId = 42,
     Tipo = (int)TipoEntidade.Veiculo,
-    Name = "Civic Preto",
+    Name = "Black Civic",
     Doc = "ABC1D23",
-    LprAtivo = 1           // Cria mídia de placa automaticamente
+    LprAtivo = 1
 };
 
 var result = await _api.CriarEntidadeAsync(request);
 ```
 
-### Listar entidades com paginação
+### List entities with pagination
 
 ```csharp
-// Listar cadastros centrais (paginado, com filtro opcional por nome)
-var cadastros = await _api.ListarCadastrosAsync(offset: 0, count: 20, filtroNome: "João");
+var cadastros = await _api.ListarCadastrosAsync(offset: 0, count: 20, filtroNome: "John");
 
-// Para cada cadastro, listar suas entidades
 foreach (var cad in cadastros.Data.Items)
 {
     var entidades = await _api.ListarEntidadesAsync(cad.Id);
@@ -178,7 +180,7 @@ foreach (var cad in cadastros.Data.Items)
 }
 ```
 
-### Criar mídia RFID
+### Create RFID media
 
 ```csharp
 var request = new CriarMidiaRequest
@@ -186,81 +188,80 @@ var request = new CriarMidiaRequest
     EntityId = 4294000123,
     CadastroId = 42,
     Tipo = TipoMidia.Wiegand26,
-    Descricao = "123,45678"     // Facility,Card
+    Descricao = "123,45678"
 };
 
 var result = await _api.CriarMidiaAsync(request);
 ```
 
-### Criar mídia LPR (Placa de veículo)
+### Create LPR media (vehicle plate)
 
-**IMPORTANTE**: O backend valida o formato da mídia automaticamente. Para LPR (placa),
-é necessário enviar `ns32_0` e `ns32_1` para evitar que o backend tente validar
-a placa como se fosse um formato RFID.
+Important: the backend validates the media format automatically. For LPR media, send `ns32_0` and `ns32_1` so the backend does not try to validate the plate as RFID data.
 
 ```csharp
 var request = new CriarMidiaRequest
 {
     EntityId = 4294000123,
     CadastroId = 42,
-    Tipo = TipoMidia.Lpr,        // Tipo 17
-    Descricao = "ABC1D23",       // Placa do veículo
-    Ns32_0 = 0,                  // Obrigatório para LPR (evita validação RFID)
-    Ns32_1 = 0                   // Obrigatório para LPR (evita validação RFID)
+    Tipo = TipoMidia.Lpr,
+    Descricao = "ABC1D23",
+    Ns32_0 = 0,
+    Ns32_1 = 0
 };
 
 var result = await _api.CriarMidiaAsync(request);
 ```
 
-**NOTA**: A forma recomendada de criar LPR é usando `lpr_ativo=1` no cadastro da
-entidade (veículo). O backend converte automaticamente a placa em dados binários:
+Recommended approach: use `lpr_ativo=1` on the vehicle entity record. The backend then converts the vehicle plate into the required binary data automatically.
 
 ```csharp
 var request = new CriarEntidadeRequest
 {
     CadastroId = 42,
     Tipo = (int)TipoEntidade.Veiculo,
-    Name = "Civic Preto",
-    Doc = "ABC1D23",      // Placa
-    LprAtivo = 1          // Cria mídia LPR automaticamente
+    Name = "Black Civic",
+    Doc = "ABC1D23",
+    LprAtivo = 1
 };
 ```
 
-## Tipos de Mídia Suportados
+## Supported Media Types
 
-| Constante | Valor | Formato |
-|-----------|-------|---------|
-| `Wiegand26` | 1 | `Facility,Card` (ex: `123,45678`) |
+| Constant | Value | Format |
+|----------|-------|--------|
+| `Wiegand26` | 1 | `Facility,Card` (example: `123,45678`) |
 | `Wiegand34` | 2 | `Facility,Card` |
-| `Lpr` | 17 | Placa do veículo (ex: `ABC1D23`) |
-| `Facial` | 20 | Imagem facial (base64) |
+| `Lpr` | 17 | Vehicle plate (example: `ABC1D23`) |
+| `Facial` | 20 | Facial image (base64) |
 
-## Compilação
+## Build
 
 ```bash
 dotnet build SmartSdk.csproj
 ```
 
-Ou use o script:
+Or use the script:
+
 ```bash
 build.bat
 ```
 
-## Execução
+## Run
 
 ```bash
 dotnet run
 ```
 
-Ou execute diretamente:
+Or run the executable directly:
+
 ```bash
 bin\Debug\net8.0-windows\SmartSdk.exe
 ```
 
-## Licença
+## License
 
-Este projeto está licenciado sob a Licença MIT.
+This project is licensed under the MIT License.
 
-Você pode usar o código C# como biblioteca embarcada na aplicação, desde que a integração seja realizada com hardwares homologados: Powered By Mobi Cortex.
+The sample code and the included SDK/library can be freely used in customer applications under the MIT License, as long as the integration targets MobiCortex devices.
 
-Para o texto completo da licença, consulte `LICENSE`.
+For the full license text, see `LICENSE`.

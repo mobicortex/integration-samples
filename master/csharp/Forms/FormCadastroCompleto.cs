@@ -408,17 +408,24 @@ namespace SmartSdk
             using var form = new FormCadastroPessoaEdit(entidade);
             if (form.ShowDialog(this) != DialogResult.OK) return;
 
-            // Cria o request de atualização
-            var request = new AtualizarEntidadeRequest
+            // Cria o request de atualização (PUT /entities?id=X)
+            // Usa AtualizarEntidadeRequest - só envia os campos que quer alterar
+            var docLimpo = string.IsNullOrWhiteSpace(form.Documento) ? null : form.Documento.Trim();
+            var entidadeAtualizada = new AtualizarEntidadeRequest
             {
-                EntityId = entidade.EntityId,
                 Name = form.Nome,
-                Doc = form.Documento,
-                Habilitado = form.Habilitado,
-                LprAtivo = form.LprAtivo
+                Doc = docLimpo, // null se vazio (não será enviado no JSON)
+                Enabled = form.EntidadeEnabled,
+                // Pessoas (tipo 1) não usam LPR - não envia o campo (null)
+                // Veículos (tipo 2) enviam 0 ou 1
+                LprAtivo = entidade.Tipo == 1 ? null : (form.EntidadeEnabled ? 1 : 0)
             };
 
-            var result = await _api.Entidades.AtualizarAsync(entidade.EntityId, request);
+            // DEBUG: Log do JSON sendo enviado
+            var jsonDebug = System.Text.Json.JsonSerializer.Serialize(entidadeAtualizada);
+            Log($"DEBUG PUT /entities?id={entidade.EntityId}: {jsonDebug}");
+
+            var result = await _api.Entidades.AtualizarAsync(entidade.EntityId, entidadeAtualizada);
             if (result.Success)
             {
                 Log($"Entidade atualizada: {form.Nome}");
@@ -427,7 +434,7 @@ namespace SmartSdk
             }
             else
             {
-                var msg = $"Erro ao atualizar entidade:\n{result.Message}";
+                var msg = $"Erro ao atualizar entidade:\n{result.Message}\nResposta: {result.RawResponse}";
                 Log(msg);
                 Aviso(msg);
             }
@@ -485,7 +492,7 @@ namespace SmartSdk
                     Name = formPessoa.Nome,
                     Doc = formPessoa.Documento,
                     LprAtivo = formPessoa.LprAtivo,
-                    Habilitado = formPessoa.Habilitado
+                    Enabled = formPessoa.EntidadeEnabled
                 };
                 nomeLog = formPessoa.Nome;
             }

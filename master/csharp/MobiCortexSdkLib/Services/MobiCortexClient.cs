@@ -180,10 +180,10 @@ namespace MobiCortex.Sdk.Services
             return await PostAsync<CriarEntidadeResponse>("/entities", request);
         }
 
-        async Task<ApiResult<ApiRetResponse>> IEntidadeService.AtualizarAsync(uint entityId, Entidade entidade)
+        async Task<ApiResult<ApiRetResponse>> IEntidadeService.AtualizarAsync(uint entityId, AtualizarEntidadeRequest request)
         {
-            // API usa PUT para atualizar entidade (com entity_id no body)
-            return await PutAsync<ApiRetResponse>("/entities", entidade);
+            // API usa PUT /entities?id=X para atualizar entidade parcialmente
+            return await PutAsync<ApiRetResponse>($"/entities?id={entityId}", request);
         }
 
         async Task<ApiResult<ApiRetResponse>> IEntidadeService.ExcluirAsync(uint entityId)
@@ -300,9 +300,15 @@ namespace MobiCortex.Sdk.Services
             try
             {
                 var url = $"{_baseUrl}{API}{endpoint}";
-                var content = JsonContent.Create(body, options: _json);
+                var jsonBody = JsonSerializer.Serialize(body, _json);
+                Debug.WriteLine($"[MobiCortex SDK] PUT {url}");
+                Debug.WriteLine($"[MobiCortex SDK] Body: {jsonBody}");
+                
+                var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
                 var response = await _http.PutAsync(url, content);
                 var json = await response.Content.ReadAsStringAsync();
+                
+                Debug.WriteLine($"[MobiCortex SDK] Response: HTTP {(int)response.StatusCode} - {json}");
                 
                 if (!response.IsSuccessStatusCode)
                     return new ApiResult<T> { Success = false, Message = $"HTTP {(int)response.StatusCode}", RawResponse = json };
@@ -312,6 +318,7 @@ namespace MobiCortex.Sdk.Services
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"[MobiCortex SDK] Error: {ex.Message}");
                 return new ApiResult<T> { Success = false, Message = ex.Message };
             }
         }

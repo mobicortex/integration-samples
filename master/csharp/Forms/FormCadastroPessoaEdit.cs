@@ -10,8 +10,7 @@ namespace SmartSdk
         // Dados da pessoa (preenchidos ao salvar)
         public string Nome { get; private set; } = string.Empty;
         public string Documento { get; private set; } = string.Empty;
-        public int LprAtivo { get; private set; }
-        public int Habilitado { get; private set; } = 1;
+        public bool EntidadeEnabled { get; private set; } = true;
         
         // Dados para edição
         private readonly Entidade _entidade;
@@ -31,8 +30,14 @@ namespace SmartSdk
             lblEntityId.Text = _entidade.EntityId.ToString();
             txtNome.Text = _entidade.Name;
             txtDocumento.Text = _entidade.Doc;
-            chkLprAtivo.Checked = _entidade.LprAtivo == 1;
-            chkHabilitado.Checked = _entidade.Habilitado == 1;
+            
+            // IMPORTANTE: habilitado = 1 significa ATIVO (checked = true)
+            // habilitado = 0 significa INATIVO (checked = false)
+            chkHabilitado.Checked = _entidade.Enabled; // Propriedade Enabled da entidade (bool)
+            
+            // Mostra datas
+            lblCreatedAt.Text = _entidade.CriadoEm;
+            lblUpdatedAt.Text = _entidade.AtualizadoEm;
         }
         
         /// <summary>
@@ -53,8 +58,10 @@ namespace SmartSdk
             // Armazena os dados
             Nome = txtNome.Text.Trim();
             Documento = txtDocumento.Text.Trim();
-            LprAtivo = chkLprAtivo.Checked ? 1 : 0;
-            Habilitado = chkHabilitado.Checked ? 1 : 0;
+            
+            // IMPORTANTE: Checked = true significa habilitado/enabled = true (ATIVO)
+            // Checked = false significa habilitado/enabled = false (INATIVO)
+            EntidadeEnabled = chkHabilitado.Checked;
             
             DialogResult = DialogResult.OK;
             Close();

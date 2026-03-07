@@ -163,15 +163,19 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("updated_at")]
         public uint UpdatedAt { get; set; }
 
-        // Helpers para exibição
+        // Helpers para exibição - Converte de UTC para horário de Brasília (UTC-3)
         [JsonIgnore]
         public string CriadoEm => CreatedAt > 0
-            ? DateTimeOffset.FromUnixTimeSeconds(CreatedAt).LocalDateTime.ToString("dd/MM/yyyy HH:mm")
+            ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
+                DateTimeOffset.FromUnixTimeSeconds(CreatedAt).UtcDateTime, 
+                "E. South America Standard Time").ToString("dd/MM/yyyy HH:mm")
             : "-";
 
         [JsonIgnore]
         public string AtualizadoEm => UpdatedAt > 0
-            ? DateTimeOffset.FromUnixTimeSeconds(UpdatedAt).LocalDateTime.ToString("dd/MM/yyyy HH:mm")
+            ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
+                DateTimeOffset.FromUnixTimeSeconds(UpdatedAt).UtcDateTime, 
+                "E. South America Standard Time").ToString("dd/MM/yyyy HH:mm")
             : "-";
     }
 
@@ -248,9 +252,9 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("tipo")]
         public int Tipo { get; set; }
 
-        /// <summary>1=habilitado, 0=desabilitado</summary>
-        [JsonPropertyName("habilitado")]
-        public int Habilitado { get; set; } = 1;
+        /// <summary>true=habilitado, false=desabilitado. API retorna boolean.</summary>
+        [JsonPropertyName("enabled")]
+        public bool Enabled { get; set; } = true;
 
         [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;
@@ -306,6 +310,11 @@ namespace MobiCortex.Sdk.Models
         public string CriadoEm => CreatedAt > 0
             ? DateTimeOffset.FromUnixTimeSeconds(CreatedAt).LocalDateTime.ToString("dd/MM/yyyy HH:mm")
             : "-";
+
+        [JsonIgnore]
+        public string AtualizadoEm => UpdatedAt > 0
+            ? DateTimeOffset.FromUnixTimeSeconds(UpdatedAt).LocalDateTime.ToString("dd/MM/yyyy HH:mm")
+            : "-";
     }
 
     /// <summary>
@@ -334,8 +343,8 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("tipo")]
         public int Tipo { get; set; } = 1;
 
-        [JsonPropertyName("habilitado")]
-        public int Habilitado { get; set; } = 1;
+        [JsonPropertyName("enabled")]
+        public bool Enabled { get; set; } = true;
 
         [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;
@@ -403,14 +412,20 @@ namespace MobiCortex.Sdk.Models
     }
 
     /// <summary>
-    /// PUT /entities?id=X - Atualizar entidade (parcial)
-    /// Só envie os campos que deseja alterar.
+    /// PUT /entities?id=X - Atualizar entidade (parcial).
+    /// 
+    /// Modelo específico para atualizações. Diferente de CriarEntidadeRequest,
+    /// este modelo permite atualização parcial: preencha apenas os campos que
+    /// deseja modificar. Campos null são ignorados na serialização (não enviados).
+    /// 
+    /// Exemplo: para alterar só o nome, defina apenas Name = "Novo Nome",
+    /// deixando os outros campos null.
     /// </summary>
     public class AtualizarEntidadeRequest
     {
-        [JsonPropertyName("habilitado")]
+        [JsonPropertyName("enabled")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? Habilitado { get; set; }
+        public bool? Enabled { get; set; }
 
         [JsonPropertyName("name")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

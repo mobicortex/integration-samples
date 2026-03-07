@@ -29,9 +29,16 @@ namespace MobiCortex.Sdk.Interfaces
         Task<ApiResult<CriarEntidadeResponse>> CriarAsync(CriarEntidadeRequest request);
 
         /// <summary>
-        /// Atualiza uma entidade existente.
+        /// Atualiza uma entidade existente (PUT /entities?id=X).
+        /// 
+        /// IMPORTANTE: Este endpoint faz atualização PARCIAL. Use AtualizarEntidadeRequest
+        /// e preencha APENAS os campos que deseja modificar (name, doc, enabled, lpr_ativo).
+        /// Campos não preenchidos (null) não serão alterados no servidor.
+        /// 
+        /// NÃO use a classe Entidade completa aqui - ela contém campos readonly
+        /// (entity_id, cadastro_id, tipo, created_at) que causam erro 400 se enviados.
         /// </summary>
-        Task<ApiResult<ApiRetResponse>> AtualizarAsync(uint entityId, Entidade entidade);
+        Task<ApiResult<ApiRetResponse>> AtualizarAsync(uint entityId, AtualizarEntidadeRequest request);
 
         /// <summary>
         /// Remove uma entidade e todas as suas mídias.
