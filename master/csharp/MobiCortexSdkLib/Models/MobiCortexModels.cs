@@ -1,7 +1,36 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace MobiCortex.Sdk.Models
+
 {
+    /// <summary>
+    /// Conversor JSON para o campo 'enabled' do CadastroCentral.
+    /// O backend retorna como booleano (true/false) mas espera receber como inteiro (0/1).
+    /// </summary>
+    public class EnabledConverter : JsonConverter<int>
+    {
+        public override int Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            // Aceita tanto booleano quanto inteiro na leitura
+            if (reader.TokenType == JsonTokenType.True)
+                return 1;
+            if (reader.TokenType == JsonTokenType.False)
+                return 0;
+            if (reader.TokenType == JsonTokenType.Number)
+                return reader.GetInt32();
+            
+            throw new JsonException($"Unexpected token type for enabled: {reader.TokenType}");
+        }
+
+        public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options)
+        {
+            // Sempre escreve como inteiro (0 ou 1)
+            writer.WriteNumberValue(value);
+        }
+    }
+
+    // =============================================================================
     // =============================================================================
     //  MODELOS DE DADOS - API MobiCortex Master
     //  
@@ -112,11 +141,12 @@ namespace MobiCortex.Sdk.Models
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// true = habilitado, false = desabilitado.
-        /// A API retorna JSON boolean (true/false), não inteiro.
+        /// 1 = habilitado, 0 = desabilitado.
+        /// A API retorna como booleano (true/false) mas espera receber como inteiro (0/1).
         /// </summary>
         [JsonPropertyName("enabled")]
-        public bool Enabled { get; set; } = true;
+        [JsonConverter(typeof(EnabledConverter))]
+        public int Enabled { get; set; } = 1;
 
         /// <summary>Tipo de cadastro (uso livre pelo integrador)</summary>
         [JsonPropertyName("type")]

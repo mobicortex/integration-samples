@@ -14,7 +14,7 @@ namespace SmartSdk
         public string? Field2 { get; private set; }
         public string? Field3 { get; private set; }
         public string? Field4 { get; private set; }
-        public bool CadastroEnabled { get; private set; } = true;
+        public int CadastroEnabled { get; private set; } = 1;
         
         // Modo edição
         public bool ModoEdicao { get; private set; }
@@ -82,8 +82,8 @@ namespace SmartSdk
             txtField3.Text = _cadastroExistente.Field3 ?? "";
             txtField4.Text = _cadastroExistente.Field4 ?? "";
             
-            // Status: Enabled=true significa ativo, Enabled=false significa inativo
-            chkBloqueado.Checked = _cadastroExistente.Enabled;
+            // Status: Enabled=1 significa ativo, Enabled=0 significa inativo
+            chkBloqueado.Checked = _cadastroExistente.Enabled == 1;
         }
         
         /// <summary>
@@ -108,7 +108,7 @@ namespace SmartSdk
             Field2 = string.IsNullOrWhiteSpace(txtField2.Text) ? null : txtField2.Text.Trim();
             Field3 = string.IsNullOrWhiteSpace(txtField3.Text) ? null : txtField3.Text.Trim();
             Field4 = string.IsNullOrWhiteSpace(txtField4.Text) ? null : txtField4.Text.Trim();
-            CadastroEnabled = chkBloqueado.Checked; // Ativado = true, Desativado = false
+            CadastroEnabled = chkBloqueado.Checked ? 1 : 0; // Ativado = 1, Desativado = 0
             
             // Em modo criação com ID 0, confirma geração automática
             if (!ModoEdicao && IdCadastro == 0)

@@ -114,7 +114,7 @@ namespace SmartSdk
                 {
                     var item = new ListViewItem(c.Id.ToString());
                     item.SubItems.Add(c.Name);
-                    item.SubItems.Add(c.Enabled ? "Sim" : "Não");
+                    item.SubItems.Add(c.Enabled == 1 ? "Sim" : "Não");
                     item.SubItems.Add($"{c.PeopleCount}P / {c.VehicleCount}V");
                     item.Tag = c;
                     listCadastros.Items.Add(item);
@@ -148,7 +148,7 @@ namespace SmartSdk
                 var c = result.Data;
                 var item = new ListViewItem(c.Id.ToString());
                 item.SubItems.Add(c.Name);
-                item.SubItems.Add(c.Enabled ? "Sim" : "Não");
+                item.SubItems.Add(c.Enabled == 1 ? "Sim" : "Não");
                 item.SubItems.Add($"{c.PeopleCount}P / {c.VehicleCount}V");
                 item.Tag = c;
                 listCadastros.Items.Add(item);

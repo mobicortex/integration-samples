@@ -227,7 +227,7 @@ if (!test.Success) {
     ```csharp
     var lista = await client.Cadastros.ListarAsync(offset: 0, count: 20);
 
-    var cadastro = new CadastroCentral { Name = "Apt 101", Enabled = true };
+    var cadastro = new CadastroCentral { Name = "Apt 101", Enabled = 1 };
     var result = await client.Cadastros.CriarAsync(cadastro);
     ```
 
