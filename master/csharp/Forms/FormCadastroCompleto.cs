@@ -400,7 +400,39 @@ namespace SmartSdk
             // Verifica o tipo de entidade
             if (entidade.Tipo == (int)TipoEntidade.Veiculo)
             {
-                Aviso("Edição de veículo ainda não implementada. Use o formulário de cadastro.");
+                // Abre formulário de edição de veículo
+                using var formVeiculo = new FormCadastroVeiculo(entidade);
+                if (formVeiculo.ShowDialog(this) != DialogResult.OK) return;
+
+                // Cria o request de atualização (PUT /entities?id=X)
+                var entidadeAtualizada = new AtualizarEntidadeRequest
+                {
+                    Name = formVeiculo.NomeEntidadeGerado,
+                    Doc = formVeiculo.Placa,
+                    Enabled = formVeiculo.EntidadeEnabled,
+                    Brand = string.IsNullOrWhiteSpace(formVeiculo.Marca) ? null : formVeiculo.Marca,
+                    Model = string.IsNullOrWhiteSpace(formVeiculo.Modelo) ? null : formVeiculo.Modelo,
+                    Color = string.IsNullOrWhiteSpace(formVeiculo.Cor) ? null : formVeiculo.Cor,
+                    LprAtivo = formVeiculo.LprAtivo
+                };
+
+                // DEBUG: Log do JSON sendo enviado
+                var jsonDebug = System.Text.Json.JsonSerializer.Serialize(entidadeAtualizada);
+                Log($"DEBUG PUT /entities?id={entidade.EntityId}: {jsonDebug}");
+
+                var result = await _api.Entidades.AtualizarAsync(entidade.EntityId, entidadeAtualizada);
+                if (result.Success)
+                {
+                    Log($"Veículo atualizado: {formVeiculo.NomeEntidadeGerado}");
+                    if (_cadastroSelecionado != null)
+                        await CarregarEntidades(_cadastroSelecionado.Id);
+                }
+                else
+                {
+                    var msg = $"Erro ao atualizar veículo:\n{result.Message}\nResposta: {result.RawResponse}";
+                    Log(msg);
+                    Aviso(msg);
+                }
                 return;
             }
 
@@ -411,7 +443,7 @@ namespace SmartSdk
             // Cria o request de atualização (PUT /entities?id=X)
             // Usa AtualizarEntidadeRequest - só envia os campos que quer alterar
             var docLimpo = string.IsNullOrWhiteSpace(form.Documento) ? null : form.Documento.Trim();
-            var entidadeAtualizada = new AtualizarEntidadeRequest
+            var entidadeAtualizadaPessoa = new AtualizarEntidadeRequest
             {
                 Name = form.Nome,
                 Doc = docLimpo, // null se vazio (não será enviado no JSON)
@@ -422,11 +454,11 @@ namespace SmartSdk
             };
 
             // DEBUG: Log do JSON sendo enviado
-            var jsonDebug = System.Text.Json.JsonSerializer.Serialize(entidadeAtualizada);
-            Log($"DEBUG PUT /entities?id={entidade.EntityId}: {jsonDebug}");
+            var jsonDebugPessoa = System.Text.Json.JsonSerializer.Serialize(entidadeAtualizadaPessoa);
+            Log($"DEBUG PUT /entities?id={entidade.EntityId}: {jsonDebugPessoa}");
 
-            var result = await _api.Entidades.AtualizarAsync(entidade.EntityId, entidadeAtualizada);
-            if (result.Success)
+            var resultPessoa = await _api.Entidades.AtualizarAsync(entidade.EntityId, entidadeAtualizadaPessoa);
+            if (resultPessoa.Success)
             {
                 Log($"Entidade atualizada: {form.Nome}");
                 if (_cadastroSelecionado != null)
@@ -434,7 +466,7 @@ namespace SmartSdk
             }
             else
             {
-                var msg = $"Erro ao atualizar entidade:\n{result.Message}\nResposta: {result.RawResponse}";
+                var msg = $"Erro ao atualizar entidade:\n{resultPessoa.Message}\nResposta: {resultPessoa.RawResponse}";
                 Log(msg);
                 Aviso(msg);
             }

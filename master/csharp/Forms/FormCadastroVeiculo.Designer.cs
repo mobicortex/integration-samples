@@ -335,6 +335,7 @@ namespace SmartSdk
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
+            Load += FormCadastroVeiculo_Load;
             Name = "FormCadastroVeiculo";
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
