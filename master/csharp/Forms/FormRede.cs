@@ -9,15 +9,16 @@ namespace SmartSdk
     //  CONFIGURAÇÃO DE REDE
     //
     //  Este formulário demonstra como ler e alterar a configuração de rede
-    //  (ethernet cabo) do controlador.
+    //  ethernet principal do controlador.
     //
     //  ENDPOINTS:
     //  GET  /network-config-cable → Lê a configuração atual
     //  POST /network-config-cable → Salva nova configuração
     //
     //  CAMPOS:
-    //  - dhcp: 1=DHCP, 0=IP fixo
-    //  - ip, mask, gateway, dns1, dns2
+    //  - ip: "dhcp" ou IPv4 estático
+    //  - mask, gw
+    //  - ip2/mask2 existem no backend, mas este form edita apenas o IP principal
     //
     //  ATENÇÃO: Alterar o IP do controlador pode desconectar a sessão.
     //  O controlador reinicia a interface de rede após a alteração.
@@ -72,14 +73,14 @@ namespace SmartSdk
             if (result.Success && result.Data != null)
             {
                 var cfg = result.Data;
-                chkDhcp.Checked = cfg.Dhcp == 1;
-                txtIp.Text = cfg.Ip;
+                chkDhcp.Checked = string.Equals(cfg.Ip, "dhcp", StringComparison.OrdinalIgnoreCase);
+                txtIp.Text = chkDhcp.Checked ? string.Empty : cfg.Ip;
                 txtMascara.Text = cfg.Mask;
-                txtGateway.Text = cfg.Gateway;
-                txtDns1.Text = cfg.Dns1;
-                txtDns2.Text = cfg.Dns2;
+                txtGateway.Text = cfg.Gw;
+                txtDns1.Text = string.Empty;
+                txtDns2.Text = string.Empty;
                 AtualizarEstadoCampos();
-                Log($"Configuração carregada: {(cfg.Dhcp == 1 ? "DHCP" : cfg.Ip)}");
+                Log($"Configuração carregada: {(chkDhcp.Checked ? "DHCP" : cfg.Ip)}");
             }
             else
             {
@@ -128,12 +129,11 @@ namespace SmartSdk
 
             var config = new NetworkCableConfig
             {
-                Dhcp = chkDhcp.Checked ? 1 : 0,
-                Ip = txtIp.Text.Trim(),
+                Ip = chkDhcp.Checked ? "dhcp" : txtIp.Text.Trim(),
                 Mask = txtMascara.Text.Trim(),
-                Gateway = txtGateway.Text.Trim(),
-                Dns1 = txtDns1.Text.Trim(),
-                Dns2 = txtDns2.Text.Trim()
+                Gw = txtGateway.Text.Trim(),
+                Ip2 = string.Empty,
+                Mask2 = string.Empty
             };
 
             Log("Salvando configuração...");

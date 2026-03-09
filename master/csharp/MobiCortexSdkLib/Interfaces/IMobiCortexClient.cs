@@ -49,6 +49,21 @@ namespace MobiCortex.Sdk.Interfaces
         ISistemaService Sistema { get; }
 
         /// <summary>
+        /// Serviço de autenticação, senha e tokens de acesso.
+        /// </summary>
+        IAccessService Acesso { get; }
+
+        /// <summary>
+        /// Serviço de configuração de webhooks da controladora.
+        /// </summary>
+        IWebhookConfigService Webhooks { get; }
+
+        /// <summary>
+        /// Serviço de configuração de canais de vídeo.
+        /// </summary>
+        IVideoSourceService VideoSources { get; }
+
+        /// <summary>
         /// Realiza login no controlador.
         /// </summary>
         /// <param name="password">Senha do administrador</param>

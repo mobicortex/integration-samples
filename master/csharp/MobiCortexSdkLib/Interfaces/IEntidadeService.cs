@@ -44,5 +44,15 @@ namespace MobiCortex.Sdk.Interfaces
         /// Remove uma entidade e todas as suas mídias.
         /// </summary>
         Task<ApiResult<ApiRetResponse>> ExcluirAsync(uint entityId);
+
+        /// <summary>
+        /// Lista os condutores vinculados a um veículo.
+        /// </summary>
+        Task<ApiResult<VehicleDriverListResponse>> ObterCondutoresVeiculoAsync(uint vehicleId);
+
+        /// <summary>
+        /// Substitui a lista de condutores vinculados a um veículo.
+        /// </summary>
+        Task<ApiResult<VehicleDriverUpdateResponse>> AtualizarCondutoresVeiculoAsync(uint vehicleId, IEnumerable<uint> driverIds);
     }
 }

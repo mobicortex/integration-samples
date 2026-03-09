@@ -11,7 +11,7 @@ namespace MobiCortex.Sdk.Services
     /// <summary>
     /// Cliente principal para integração com controladores MobiCortex.
     /// </summary>
-    public class MobiCortexClient : IMobiCortexClient, ICadastroService, IEntidadeService, IMidiaService, ISistemaService
+    public class MobiCortexClient : IMobiCortexClient, ICadastroService, IEntidadeService, IMidiaService, ISistemaService, IAccessService, IWebhookConfigService, IVideoSourceService
     {
         private const string API = "/mbcortex/master/api/v1";
         private readonly HttpClient _http;
@@ -41,6 +41,15 @@ namespace MobiCortex.Sdk.Services
 
         /// <inheritdoc/>
         public ISistemaService Sistema => this;
+
+        /// <inheritdoc/>
+        public IAccessService Acesso => this;
+
+        /// <inheritdoc/>
+        public IWebhookConfigService Webhooks => this;
+
+        /// <inheritdoc/>
+        public IVideoSourceService VideoSources => this;
 
         /// <summary>
         /// Cria uma nova instância do cliente MobiCortex.
@@ -190,6 +199,19 @@ namespace MobiCortex.Sdk.Services
         {
             return await DeleteAsync<ApiRetResponse>($"/entities?id={entityId}");
         }
+
+        async Task<ApiResult<VehicleDriverListResponse>> IEntidadeService.ObterCondutoresVeiculoAsync(uint vehicleId)
+        {
+            return await GetAsync<VehicleDriverListResponse>($"/vehicle-drivers?vehicle_id={vehicleId}");
+        }
+
+        async Task<ApiResult<VehicleDriverUpdateResponse>> IEntidadeService.AtualizarCondutoresVeiculoAsync(uint vehicleId, IEnumerable<uint> driverIds)
+        {
+            return await PutAsync<VehicleDriverUpdateResponse>($"/vehicle-drivers?vehicle_id={vehicleId}", new UpdateVehicleDriversRequest
+            {
+                DriverIds = driverIds?.Distinct().ToList() ?? new List<uint>()
+            });
+        }
         #endregion
 
         #region IMidiaService
@@ -248,6 +270,112 @@ namespace MobiCortex.Sdk.Services
         async Task<ApiResult<ApiRetResponse>> ISistemaService.SalvarConfiguracaoRedeAsync(NetworkCableConfig config)
         {
             return await PostAsync<ApiRetResponse>("/network-config-cable", config);
+        }
+
+        async Task<ApiResult<NetworkWifiApConfig>> ISistemaService.ObterConfiguracaoWifiApAsync()
+        {
+            return await GetAsync<NetworkWifiApConfig>("/network-config-wifi-ap");
+        }
+
+        async Task<ApiResult<ApiRetResponse>> ISistemaService.SalvarConfiguracaoWifiApAsync(NetworkWifiApConfig config)
+        {
+            return await PostAsync<ApiRetResponse>("/network-config-wifi-ap", config);
+        }
+
+        async Task<ApiResult<NetworkWifiStationConfig>> ISistemaService.ObterConfiguracaoWifiStationAsync()
+        {
+            return await GetAsync<NetworkWifiStationConfig>("/network-config-wifi-st");
+        }
+
+        async Task<ApiResult<ApiRetResponse>> ISistemaService.SalvarConfiguracaoWifiStationAsync(NetworkWifiStationConfig config)
+        {
+            return await PostAsync<ApiRetResponse>("/network-config-wifi-st", config);
+        }
+
+        async Task<ApiResult<NetworkInterfacesResponse>> ISistemaService.ListarInterfacesRedeAsync()
+        {
+            return await GetAsync<NetworkInterfacesResponse>("/network-interfaces");
+        }
+
+        async Task<ApiResult<WifiScanResponse>> ISistemaService.EscanearRedesWifiAsync()
+        {
+            return await GetAsync<WifiScanResponse>("/network-wifi-scan");
+        }
+
+        async Task<ApiResult<WifiApClientsResponse>> ISistemaService.ListarClientesWifiApAsync()
+        {
+            return await GetAsync<WifiApClientsResponse>("/network-wifi-clients");
+        }
+
+        async Task<ApiResult<WifiSignalResponse>> ISistemaService.ObterSinalWifiAsync()
+        {
+            return await GetAsync<WifiSignalResponse>("/network-wifi-signal");
+        }
+        #endregion
+
+        #region IAccessService
+        async Task<ApiResult<ApiRetResponse>> IAccessService.AlterarSenhaAsync(ChangePasswordRequest request)
+        {
+            return await PutAsync<ApiRetResponse>("/login", request);
+        }
+
+        async Task<ApiResult<ApiTokenListResponse>> IAccessService.ListarTokensAsync()
+        {
+            return await GetAsync<ApiTokenListResponse>("/token");
+        }
+
+        async Task<ApiResult<ApiTokenCreateResponse>> IAccessService.CriarTokenAsync(CreateApiTokenRequest request)
+        {
+            return await PostAsync<ApiTokenCreateResponse>("/token", request);
+        }
+
+        async Task<ApiResult<ApiRetResponse>> IAccessService.ExcluirTokenAsync(string token)
+        {
+            return await DeleteAsync<ApiRetResponse>("/token", new { token });
+        }
+        #endregion
+
+        #region IWebhookConfigService
+        async Task<ApiResult<WebhookListResponse>> IWebhookConfigService.ListarAsync()
+        {
+            return await GetAsync<WebhookListResponse>("/webhook");
+        }
+
+        async Task<ApiResult<WebhookConfig>> IWebhookConfigService.ObterAsync(int id)
+        {
+            return await GetAsync<WebhookConfig>($"/webhook?id={id}");
+        }
+
+        async Task<ApiResult<WebhookConfig>> IWebhookConfigService.SalvarAsync(int id, WebhookConfig config)
+        {
+            return await PostAsync<WebhookConfig>($"/webhook?id={id}", config);
+        }
+
+        async Task<ApiResult<ApiRetResponse>> IWebhookConfigService.ExcluirAsync(int id)
+        {
+            return await DeleteAsync<ApiRetResponse>($"/webhook?id={id}");
+        }
+        #endregion
+
+        #region IVideoSourceService
+        async Task<ApiResult<VideoSourceListResponse>> IVideoSourceService.ListarAsync()
+        {
+            return await GetAsync<VideoSourceListResponse>("/video-source");
+        }
+
+        async Task<ApiResult<VideoSourceConfig>> IVideoSourceService.ObterAsync(int id)
+        {
+            return await GetAsync<VideoSourceConfig>($"/video-source?id={id}");
+        }
+
+        async Task<ApiResult<VideoSourceConfig>> IVideoSourceService.SalvarAsync(int id, VideoSourceConfig config)
+        {
+            return await PostAsync<VideoSourceConfig>($"/video-source?id={id}", config);
+        }
+
+        async Task<ApiResult<ApiRetResponse>> IVideoSourceService.ExcluirAsync(int id)
+        {
+            return await DeleteAsync<ApiRetResponse>($"/video-source?id={id}");
         }
         #endregion
 
@@ -336,6 +464,31 @@ namespace MobiCortex.Sdk.Services
                 var response = await _http.DeleteAsync(url);
                 var json = await response.Content.ReadAsStringAsync();
                 
+                if (!response.IsSuccessStatusCode)
+                    return new ApiResult<T> { Success = false, Message = $"HTTP {(int)response.StatusCode}", RawResponse = json };
+
+                var data = JsonSerializer.Deserialize<T>(json, _json);
+                return new ApiResult<T> { Success = true, Data = data, RawResponse = json };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult<T> { Success = false, Message = ex.Message };
+            }
+        }
+
+        private async Task<ApiResult<T>> DeleteAsync<T>(string endpoint, object body)
+        {
+            try
+            {
+                var url = $"{_baseUrl}{API}{endpoint}";
+                var jsonBody = JsonSerializer.Serialize(body, _json);
+                using var request = new HttpRequestMessage(HttpMethod.Delete, url)
+                {
+                    Content = new StringContent(jsonBody, Encoding.UTF8, "application/json")
+                };
+                var response = await _http.SendAsync(request);
+                var json = await response.Content.ReadAsStringAsync();
+
                 if (!response.IsSuccessStatusCode)
                     return new ApiResult<T> { Success = false, Message = $"HTTP {(int)response.StatusCode}", RawResponse = json };
 

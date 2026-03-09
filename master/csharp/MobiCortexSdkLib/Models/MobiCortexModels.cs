@@ -149,6 +149,72 @@ namespace MobiCortex.Sdk.Models
         public string SenhaNovaConfirm { get; set; } = string.Empty;
     }
 
+    /// <summary>
+    /// Token de API listado por GET /token.
+    /// </summary>
+    public class ApiTokenInfo
+    {
+        [JsonPropertyName("token")]
+        public string Token { get; set; } = string.Empty;
+
+        [JsonPropertyName("label")]
+        public string Label { get; set; } = string.Empty;
+
+        [JsonPropertyName("expires_at")]
+        public string ExpiresAt { get; set; } = string.Empty;
+
+        [JsonPropertyName("expired")]
+        public int Expired { get; set; }
+    }
+
+    /// <summary>
+    /// Resposta de listagem de tokens.
+    /// </summary>
+    public class ApiTokenListResponse
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("tokens")]
+        public List<ApiTokenInfo> Tokens { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Body para criação de token de API.
+    /// </summary>
+    public class CreateApiTokenRequest
+    {
+        [JsonPropertyName("label")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Label { get; set; }
+
+        [JsonPropertyName("expires_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? ExpiresAt { get; set; }
+
+        [JsonPropertyName("ttl_days")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? TtlDays { get; set; }
+    }
+
+    /// <summary>
+    /// Resposta de criação de token.
+    /// </summary>
+    public class ApiTokenCreateResponse
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("token")]
+        public string Token { get; set; } = string.Empty;
+
+        [JsonPropertyName("label")]
+        public string Label { get; set; } = string.Empty;
+
+        [JsonPropertyName("expires_at")]
+        public string ExpiresAt { get; set; } = string.Empty;
+    }
+
     #endregion
 
     #region Cadastro Central - GET/POST/DELETE /central-registry
@@ -541,6 +607,45 @@ namespace MobiCortex.Sdk.Models
         public List<Entidade> Items { get; set; } = new();
     }
 
+    /// <summary>
+    /// GET /vehicle-drivers?vehicle_id=X
+    /// </summary>
+    public class VehicleDriverListResponse
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("vehicle_id")]
+        public uint VehicleId { get; set; }
+
+        [JsonPropertyName("driver_ids")]
+        public List<uint> DriverIds { get; set; } = new();
+    }
+
+    /// <summary>
+    /// PUT /vehicle-drivers?vehicle_id=X
+    /// </summary>
+    public class UpdateVehicleDriversRequest
+    {
+        [JsonPropertyName("driver_ids")]
+        public List<uint> DriverIds { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Resposta da atualização de vínculos condutor-veículo.
+    /// </summary>
+    public class VehicleDriverUpdateResponse
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("vehicle_id")]
+        public uint VehicleId { get; set; }
+
+        [JsonPropertyName("count")]
+        public int Count { get; set; }
+    }
+
     #endregion
 
     #region Mídias de Acesso - GET/POST/PUT/DELETE /media
@@ -878,9 +983,58 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("ret")]
         public int Ret { get; set; }
 
-        /// <summary>1=DHCP, 0=IP fixo</summary>
-        [JsonPropertyName("dhcp")]
-        public int Dhcp { get; set; }
+        [JsonPropertyName("ip")]
+        public string Ip { get; set; } = string.Empty;
+
+        [JsonPropertyName("mask")]
+        public string Mask { get; set; } = string.Empty;
+
+        [JsonPropertyName("gw")]
+        public string Gw { get; set; } = string.Empty;
+
+        [JsonPropertyName("ip2")]
+        public string Ip2 { get; set; } = string.Empty;
+
+        [JsonPropertyName("mask2")]
+        public string Mask2 { get; set; } = string.Empty;
+
+        [JsonPropertyName("auto_tests_enb")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? AutoTestsEnb { get; set; }
+
+        [JsonIgnore]
+        public int Dhcp => string.Equals(Ip, "dhcp", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+
+        [JsonIgnore]
+        public string Gateway
+        {
+            get => Gw;
+            set => Gw = value;
+        }
+    }
+
+    /// <summary>
+    /// GET/POST /network-config-wifi-ap
+    /// </summary>
+    public class NetworkWifiApConfig
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("enabled")]
+        public int Enabled { get; set; }
+
+        [JsonPropertyName("ssid")]
+        public string Ssid { get; set; } = string.Empty;
+
+        [JsonPropertyName("pass")]
+        public string Pass { get; set; } = string.Empty;
+
+        [JsonPropertyName("ssid_suggested")]
+        public string SsidSuggested { get; set; } = string.Empty;
+
+        [JsonPropertyName("pass_suggested")]
+        public string PassSuggested { get; set; } = string.Empty;
 
         [JsonPropertyName("ip")]
         public string Ip { get; set; } = string.Empty;
@@ -888,14 +1042,251 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("mask")]
         public string Mask { get; set; } = string.Empty;
 
-        [JsonPropertyName("gateway")]
-        public string Gateway { get; set; } = string.Empty;
+        [JsonPropertyName("dhcpserver_enb")]
+        public int DhcpServerEnabled { get; set; }
 
-        [JsonPropertyName("dns1")]
-        public string Dns1 { get; set; } = string.Empty;
+        [JsonPropertyName("dhcpserver_start")]
+        public int DhcpServerStart { get; set; }
 
-        [JsonPropertyName("dns2")]
-        public string Dns2 { get; set; } = string.Empty;
+        [JsonPropertyName("dhcpserver_end")]
+        public int DhcpServerEnd { get; set; }
+    }
+
+    /// <summary>
+    /// GET/POST /network-config-wifi-st
+    /// </summary>
+    public class NetworkWifiStationConfig
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("enabled")]
+        public int Enabled { get; set; }
+
+        [JsonPropertyName("ssid")]
+        public string Ssid { get; set; } = string.Empty;
+
+        [JsonPropertyName("pass")]
+        public string Pass { get; set; } = string.Empty;
+
+        [JsonPropertyName("ip")]
+        public string Ip { get; set; } = string.Empty;
+
+        [JsonPropertyName("mask")]
+        public string Mask { get; set; } = string.Empty;
+
+        [JsonPropertyName("gw")]
+        public string Gw { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// Rede Wi-Fi encontrada pelo scanner do equipamento.
+    /// </summary>
+    public class WifiScanNetwork
+    {
+        [JsonPropertyName("bssid")]
+        public string Bssid { get; set; } = string.Empty;
+
+        [JsonPropertyName("ssid")]
+        public string Ssid { get; set; } = string.Empty;
+
+        [JsonPropertyName("freq_mhz")]
+        public string FreqMhz { get; set; } = string.Empty;
+
+        [JsonPropertyName("channel")]
+        public string Channel { get; set; } = string.Empty;
+
+        [JsonPropertyName("signal_dbm")]
+        public string SignalDbm { get; set; } = string.Empty;
+
+        [JsonPropertyName("security")]
+        public string Security { get; set; } = string.Empty;
+
+        [JsonPropertyName("ht")]
+        public int Ht { get; set; }
+
+        [JsonPropertyName("vht")]
+        public int Vht { get; set; }
+    }
+
+    /// <summary>
+    /// Resposta do scan Wi-Fi.
+    /// </summary>
+    public class WifiScanResponse
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("count")]
+        public int Count { get; set; }
+
+        [JsonPropertyName("iface")]
+        public string Iface { get; set; } = string.Empty;
+
+        [JsonPropertyName("iface_mode")]
+        public string IfaceMode { get; set; } = string.Empty;
+
+        [JsonPropertyName("iface_up")]
+        public int IfaceUp { get; set; }
+
+        [JsonPropertyName("scan_note")]
+        public string ScanNote { get; set; } = string.Empty;
+
+        [JsonPropertyName("networks")]
+        public List<WifiScanNetwork> Networks { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Cliente conectado ao Access Point do equipamento.
+    /// </summary>
+    public class WifiApClientInfo
+    {
+        [JsonPropertyName("mac")]
+        public string Mac { get; set; } = string.Empty;
+
+        [JsonPropertyName("ip")]
+        public string Ip { get; set; } = string.Empty;
+
+        [JsonPropertyName("inactive_ms")]
+        public string InactiveMs { get; set; } = string.Empty;
+
+        [JsonPropertyName("connected_time")]
+        public string ConnectedTime { get; set; } = string.Empty;
+
+        [JsonPropertyName("authorized")]
+        public string Authorized { get; set; } = string.Empty;
+
+        [JsonPropertyName("signal_dbm")]
+        public string SignalDbm { get; set; } = string.Empty;
+
+        [JsonPropertyName("signal_avg_dbm")]
+        public string SignalAvgDbm { get; set; } = string.Empty;
+
+        [JsonPropertyName("tx_bitrate")]
+        public string TxBitrate { get; set; } = string.Empty;
+
+        [JsonPropertyName("rx_bitrate")]
+        public string RxBitrate { get; set; } = string.Empty;
+
+        [JsonPropertyName("rx_bytes")]
+        public string RxBytes { get; set; } = string.Empty;
+
+        [JsonPropertyName("rx_packets")]
+        public string RxPackets { get; set; } = string.Empty;
+
+        [JsonPropertyName("tx_bytes")]
+        public string TxBytes { get; set; } = string.Empty;
+
+        [JsonPropertyName("tx_packets")]
+        public string TxPackets { get; set; } = string.Empty;
+
+        [JsonPropertyName("tx_retries")]
+        public string TxRetries { get; set; } = string.Empty;
+
+        [JsonPropertyName("tx_failed")]
+        public string TxFailed { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// Resposta da lista de clientes Wi-Fi conectados ao AP.
+    /// </summary>
+    public class WifiApClientsResponse
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("count")]
+        public int Count { get; set; }
+
+        [JsonPropertyName("iface")]
+        public string Iface { get; set; } = string.Empty;
+
+        [JsonPropertyName("clients")]
+        public List<WifiApClientInfo> Clients { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Interface de rede enumerada por GET /network-interfaces.
+    /// </summary>
+    public class NetworkInterfaceInfo
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = string.Empty;
+
+        [JsonPropertyName("state")]
+        public string State { get; set; } = string.Empty;
+
+        [JsonPropertyName("mac")]
+        public string Mac { get; set; } = string.Empty;
+
+        [JsonPropertyName("mtu")]
+        public string Mtu { get; set; } = string.Empty;
+
+        [JsonPropertyName("addresses")]
+        public string Addresses { get; set; } = string.Empty;
+
+        [JsonPropertyName("wifi_mode")]
+        public string WifiMode { get; set; } = string.Empty;
+
+        [JsonPropertyName("wifi_ssid")]
+        public string WifiSsid { get; set; } = string.Empty;
+
+        [JsonPropertyName("wifi_channel")]
+        public string WifiChannel { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// Resposta de GET /network-interfaces.
+    /// </summary>
+    public class NetworkInterfacesResponse
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("interfaces")]
+        public List<NetworkInterfaceInfo> Interfaces { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Resposta de GET /network-wifi-signal.
+    /// </summary>
+    public class WifiSignalResponse
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("iface")]
+        public string Iface { get; set; } = string.Empty;
+
+        [JsonPropertyName("connected")]
+        public int Connected { get; set; }
+
+        [JsonPropertyName("connected_to")]
+        public string ConnectedTo { get; set; } = string.Empty;
+
+        [JsonPropertyName("ssid")]
+        public string Ssid { get; set; } = string.Empty;
+
+        [JsonPropertyName("freq_mhz")]
+        public string FreqMhz { get; set; } = string.Empty;
+
+        [JsonPropertyName("channel")]
+        public string Channel { get; set; } = string.Empty;
+
+        [JsonPropertyName("signal_dbm")]
+        public string SignalDbm { get; set; } = string.Empty;
+
+        [JsonPropertyName("tx_bitrate")]
+        public string TxBitrate { get; set; } = string.Empty;
+
+        [JsonPropertyName("rx_bitrate")]
+        public string RxBitrate { get; set; } = string.Empty;
+
+        [JsonPropertyName("beacon_interval")]
+        public string BeaconInterval { get; set; } = string.Empty;
+
+        [JsonPropertyName("dtim_period")]
+        public string DtimPeriod { get; set; } = string.Empty;
     }
 
     #endregion
@@ -932,6 +1323,124 @@ namespace MobiCortex.Sdk.Models
         /// <summary>1 = notificar logs</summary>
         [JsonPropertyName("logs")]
         public int Logs { get; set; }
+    }
+
+    /// <summary>
+    /// Resposta de listagem de webhooks.
+    /// </summary>
+    public class WebhookListResponse
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("items")]
+        public List<WebhookConfig> Items { get; set; } = new();
+    }
+
+    #endregion
+
+    #region Video Source - GET/POST/PUT/DELETE /video-source
+
+    /// <summary>
+    /// Configuração de um canal de vídeo da controladora.
+    /// </summary>
+    public class VideoSourceConfig
+    {
+        [JsonPropertyName("ret")]
+        public int? Ret { get; set; }
+
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("auto_detect")]
+        public int AutoDetect { get; set; }
+
+        [JsonPropertyName("channel_name")]
+        public string ChannelName { get; set; } = string.Empty;
+
+        [JsonPropertyName("ip")]
+        public string Ip { get; set; } = string.Empty;
+
+        [JsonPropertyName("username")]
+        public string Username { get; set; } = string.Empty;
+
+        [JsonPropertyName("password")]
+        public string Password { get; set; } = string.Empty;
+
+        [JsonPropertyName("rtsp_port")]
+        public int RtspPort { get; set; } = 554;
+
+        [JsonPropertyName("uri_hd")]
+        public string UriHd { get; set; } = string.Empty;
+
+        [JsonPropertyName("uri_sd")]
+        public string UriSd { get; set; } = string.Empty;
+
+        [JsonPropertyName("detected_uri_hd")]
+        public string DetectedUriHd { get; set; } = string.Empty;
+
+        [JsonPropertyName("detected_uri_sd")]
+        public string DetectedUriSd { get; set; } = string.Empty;
+
+        [JsonPropertyName("brand")]
+        public string Brand { get; set; } = string.Empty;
+
+        [JsonPropertyName("model")]
+        public string Model { get; set; } = string.Empty;
+
+        [JsonPropertyName("mac_address")]
+        public string MacAddress { get; set; } = string.Empty;
+
+        [JsonPropertyName("cloud_id")]
+        public string CloudId { get; set; } = string.Empty;
+
+        [JsonPropertyName("lpr_enabled")]
+        public int LprEnabled { get; set; }
+
+        [JsonPropertyName("face_enabled")]
+        public int FaceEnabled { get; set; }
+
+        [JsonPropertyName("car_enabled")]
+        public int CarEnabled { get; set; }
+
+        [JsonPropertyName("animal_enabled")]
+        public int AnimalEnabled { get; set; }
+
+        [JsonPropertyName("face_rec_enabled")]
+        public int FaceRecEnabled { get; set; }
+
+        [JsonPropertyName("lpr_threshold")]
+        public int LprThreshold { get; set; } = 70;
+
+        [JsonPropertyName("face_threshold")]
+        public int FaceThreshold { get; set; } = 70;
+
+        [JsonPropertyName("car_threshold")]
+        public int CarThreshold { get; set; } = 70;
+
+        [JsonPropertyName("animal_threshold")]
+        public int AnimalThreshold { get; set; } = 70;
+
+        [JsonPropertyName("face_rec_threshold")]
+        public int FaceRecThreshold { get; set; } = 70;
+
+        [JsonIgnore]
+        public bool Active => !string.IsNullOrWhiteSpace(Ip);
+    }
+
+    /// <summary>
+    /// Resposta de listagem dos canais de vídeo.
+    /// </summary>
+    public class VideoSourceListResponse
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("max_channels")]
+        public int MaxChannels { get; set; }
+
+        [JsonPropertyName("items")]
+        public List<VideoSourceConfig> Items { get; set; } = new();
     }
 
     #endregion

@@ -31,5 +31,45 @@ namespace MobiCortex.Sdk.Interfaces
         /// Salva configuração de rede.
         /// </summary>
         Task<ApiResult<ApiRetResponse>> SalvarConfiguracaoRedeAsync(NetworkCableConfig config);
+
+        /// <summary>
+        /// Obtém a configuração do Wi-Fi em modo Access Point.
+        /// </summary>
+        Task<ApiResult<NetworkWifiApConfig>> ObterConfiguracaoWifiApAsync();
+
+        /// <summary>
+        /// Salva a configuração do Wi-Fi em modo Access Point.
+        /// </summary>
+        Task<ApiResult<ApiRetResponse>> SalvarConfiguracaoWifiApAsync(NetworkWifiApConfig config);
+
+        /// <summary>
+        /// Obtém a configuração do Wi-Fi em modo cliente/station.
+        /// </summary>
+        Task<ApiResult<NetworkWifiStationConfig>> ObterConfiguracaoWifiStationAsync();
+
+        /// <summary>
+        /// Salva a configuração do Wi-Fi em modo cliente/station.
+        /// </summary>
+        Task<ApiResult<ApiRetResponse>> SalvarConfiguracaoWifiStationAsync(NetworkWifiStationConfig config);
+
+        /// <summary>
+        /// Lista as interfaces de rede detectadas no equipamento.
+        /// </summary>
+        Task<ApiResult<NetworkInterfacesResponse>> ListarInterfacesRedeAsync();
+
+        /// <summary>
+        /// Executa um scan das redes Wi-Fi visíveis.
+        /// </summary>
+        Task<ApiResult<WifiScanResponse>> EscanearRedesWifiAsync();
+
+        /// <summary>
+        /// Lista os clientes conectados ao Access Point do equipamento.
+        /// </summary>
+        Task<ApiResult<WifiApClientsResponse>> ListarClientesWifiApAsync();
+
+        /// <summary>
+        /// Obtém a qualidade do link Wi-Fi atual.
+        /// </summary>
+        Task<ApiResult<WifiSignalResponse>> ObterSinalWifiAsync();
     }
 }
