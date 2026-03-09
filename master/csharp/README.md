@@ -1,7 +1,7 @@
 # SmartSdk - MobiCortex Integration Sample (C# / WinForms)
 
 Windows Forms application that demonstrates integration with the MobiCortex controller REST API.
-This project is a reference sample for integrators who need to manage registries, entities, media, MQTT monitoring, and network settings through the MobiCortex platform.
+This project is a reference sample for integrators who need to manage registries, entities, media, and MQTT monitoring through the MobiCortex platform.
 
 The repository also includes the MobiCortex .NET SDK library used by the sample application. You may freely use, copy, modify, and distribute the SDK/library in your own customer projects under the MIT License, provided the integration is used with MobiCortex devices.
 
@@ -13,7 +13,6 @@ The application uses a multi-form launcher architecture:
 - FormCadastroCompleto - Complete 3-level model: Central Registry -> Entity -> Media.
 - FormCadastroSimples - Simplified 2-level model: Entity -> Media (`createid=true`).
 - FormMonitoramento - Real-time event monitoring through MQTT.
-- FormRede - Read and update controller network settings.
 - FormDashboard - Device information, uptime, and statistics.
 
 All forms share a single `MobiCortexApiService` instance.
@@ -36,10 +35,6 @@ All forms share a single `MobiCortexApiService` instance.
 - MQTT connection to the controller (port 1883)
 - Real-time access events
 - Formatted event output in the console
-
-### Network
-- Read current network settings (IP, mask, gateway, DNS, DHCP)
-- Update and submit a new network configuration
 
 ### Dashboard
 - Device information (model, firmware version, MAC)
@@ -67,7 +62,6 @@ SmartSdk/
 |   |-- FormCadastroCompleto.cs/.Designer.cs
 |   |-- FormCadastroSimples.cs/.Designer.cs
 |   |-- FormMonitoramento.cs/.Designer.cs
-|   |-- FormRede.cs/.Designer.cs
 |   `-- FormDashboard.cs/.Designer.cs
 |-- Models/
 |   `-- MobiCortexModels.cs
@@ -119,12 +113,6 @@ Base route prefix: `/mbcortex/master/api/v1`
 | GET | `/media?id={media_id}` | Get media by ID |
 | POST | `/media` | Create media (RFID, plate, facial, and others) |
 | DELETE | `/media?id={media_id}` | Delete media |
-
-### Network
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/network/cable` | Read network configuration |
-| POST | `/network/cable` | Update network configuration |
 
 ### Dashboard
 | Method | Endpoint | Description |

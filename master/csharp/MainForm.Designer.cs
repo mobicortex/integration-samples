@@ -32,8 +32,6 @@ namespace SmartSdk
             lblDescSimples = new Label();
             btnMonitoramento = new Button();
             lblDescMonitoramento = new Label();
-            btnRede = new Button();
-            lblDescRede = new Label();
             btnDashboard = new Button();
             lblDescDashboard = new Label();
             btnMqttCliente = new Button();
@@ -171,8 +169,6 @@ namespace SmartSdk
             panelBotoes.Controls.Add(lblDescSimples);
             panelBotoes.Controls.Add(btnMonitoramento);
             panelBotoes.Controls.Add(lblDescMonitoramento);
-            panelBotoes.Controls.Add(btnRede);
-            panelBotoes.Controls.Add(lblDescRede);
             panelBotoes.Controls.Add(btnDashboard);
             panelBotoes.Controls.Add(lblDescDashboard);
             panelBotoes.Controls.Add(btnMqttCliente);
@@ -270,30 +266,6 @@ namespace SmartSdk
             lblDescMonitoramento.TabIndex = 6;
             lblDescMonitoramento.Text = "Recebe eventos em tempo real via MQTT over WebSocket. Monitora acessos, sensores e status do controlador.";
             // 
-            // btnRede
-            // 
-            btnRede.BackColor = Color.FromArgb(108, 117, 125);
-            btnRede.Enabled = false;
-            btnRede.FlatStyle = FlatStyle.Flat;
-            btnRede.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnRede.ForeColor = Color.White;
-            btnRede.Location = new Point(15, 220);
-            btnRede.Name = "btnRede";
-            btnRede.Size = new Size(250, 40);
-            btnRede.TabIndex = 7;
-            btnRede.Text = "Configuração de Rede";
-            btnRede.UseVisualStyleBackColor = false;
-            btnRede.Click += btnRede_Click;
-            // 
-            // lblDescRede
-            // 
-            lblDescRede.ForeColor = Color.Gray;
-            lblDescRede.Location = new Point(275, 220);
-            lblDescRede.Name = "lblDescRede";
-            lblDescRede.Size = new Size(490, 40);
-            lblDescRede.TabIndex = 8;
-            lblDescRede.Text = "Leitura e configuração de rede do controlador (IP fixo, DHCP, máscara, gateway).";
-            // 
             // btnDashboard
             // 
             btnDashboard.BackColor = Color.FromArgb(23, 162, 184);
@@ -301,10 +273,10 @@ namespace SmartSdk
             btnDashboard.FlatStyle = FlatStyle.Flat;
             btnDashboard.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnDashboard.ForeColor = Color.White;
-            btnDashboard.Location = new Point(15, 275);
+            btnDashboard.Location = new Point(15, 220);
             btnDashboard.Name = "btnDashboard";
             btnDashboard.Size = new Size(250, 40);
-            btnDashboard.TabIndex = 9;
+            btnDashboard.TabIndex = 7;
             btnDashboard.Text = "Dashboard / Info Dispositivo";
             btnDashboard.UseVisualStyleBackColor = false;
             btnDashboard.Click += btnDashboard_Click;
@@ -312,10 +284,10 @@ namespace SmartSdk
             // lblDescDashboard
             // 
             lblDescDashboard.ForeColor = Color.Gray;
-            lblDescDashboard.Location = new Point(275, 275);
+            lblDescDashboard.Location = new Point(275, 220);
             lblDescDashboard.Name = "lblDescDashboard";
             lblDescDashboard.Size = new Size(490, 40);
-            lblDescDashboard.TabIndex = 10;
+            lblDescDashboard.TabIndex = 8;
             lblDescDashboard.Text = "Exibe informações do controlador: modelo, firmware, CPU, memória, estatísticas de cadastros e mídias.";
             // 
             // btnMqttCliente
@@ -325,10 +297,10 @@ namespace SmartSdk
             btnMqttCliente.FlatStyle = FlatStyle.Flat;
             btnMqttCliente.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnMqttCliente.ForeColor = Color.White;
-            btnMqttCliente.Location = new Point(15, 330);
+            btnMqttCliente.Location = new Point(15, 275);
             btnMqttCliente.Name = "btnMqttCliente";
             btnMqttCliente.Size = new Size(250, 40);
-            btnMqttCliente.TabIndex = 11;
+            btnMqttCliente.TabIndex = 9;
             btnMqttCliente.Text = "MQTT Cliente → Controladora";
             btnMqttCliente.UseVisualStyleBackColor = false;
             btnMqttCliente.Click += btnMqttCliente_Click;
@@ -336,10 +308,10 @@ namespace SmartSdk
             // lblDescMqttCliente
             // 
             lblDescMqttCliente.ForeColor = Color.Gray;
-            lblDescMqttCliente.Location = new Point(275, 330);
+            lblDescMqttCliente.Location = new Point(275, 275);
             lblDescMqttCliente.Name = "lblDescMqttCliente";
             lblDescMqttCliente.Size = new Size(490, 40);
-            lblDescMqttCliente.TabIndex = 12;
+            lblDescMqttCliente.TabIndex = 10;
             lblDescMqttCliente.Text = "Conecta como cliente MQTT ao broker da controladora. Recebe eventos em tempo real via WebSocket.";
             // 
             // btnMqttBroker
@@ -348,10 +320,10 @@ namespace SmartSdk
             btnMqttBroker.FlatStyle = FlatStyle.Flat;
             btnMqttBroker.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnMqttBroker.ForeColor = Color.White;
-            btnMqttBroker.Location = new Point(15, 385);
+            btnMqttBroker.Location = new Point(15, 330);
             btnMqttBroker.Name = "btnMqttBroker";
             btnMqttBroker.Size = new Size(250, 40);
-            btnMqttBroker.TabIndex = 13;
+            btnMqttBroker.TabIndex = 11;
             btnMqttBroker.Text = "MQTT Broker (Embutido)";
             btnMqttBroker.UseVisualStyleBackColor = false;
             btnMqttBroker.Click += btnMqttBroker_Click;
@@ -359,10 +331,10 @@ namespace SmartSdk
             // lblDescMqttBroker
             // 
             lblDescMqttBroker.ForeColor = Color.Gray;
-            lblDescMqttBroker.Location = new Point(275, 385);
+            lblDescMqttBroker.Location = new Point(275, 330);
             lblDescMqttBroker.Name = "lblDescMqttBroker";
             lblDescMqttBroker.Size = new Size(490, 40);
-            lblDescMqttBroker.TabIndex = 14;
+            lblDescMqttBroker.TabIndex = 12;
             lblDescMqttBroker.Text = "Inicia um broker MQTT embutido. A controladora pode se conectar diretamente a este servidor.";
             // 
             // btnWebhookServer
@@ -371,10 +343,10 @@ namespace SmartSdk
             btnWebhookServer.FlatStyle = FlatStyle.Flat;
             btnWebhookServer.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnWebhookServer.ForeColor = Color.White;
-            btnWebhookServer.Location = new Point(15, 440);
+            btnWebhookServer.Location = new Point(15, 385);
             btnWebhookServer.Name = "btnWebhookServer";
             btnWebhookServer.Size = new Size(250, 40);
-            btnWebhookServer.TabIndex = 15;
+            btnWebhookServer.TabIndex = 13;
             btnWebhookServer.Text = "Webhook Server (HTTP)";
             btnWebhookServer.UseVisualStyleBackColor = false;
             btnWebhookServer.Click += btnWebhookServer_Click;
@@ -382,10 +354,10 @@ namespace SmartSdk
             // lblDescWebhookServer
             // 
             lblDescWebhookServer.ForeColor = Color.Gray;
-            lblDescWebhookServer.Location = new Point(275, 440);
+            lblDescWebhookServer.Location = new Point(275, 385);
             lblDescWebhookServer.Name = "lblDescWebhookServer";
             lblDescWebhookServer.Size = new Size(490, 40);
-            lblDescWebhookServer.TabIndex = 16;
+            lblDescWebhookServer.TabIndex = 14;
             lblDescWebhookServer.Text = "Inicia um servidor HTTP para receber eventos via webhook. A controladora envia POST com eventos JSON.";
             // 
             // panelLog
@@ -474,8 +446,6 @@ namespace SmartSdk
         private Label lblDescSimples;
         private Button btnMonitoramento;
         private Label lblDescMonitoramento;
-        private Button btnRede;
-        private Label lblDescRede;
         private Button btnDashboard;
         private Label lblDescDashboard;
         private Button btnMqttCliente;

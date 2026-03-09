@@ -1,7 +1,7 @@
 # SmartSdk - Exemplo de Integracao MobiCortex (C# / WinForms)
 
 Aplicacao Windows Forms que demonstra a integracao com a API REST do controlador MobiCortex.
-Este projeto e um exemplo de referencia para integradores que desejam gerenciar cadastros, entidades, midias, monitoramento MQTT e configuracao de rede pela plataforma MobiCortex.
+Este projeto e um exemplo de referencia para integradores que desejam gerenciar cadastros, entidades, midias e monitoramento MQTT pela plataforma MobiCortex.
 
 O repositorio tambem inclui a biblioteca/SDK .NET da MobiCortex usada pela aplicacao de exemplo. Voce pode usar, copiar, modificar e distribuir livremente essa SDK em projetos de clientes sob a licenca MIT, desde que a integracao seja utilizada com dispositivos MobiCortex.
 
@@ -13,7 +13,6 @@ O aplicativo usa uma arquitetura de launcher com multiplos formularios:
 - FormCadastroCompleto - Modelo completo de 3 niveis: Cadastro Central -> Entidade -> Midia.
 - FormCadastroSimples - Modelo simplificado de 2 niveis: Entidade -> Midia (`createid=true`).
 - FormMonitoramento - Recebimento de eventos em tempo real via MQTT.
-- FormRede - Leitura e alteracao da configuracao de rede do controlador.
 - FormDashboard - Informacoes do dispositivo, uptime e estatisticas.
 
 Todos os formularios compartilham uma unica instancia de `MobiCortexApiService`.
@@ -36,10 +35,6 @@ Todos os formularios compartilham uma unica instancia de `MobiCortexApiService`.
 - Conexao MQTT ao controlador (porta 1883)
 - Recebimento de eventos de acesso em tempo real
 - Exibicao formatada de eventos no console
-
-### Rede
-- Leitura da configuracao de rede atual (IP, mascara, gateway, DNS, DHCP)
-- Alteracao e envio de nova configuracao de rede
 
 ### Dashboard
 - Informacoes do dispositivo (modelo, versao de firmware, MAC)
@@ -67,7 +62,6 @@ SmartSdk/
 |   |-- FormCadastroCompleto.cs/.Designer.cs
 |   |-- FormCadastroSimples.cs/.Designer.cs
 |   |-- FormMonitoramento.cs/.Designer.cs
-|   |-- FormRede.cs/.Designer.cs
 |   `-- FormDashboard.cs/.Designer.cs
 |-- Models/
 |   `-- MobiCortexModels.cs
@@ -120,12 +114,6 @@ Prefixo base das rotas: `/mbcortex/master/api/v1`
 | GET | `/media?id={media_id}` | Busca midia por ID |
 | POST | `/media` | Cria midia (RFID, placa, facial e outros formatos) |
 | DELETE | `/media?id={media_id}` | Remove midia |
-
-### Rede
-| Metodo | Endpoint | Descricao |
-|--------|----------|-----------|
-| GET | `/network/cable` | Le a configuracao de rede |
-| POST | `/network/cable` | Atualiza a configuracao de rede |
 
 ### Dashboard
 | Metodo | Endpoint | Descricao |

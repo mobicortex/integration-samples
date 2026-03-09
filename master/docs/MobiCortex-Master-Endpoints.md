@@ -1,1862 +1,902 @@
-# MobiCortex Master - API Endpoints (RXPPRO)
+# MobiCortex Master - API Endpoints
 
-Documentação completa dos endpoints da API da Controladora Master MobiCortex (RXPPRO).
+Documentacao operacional da API HTTP do MobiCortex Master.
 
-## Base URL
+## Base URL e autenticacao
 
+Base URLs usuais:
+
+```text
+https://<ip-da-controladora>:4449
+https://<ip-da-controladora>
 ```
-https://<ip-da-controladora>:4449  (modo desktop/debug)
-https://<ip-da-controladora>:443   (modo produção ARM)
-http://<ip-da-controladora>:80     (redireciona para HTTPS)
-```
 
-## Base Path
+Notas:
+- `https://<ip-da-controladora>` representa HTTPS na porta padrao `443`
+- explicite a porta apenas quando ela for diferente da padrao, como `4449`
+- `4449` e tipicamente usada em ambiente de desenvolvimento ou debug
 
-```
+Base path:
+
+```text
 /mbcortex/master/api/v1
 ```
 
-## Autenticação
+Autenticacao:
 
-A API utiliza autenticação por session key. Para obter uma session key, use o endpoint de login.
-
-### Header de Autenticação
-
-```
+```text
 Authorization: Bearer <session_key>
 ```
 
-A session key é um token de 64 caracteres hexadecimais (SHA256) válido por 15 minutos (TTL = 900 segundos). A sessão é renovada automaticamente a cada requisição válida (sliding TTL).
+Notas:
+- TTL padrao da sessao: 900 segundos
+- renovacao deslizante: cada request autenticado renova o TTL
+- a collection Postman deste repositorio salva `sessionKey` automaticamente apos o login
 
-> **💡 Dica Postman**: A collection Postman disponível neste repositório inclui um script automático que extrai a `session_key` do response de login e salva na variável `sessionKey`. Após fazer login, todas as requisições subsequentes usarão automaticamente o token salvo.
+## Autenticacao
 
-**Limites:**
-- Máximo de 10 sessões simultâneas por dispositivo
-- Máximo de 64 tokens de API por dispositivo
+### POST `/login`
 
----
+Obtem a `session_key` para todos os endpoints autenticados.
 
-## Índice
+Request:
 
-1. [Endpoints de Autenticação](#endpoints-de-autenticação)
-2. [Endpoints de Tokens de API](#endpoints-de-tokens-de-api)
-3. [Endpoints de Configuração](#endpoints-de-configuração)
-4. [Endpoints de Rede](#endpoints-de-rede)
-5. [Endpoints de Central Registry](#endpoints-de-central-registry)
-6. [Endpoints de Entidades](#endpoints-de-entidades)
-7. [Endpoints de Mídias](#endpoints-de-mídias)
-8. [Endpoints de Video Source](#endpoints-de-video-source)
-9. [Endpoints de Webhook](#endpoints-de-webhook)
-10. [Endpoints de Device Info](#endpoints-de-device-info)
-11. [Endpoints de Dashboard](#endpoints-de-dashboard)
-12. [Endpoints de Vehicle Drivers](#endpoints-de-vehicle-drivers)
-13. [Endpoints de Smart Slaves](#endpoints-de-smart-slaves)
-14. [Endpoints de Arquivos](#endpoints-de-arquivos)
-15. [Endpoints de Comandos](#endpoints-de-comandos)
-16. [Endpoints de Teste](#endpoints-de-teste)
-17. [Compatibilidade CTID](#compatibilidade-ctid)
-18. [Compatibilidade Hikvision](#compatibilidade-hikvision)
-19. [Modelos de Dados](#modelos-de-dados)
-20. [Códigos de Retorno](#códigos-de-retorno)
-
----
-
-## Endpoints de Autenticação
-
-### 1. Login
-
-**Endpoint:** `POST /mbcortex/master/api/v1/login`
-
-Autentica o usuário e retorna uma session key.
-
-#### Request Body
 ```json
 {
-  "pass": "senha_do_usuario"
+  "pass": "admin"
 }
 ```
 
-#### Response (200 OK)
+Response `200`:
+
 ```json
 {
   "ret": 0,
-  "session_key": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+  "session_key": "64_hex_chars",
   "expires_in": 900
 }
 ```
 
-> **⚠️ Importante**: O campo `ret` é numérico (`0` = sucesso), não string. A Postman Collection inclui um script automático que extrai a `session_key` e salva na variável `sessionKey` para uso automático nas próximas requisições.
+Erros comuns:
+- `401`: senha incorreta
+- `500`: falha interna
 
-#### Response (401 Unauthorized)
+### PUT `/login`
+
+Altera a senha atual.
+
+Request:
+
 ```json
 {
-  "ret": -1,
-  "error": "senha incorreta"
-}
-```
-
-**Notas:**
-- Em caso de falha de autenticação, há um delay de 5 segundos (anti brute-force)
-- A senha é armazenada como MD5 hex em `/var/mcut/.data/passwd`
-- Senha padrão quando o arquivo não existe: "admin" (MD5: 21232f297a57a5a743894a0e4a801fc3)
-
----
-
-### 2. Alterar Senha
-
-**Endpoint:** `PUT /mbcortex/master/api/v1/login`
-
-Altera a senha do usuário autenticado.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Request Body
-```json
-{
-  "pass_atual": "senha_atual",
+  "pass_atual": "admin",
   "pass_nova": "nova_senha",
   "pass_nova2": "nova_senha"
 }
 ```
 
-#### Response (200 OK)
+Response `200`:
+
 ```json
 {
-  "ret": "OK"
+  "ret": 0
 }
 ```
 
-#### Response (400 Bad Request)
+Erros comuns:
+- `400`: campos ausentes, JSON invalido ou confirmacao divergente
+- `401`: senha atual incorreta
+
+### DELETE `/login`
+
+Invalida a sessao atual.
+
+Request:
+
 ```json
 {
-  "ret": -2,
-  "error": "confirmacao de senha nao confere"
+  "session_key": "64_hex_chars"
 }
 ```
 
-#### Response (401 Unauthorized)
+Response `200`:
+
 ```json
 {
-  "ret": -3,
-  "error": "senha atual incorreta"
+  "ret": 0
 }
 ```
 
----
+## Tokens de API
 
-### 3. Logout
+### GET `/token`
 
-**Endpoint:** `DELETE /mbcortex/master/api/v1/login`
+Lista tokens de integracao existentes.
 
-Invalida a session key atual.
+Response `200`:
 
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Request Body
 ```json
 {
-  "session_key": "a1b2c3d4e5f6..."
-}
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK"
-}
-```
-
----
-
-## Endpoints de Tokens de API
-
-Tokens de API são credenciais de longa duração para integrações sistêmicas.
-
-### 4. Listar Tokens
-
-**Endpoint:** `GET /mbcortex/master/api/v1/token`
-
-Lista todos os tokens de API salvos.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
+  "ret": 0,
   "tokens": [
     {
-      "token": "a1b2c3d4...",
-      "label": "ERP Principal",
+      "token": "64_hex_chars",
+      "label": "ERP",
       "expires_at": "2026-12-31T23:59:59",
-      "expired": false
-    },
-    {
-      "token": "e5f6g7h8...",
-      "label": "Integração Mobile",
-      "expires_at": "",
-      "expired": false
+      "expired": 0
     }
-  ],
-  "ret": "OK"
+  ]
 }
 ```
 
-**Notas:**
-- `expires_at` vazio indica token sem data de expiração
-- `expired` é `true` se o token expirou
+### POST `/token`
 
----
+Com `ttl_days`:
 
-### 5. Criar Token
-
-**Endpoint:** `POST /mbcortex/master/api/v1/token`
-
-Cria um novo token de API.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body (com data de expiração)
 ```json
 {
-  "label": "Integração ERP",
-  "expires_at": "2026-12-31T23:59:59"
-}
-```
-
-#### Request Body (com TTL em dias)
-```json
-{
-  "label": "Integração ERP",
+  "label": "ERP",
   "ttl_days": 365
 }
 ```
 
-#### Request Body (sem expiração)
+Com `expires_at`:
+
 ```json
 {
-  "label": "Token Permanente"
+  "label": "ERP",
+  "expires_at": "2026-12-31T23:59:59"
 }
 ```
 
-#### Response (201 Created)
+Sem expiracao:
+
 ```json
 {
-  "token": "a1b2c3d4e5f6...",
-  "label": "Integração ERP",
-  "expires_at": "2026-12-31T23:59:59",
-  "ret": "OK"
+  "label": "Integracao permanente"
 }
 ```
 
-**Notas:**
-- Máximo de 64 tokens por dispositivo
-- Formato de data aceito: `YYYY-MM-DDTHH:MM:SS` ou `YYYY-MM-DD`
+Response `201`:
 
----
-
-### 6. Remover Token
-
-**Endpoint:** `DELETE /mbcortex/master/api/v1/token`
-
-Remove um token de API.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body
 ```json
 {
-  "token": "a1b2c3d4e5f6..."
+  "ret": 0,
+  "token": "64_hex_chars",
+  "label": "ERP",
+  "expires_at": "2026-12-31T23:59:59"
 }
 ```
 
-#### Response (200 OK)
+Notas:
+- maximo de 64 tokens
+- `expires_at` aceita `YYYY-MM-DDTHH:MM:SS` ou `YYYY-MM-DD`
+
+### DELETE `/token`
+
+Request:
+
 ```json
 {
-  "ret": "OK"
+  "token": "64_hex_chars"
 }
 ```
 
-#### Response (404 Not Found)
+Response `200`:
+
 ```json
 {
-  "ret": -4,
-  "error": "token nao encontrado"
+  "ret": 0
 }
 ```
 
----
+## Cadastro Central
 
-## Endpoints de Configuração
+Contrato publico:
+- `id`: `0` para geracao automatica
+- `name`: obrigatorio
+- `field1`: bloco
+- `field2`: apartamento
+- `field3`: departamento
+- `field4`: divisao
+- `enabled`: `1|0` ou `true|false`
+- `slots1`, `slots2`, `type`
 
-### 7. Obter Configuração
+### GET `/central-registry`
 
-**Endpoint:** `GET /mbcortex/master/api/v1/config`
+Consultas suportadas:
+- `?id=<id>`
+- `?search=<texto>`
+- `?offset=<n>&count=<n>`
+- `?offset=<n>&count=<n>&name=<texto>`
 
-Retorna a configuração completa do dispositivo.
+Comportamento atual do backend:
+- `offset`: padrao `0`
+- `count`: padrao `10`
+- `count`: maximo `200`
 
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
+### GET `/central-registry?id=123`
 
-#### Response (200 OK)
+Response `200`:
+
 ```json
 {
-  "ret": "OK",
-  "model": {
-    "hw_modeln": 1,
-    "hw_model": "RXPPRO-MASTER",
-    "versao_string": "1.0.0",
-    "builddate": "2026-02-27"
-  },
-  "eth": [...],
-  "wifi": [...],
-  "master": {
-    "id": 1,
-    "frase": "FRASE_DE_ACESSO",
-    "app": "RXPPRO"
-  },
-  "devgid": 123456789,
-  "idShowStr": "000-000-001"
+  "ret": 0,
+  "id": 123,
+  "name": "Empresa ABC Ltda",
+  "enabled": true,
+  "type": 0,
+  "field1": "Bloco A",
+  "field2": "101",
+  "field3": "TI",
+  "field4": "Matriz",
+  "slots1": 0,
+  "slots2": 0,
+  "people_count": 2,
+  "vehicle_count": 1
 }
 ```
 
----
+### GET `/central-registry?offset=0&count=10&name=Empresa`
 
-### 8. Atualizar Configuração
+Response `200`:
 
-**Endpoint:** `POST /mbcortex/master/api/v1/config`
-
-Atualiza a configuração do dispositivo.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body
 ```json
 {
-  "master": {
-    "frase": "NOVA_FRASE"
-  }
-}
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK"
-}
-```
-
----
-
-## Endpoints de Rede
-
-### 9. Configuração de Rede Cabo (GET)
-
-**Endpoint:** `GET /mbcortex/master/api/v1/network-config-cable`
-
-Retorna configuração da interface Ethernet.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "ip": "192.168.1.100",
-  "mask": "255.255.255.0",
-  "gw": "192.168.1.1",
-  "ip2": "",
-  "mask2": "",
-  "ret": "OK"
-}
-```
-
----
-
-### 10. Configuração de Rede Cabo (POST)
-
-**Endpoint:** `POST /mbcortex/master/api/v1/network-config-cable`
-
-Atualiza configuração da interface Ethernet.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body (IP Estático)
-```json
-{
-  "ip": "192.168.1.100",
-  "mask": "255.255.255.0",
-  "gw": "192.168.1.1"
-}
-```
-
-#### Request Body (DHCP)
-```json
-{
-  "ip": "dhcp"
-}
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK"
-}
-```
-
----
-
-### 11. Configuração WiFi AP (GET)
-
-**Endpoint:** `GET /mbcortex/master/api/v1/network-config-wifi-ap`
-
-Retorna configuração do Access Point WiFi.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "enabled": 1,
-  "ssid": "MobiCortex-AP",
-  "channel": 6,
-  "ret": "OK"
-}
-```
-
----
-
-### 12. Configuração WiFi AP (POST)
-
-**Endpoint:** `POST /mbcortex/master/api/v1/network-config-wifi-ap`
-
-Atualiza configuração do Access Point WiFi.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body
-```json
-{
-  "enabled": 1,
-  "ssid": "MobiCortex-AP",
-  "password": "senha123",
-  "channel": 6
-}
-```
-
----
-
-### 13. Configuração WiFi Station (GET)
-
-**Endpoint:** `GET /mbcortex/master/api/v1/network-config-wifi-st`
-
-Retorna configuração do cliente WiFi (station).
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "enabled": 1,
-  "ssid": "Rede-WiFi",
-  "ret": "OK"
-}
-```
-
----
-
-### 14. Configuração WiFi Station (POST)
-
-**Endpoint:** `POST /mbcortex/master/api/v1/network-config-wifi-st`
-
-Atualiza configuração do cliente WiFi (station).
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body
-```json
-{
-  "enabled": 1,
-  "ssid": "Rede-WiFi",
-  "password": "senha123"
-}
-```
-
----
-
-### 15. Scan WiFi
-
-**Endpoint:** `GET /mbcortex/master/api/v1/network-wifi-scan`
-
-Escaneia redes WiFi disponíveis.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "networks": [
+  "ret": 0,
+  "count": 1,
+  "total": 20,
+  "items": [
     {
-      "ssid": "Rede-1",
-      "bssid": "AA:BB:CC:DD:EE:FF",
-      "channel": 6,
-      "rssi": -45,
-      "auth": "WPA2-PSK"
+      "id": 123,
+      "name": "Empresa ABC Ltda",
+      "enabled": true,
+      "type": 0,
+      "field1": "Bloco A",
+      "field2": "101",
+      "field3": "TI",
+      "field4": "Matriz",
+      "slots1": 0,
+      "slots2": 0,
+      "people_count": 2,
+      "vehicle_count": 1
     }
-  ],
-  "ret": "OK"
+  ]
 }
 ```
 
----
+### GET `/central-registry?search=ABC1D23`
 
-### 16. Clientes WiFi Conectados
+Busca consolidada por nome do cadastro, entidade, documento/placa ou descricao de midia.
 
-**Endpoint:** `GET /mbcortex/master/api/v1/network-wifi-clients`
+Response `200`:
 
-Lista clientes conectados ao AP.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
 ```json
 {
-  "clients": [
+  "ret": 0,
+  "count": 1,
+  "total": 1,
+  "items": [
     {
-      "mac": "AA:BB:CC:DD:EE:FF",
-      "ip": "192.168.4.2",
-      "rssi": -50
+      "id": 123,
+      "name": "Empresa ABC Ltda",
+      "enabled": true,
+      "type": 0,
+      "field1": "Bloco A",
+      "field2": "101",
+      "field3": "TI",
+      "field4": "Matriz",
+      "slots1": 0,
+      "slots2": 0,
+      "people_count": 2,
+      "vehicle_count": 1,
+      "match_source": "vehicle_plate",
+      "match_value": "ABC1D23"
     }
-  ],
-  "ret": "OK"
+  ]
 }
 ```
 
----
+### POST `/central-registry`
 
-### 17. Interfaces de Rede
+Create/update do cadastro central.
 
-**Endpoint:** `GET /mbcortex/master/api/v1/network-interfaces`
+Request:
 
-Lista interfaces de rede.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "interfaces": [
-    {
-      "name": "eth0",
-      "ip": "192.168.1.100",
-      "mac": "AA:BB:CC:DD:EE:FF",
-      "up": true
-    }
-  ],
-  "ret": "OK"
-}
-```
-
----
-
-### 18. Sinal WiFi
-
-**Endpoint:** `GET /mbcortex/master/api/v1/network-wifi-signal`
-
-Retorna qualidade do sinal WiFi.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "rssi": -50,
-  "quality": "good",
-  "ret": "OK"
-}
-```
-
----
-
-## Endpoints de Central Registry
-
-### 19. Listar Cadastros (Paginado)
-
-**Endpoint:** `GET /mbcortex/master/api/v1/central-registry`
-
-Lista cadastros com paginação e filtros.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Parâmetros de Query
-| Parâmetro | Tipo | Default | Descrição |
-|-----------|------|---------|-----------|
-| `offset` | int | 0 | Registro inicial |
-| `count` | int | 20 | Registros por página |
-| `name` | string | - | Filtro por nome (parcial) |
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK",
-  "data": [
-    {
-      "id": 12345,
-      "name": "Cadastro Exemplo",
-      "enabled": 1,
-      "slots1": 5,
-      "slots2": 3,
-      "type": 0
-    }
-  ],
-  "total": 150,
-  "offset": 0,
-  "count": 20
-}
-```
-
----
-
-### 20. Buscar Cadastro por ID
-
-**Endpoint:** `GET /mbcortex/master/api/v1/central-registry?id=<cadastro_id>`
-
-Busca cadastro específico por ID.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK",
-  "data": {
-    "id": 12345,
-    "name": "Cadastro Exemplo",
-    "enabled": 1,
-    "slots1": 5,
-    "slots2": 3,
-    "type": 0
-  }
-}
-```
-
----
-
-### 21. Criar/Atualizar Cadastro
-
-**Endpoint:** `POST /mbcortex/master/api/v1/central-registry`
-
-Cria ou atualiza cadastro.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body (Criar Novo)
 ```json
 {
   "id": 0,
-  "name": "Cadastro Principal",
-  "enabled": 1,
+  "name": "Empresa ABC Ltda",
+  "field1": "Bloco A",
+  "field2": "101",
+  "field3": "TI",
+  "field4": "Matriz",
+  "enabled": true,
   "slots1": 0,
   "slots2": 0,
   "type": 0
 }
 ```
 
-#### Request Body (Atualizar Existente)
+Response `200`:
+
 ```json
 {
-  "id": 12345,
-  "name": "Cadastro Atualizado",
-  "enabled": 1,
-  "slots1": 10,
-  "slots2": 5,
-  "type": 0
+  "ret": 0,
+  "id": 4294000001
 }
 ```
 
-#### Response (200 OK)
+Notas:
+- `POST` cobre criacao e atualizacao
+- `id=0` gera ID automaticamente
+- se `id=0` e `name` ja existir, o backend pode retornar `409`
+- nao omita `field1..field4` da integracao; envie apenas os que tiver valor
+
+### DELETE `/central-registry?id=123`
+
+Tambem pode receber body com `id`.
+
+Response `200`:
+
 ```json
 {
-  "ret": "OK",
-  "id": 12345
+  "ret": 0,
+  "id": 123
 }
 ```
 
----
+### GET `/central-registry/stats`
 
-### 22. Remover Cadastro
+Response `200`:
 
-**Endpoint:** `DELETE /mbcortex/master/api/v1/central-registry?id=<cadastro_id>`
-
-Remove cadastro.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
 ```json
 {
-  "ret": "OK"
+  "ret": 0,
+  "max_capacity": 200000,
+  "current_total": 1500,
+  "usage_percent": 0.8
 }
 ```
 
----
+## Entidades
 
-### 23. Estatísticas do Registro Central
+Tipos principais:
+- `1`: pessoa
+- `2`: veiculo
 
-**Endpoint:** `GET /mbcortex/master/api/v1/central-registry/stats`
+Campos principais de integracao:
+- `id`: `0` para auto-ID
+- `type`
+- `name`
+- `doc`
+- `central_registry_id`
+- `enabled`
+- `brand`, `model`, `color` para veiculos
+- `lpr_enabled` para veiculos
 
-Retorna estatísticas do registro central.
+Regras importantes:
+- `doc` de veiculo representa a placa
+- normalizar placa para maiusculo e sem separadores
+- validar formato brasileiro antes de enviar
+- `lpr_enabled=true` cria/atualiza a midia LPR automaticamente
 
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
+### GET `/entities`
 
-#### Response (200 OK)
+Consultas suportadas:
+- `?id=<entity_id>`
+- `?central_registry_id=<id>`
+- `?offset=<n>&count=<n>`
+- `?offset=<n>&count=<n>&name=<texto>`
+- `?offset=<n>&count=<n>&doc=<texto>`
+- `?offset=<n>&count=<n>&type=1|2`
+
+Comportamento atual do backend:
+- `offset=0`
+- `count=10`
+- `count` maximo:
+  - Linux embarcado: `100`
+  - ESP32/targets menores: `10`
+
+### GET `/entities?id=456`
+
+Response `200`:
+
 ```json
 {
-  "ret": "OK",
-  "total_cadastros": 150,
-  "total_entidades": 5000,
-  "total_midias": 8500
+  "ret": 0,
+  "entity_id": 456,
+  "central_registry_id": 123,
+  "type": 2,
+  "enabled": true,
+  "name": "Joao Silva Santos",
+  "doc": "ABC1D23",
+  "brand": "Toyota",
+  "model": "Corolla",
+  "color": "Branco",
+  "lpr_enabled": true
 }
 ```
 
----
+### GET `/entities?central_registry_id=123`
 
-## Endpoints de Entidades
+Lista completa de pessoas e veiculos vinculados ao cadastro.
 
-### 24. Listar Entidades (Paginado)
+Response `200`:
 
-**Endpoint:** `GET /mbcortex/master/api/v1/entities`
-
-Lista entidades com paginação e filtros.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Parâmetros de Query
-| Parâmetro | Tipo | Default | Descrição |
-|-----------|------|---------|-----------|
-| `id` | uint32 | - | ID da entidade (retorna única) |
-| `cadastro_id` | uint32 | - | Filtra por cadastro |
-| `offset` | int | 0 | Registro inicial |
-| `count` | int | 20 | Registros por página (max: 100 Linux, 10 ESP32) |
-| `name` | string | - | Filtro por nome (parcial) |
-| `doc` | string | - | Filtro por documento |
-| `tipo` | int | - | Filtro por tipo (1=pessoa, 2=veículo) |
-
-#### Response (200 OK)
 ```json
 {
-  "ret": "OK",
-  "data": [
+  "ret": 0,
+  "central_registry_id": 123,
+  "count": 2,
+  "items": [
     {
-      "entity_id": 12345,
-      "cadastro_id": 100,
-      "tipo": 1,
-      "habilitado": 1,
-      "name": "João Silva",
-      "doc": "12345678900",
-      "lpr_ativo": 0,
-      "created_at": 1709000000,
-      "updated_at": 1709000000
+      "entity_id": 111,
+      "central_registry_id": 123,
+      "type": 1,
+      "enabled": true,
+      "name": "Maria Oliveira",
+      "doc": "12345678900"
+    },
+    {
+      "entity_id": 222,
+      "central_registry_id": 123,
+      "type": 2,
+      "enabled": true,
+      "name": "Joao Silva Santos",
+      "doc": "ABC1D23",
+      "brand": "Toyota",
+      "model": "Corolla",
+      "color": "Branco",
+      "lpr_enabled": true
     }
-  ],
-  "total": 5000,
-  "offset": 0,
-  "count": 20
+  ]
 }
 ```
 
----
+### GET `/entities?offset=0&count=10&name=joao&doc=ABC1D23&type=2`
 
-### 25. Buscar Entidade por ID
+Busca avancada com filtros combinados.
 
-**Endpoint:** `GET /mbcortex/master/api/v1/entities?id=<entity_id>`
+Response `200`:
 
-Busca entidade específica por ID.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
 ```json
 {
-  "ret": "OK",
-  "data": {
-    "entity_id": 12345,
-    "cadastro_id": 100,
-    "tipo": 1,
-    "habilitado": 1,
-    "name": "João Silva",
-    "doc": "12345678900",
-    "lpr_ativo": 0,
-    "created_at": 1709000000,
-    "updated_at": 1709000000
+  "ret": 0,
+  "count": 1,
+  "total": 1,
+  "items": [
+    {
+      "entity_id": 222,
+      "central_registry_id": 123,
+      "type": 2,
+      "enabled": true,
+      "name": "Joao Silva Santos",
+      "doc": "ABC1D23",
+      "brand": "Toyota",
+      "model": "Corolla",
+      "color": "Branco",
+      "lpr_enabled": true
+    }
+  ]
+}
+```
+
+### POST `/entities`
+
+Pessoa:
+
+```json
+{
+  "id": 0,
+  "type": 1,
+  "name": "Maria Oliveira",
+  "doc": "12345678900",
+  "central_registry_id": 123,
+  "enabled": true
+}
+```
+
+Veiculo:
+
+```json
+{
+  "id": 0,
+  "type": 2,
+  "name": "Joao Silva Santos",
+  "doc": "ABC1D23",
+  "central_registry_id": 123,
+  "lpr_enabled": true,
+  "brand": "Toyota",
+  "model": "Corolla",
+  "color": "Branco",
+  "enabled": true
+}
+```
+
+Auto-ID com criacao automatica:
+
+```json
+{
+  "id": 0,
+  "createid": true,
+  "type": 1,
+  "name": "Cadastro automatico",
+  "doc": "",
+  "enabled": true
+}
+```
+
+Response `200`:
+
+```json
+{
+  "ret": 0,
+  "id": 456,
+  "entity_id": 456,
+  "central_registry_id": 123,
+  "created_central": 0,
+  "updated_existing": 0
+}
+```
+
+Erros comuns:
+- `400`: nome ausente, placa invalida, payload invalido
+- `404`: cadastro nao encontrado
+- `409`: placa duplicada ou ID existente
+
+### PUT `/entities?id=456`
+
+Atualizacao parcial.
+
+Request:
+
+```json
+{
+  "name": "Joao Silva Santos",
+  "brand": "Toyota",
+  "model": "Corolla XEI",
+  "color": "Prata",
+  "lpr_enabled": true,
+  "enabled": true
+}
+```
+
+Response `200`:
+
+```json
+{
+  "ret": 0,
+  "entity_id": 456
+}
+```
+
+### DELETE `/entities?id=456`
+
+Response `200`:
+
+```json
+{
+  "ret": 0
+}
+```
+
+## Condutores de veiculo
+
+### GET `/vehicle-drivers?vehicle_id=456`
+
+Response `200`:
+
+```json
+{
+  "ret": 0,
+  "vehicle_id": 456,
+  "driver_ids": [111, 222]
+}
+```
+
+### PUT `/vehicle-drivers?vehicle_id=456`
+
+Request:
+
+```json
+{
+  "driver_ids": [111, 222]
+}
+```
+
+Response `200`:
+
+```json
+{
+  "ret": 0,
+  "vehicle_id": 456,
+  "count": 2
+}
+```
+
+Erros comuns:
+- `400`: `driver_ids` invalido, pessoa inexistente ou de outro cadastro
+- `404`: veiculo nao encontrado
+
+## Midias
+
+Campos principais:
+- `entity_id`
+- `central_registry_id`
+- `type`
+- `description`
+- `enabled`
+- `expiration`
+
+### GET `/media`
+
+Consultas suportadas:
+- `?id=<media_id>`
+- `?entity_id=<entity_id>`
+
+### GET `/media?id=789`
+
+Response `200`:
+
+```json
+{
+  "ret": 0,
+  "media_id": 789,
+  "entity_id": 456,
+  "central_registry_id": 123,
+  "type": 21,
+  "description": "123,45678",
+  "expiration": 0,
+  "enabled": true
+}
+```
+
+### GET `/media?entity_id=456`
+
+Response `200`:
+
+```json
+{
+  "ret": 0,
+  "entity_id": 456,
+  "count": 1,
+  "items": [
+    {
+      "media_id": 789,
+      "entity_id": 456,
+      "central_registry_id": 123,
+      "type": 21,
+      "description": "123,45678",
+      "expiration": 0,
+      "enabled": true
+    }
+  ]
+}
+```
+
+### POST `/media`
+
+RFID:
+
+```json
+{
+  "entity_id": 456,
+  "central_registry_id": 123,
+  "type": 21,
+  "description": "123,45678",
+  "enabled": true
+}
+```
+
+LPR manual:
+
+```json
+{
+  "entity_id": 456,
+  "central_registry_id": 123,
+  "type": 17,
+  "description": "ABC1D23",
+  "enabled": true
+}
+```
+
+Response `200`:
+
+```json
+{
+  "ret": 0,
+  "media_id": 789
+}
+```
+
+Notas:
+- `entity_id` e `central_registry_id` sao obrigatorios
+- para veiculos, prefira `lpr_enabled=true` no cadastro da entidade em vez de criar LPR manualmente
+- duplicidade de midia pode retornar `409`
+
+### PUT `/media?id=789`
+
+Request:
+
+```json
+{
+  "enabled": false,
+  "expiration": 1767225600
+}
+```
+
+Response `200`:
+
+```json
+{
+  "ret": 0,
+  "media_id": 789
+}
+```
+
+### DELETE `/media?id=789`
+
+Response `200`:
+
+```json
+{
+  "ret": 0
+}
+```
+
+## Dashboard
+
+### GET `/dashboard`
+
+Response `200`:
+
+```json
+{
+  "ret": 0,
+  "counts": {
+    "cadastros": 100,
+    "pessoas": 80,
+    "veiculos": 20,
+    "registros_memoria": 150
+  },
+  "midias": {
+    "rfid": 120,
+    "senha": 5,
+    "biometria": 3,
+    "lpr": 12
   }
 }
 ```
 
----
+## Device Info
 
-### 26. Criar Entidade
+### GET `/device-info`
 
-**Endpoint:** `POST /mbcortex/master/api/v1/entities`
+Response `200`:
 
-Cria uma nova entidade.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body (Pessoa)
 ```json
 {
-  "cadastro_id": 100,
-  "tipo": 1,
-  "habilitado": 1,
-  "name": "João Silva",
-  "doc": "12345678900"
-}
-```
-
-#### Request Body (Veículo com LPR)
-```json
-{
-  "cadastro_id": 100,
-  "tipo": 2,
-  "habilitado": 1,
-  "name": "Civic Preto",
-  "doc": "ABC1D23",
-  "lpr_ativo": 1
-}
-```
-
-#### Request Body (Auto-ID)
-```json
-{
-  "id": 0,
-  "cadastro_id": 0,
-  "createid": true,
-  "tipo": 1,
-  "habilitado": 1,
-  "name": "Nova Entidade",
-  "doc": ""
-}
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK",
-  "entity_id": 12345
-}
-```
-
-**Notas:**
-- `lpr_ativo=1` cria automaticamente uma mídia LPR para a entidade
-- `createid=true` gera automaticamente cadastro_id e entity_id
-- Placas de veículos são normalizadas (maiúsculas, sem espaços/hífens)
-- IDs altos (>=4294000000) são reservados para uso web
-
----
-
-### 27. Atualizar Entidade
-
-**Endpoint:** `PUT /mbcortex/master/api/v1/entities`
-
-Atualiza uma entidade existente.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body
-```json
-{
-  "entity_id": 12345,
-  "name": "João Silva Atualizado",
-  "habilitado": 1,
-  "lpr_ativo": 1
-}
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK"
-}
-```
-
-**Notas:**
-- Apenas os campos fornecidos serão atualizados
-- `lpr_ativo=1` cria mídia LPR se não existir
-- `lpr_ativo=0` remove mídia LPR se existir
-
----
-
-### 28. Remover Entidade
-
-**Endpoint:** `DELETE /mbcortex/master/api/v1/entities?id=<entity_id>`
-
-Remove uma entidade e suas mídias vinculadas (cascade delete).
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK"
-}
-```
-
----
-
-## Endpoints de Mídias
-
-### 29. Listar Mídias
-
-**Endpoint:** `GET /mbcortex/master/api/v1/media`
-
-Lista mídias com filtros.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Parâmetros de Query
-| Parâmetro | Tipo | Descrição |
-|-----------|------|-----------|
-| `id` | uint32 | ID da mídia (retorna única) |
-| `entity_id` | uint32 | Filtra por entidade |
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK",
-  "data": [
-    {
-      "media_id": 54321,
-      "entity_id": 12345,
-      "cadastro_id": 100,
-      "tipo": 21,
-      "descricao": "123,45678",
-      "habilitado": 1,
-      "ns32_0": 123,
-      "ns32_1": 45678
-    }
-  ]
-}
-```
-
----
-
-### 30. Criar Mídia
-
-**Endpoint:** `POST /mbcortex/master/api/v1/media`
-
-Cria uma nova mídia.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body (RFID Wiegand 26)
-```json
-{
-  "entity_id": 12345,
-  "cadastro_id": 100,
-  "tipo": 21,
-  "descricao": "123,45678"
-}
-```
-
-#### Request Body (LPR - Placa)
-```json
-{
-  "entity_id": 12345,
-  "cadastro_id": 100,
-  "tipo": 17,
-  "descricao": "ABC1D23",
-  "ns32_0": 0,
-  "ns32_1": 0
-}
-```
-
-> **Nota**: Para LPR, os campos `ns32_0=0` e `ns32_1=0` são obrigatórios para evitar validação RFID.
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK",
-  "media_id": 54321
-}
-```
-
----
-
-### 31. Atualizar Mídia
-
-**Endpoint:** `PUT /mbcortex/master/api/v1/media`
-
-Atualiza uma mídia existente.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body
-```json
-{
-  "media_id": 54321,
-  "descricao": "124,45679",
-  "habilitado": 1
-}
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK"
-}
-```
-
----
-
-### 32. Remover Mídia
-
-**Endpoint:** `DELETE /mbcortex/master/api/v1/media?id=<media_id>`
-
-Remove uma mídia.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK"
-}
-```
-
----
-
-## Endpoints de Video Source
-
-### 33. Listar Fontes de Vídeo
-
-**Endpoint:** `GET /mbcortex/master/api/v1/video-source`
-
-Retorna configuração das fontes de vídeo.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK",
-  "sources": [
-    {
-      "id": 0,
-      "name": "Camera 1",
-      "type": "rtsp",
-      "url": "rtsp://192.168.1.50:554/stream1",
-      "enabled": 1
-    }
-  ]
-}
-```
-
----
-
-### 34. Criar Fonte de Vídeo
-
-**Endpoint:** `POST /mbcortex/master/api/v1/video-source`
-
-Cria uma nova fonte de vídeo.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body
-```json
-{
-  "name": "Camera 2",
-  "type": "rtsp",
-  "url": "rtsp://192.168.1.51:554/stream1",
-  "enabled": 1
-}
-```
-
----
-
-### 35. Atualizar Fonte de Vídeo
-
-**Endpoint:** `PUT /mbcortex/master/api/v1/video-source`
-
-Atualiza uma fonte de vídeo existente.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body
-```json
-{
-  "id": 0,
-  "name": "Camera 1 Atualizada",
-  "enabled": 1
-}
-```
-
----
-
-### 36. Remover Fonte de Vídeo
-
-**Endpoint:** `DELETE /mbcortex/master/api/v1/video-source?id=<source_id>`
-
-Remove uma fonte de vídeo.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
----
-
-## Endpoints de Webhook
-
-### 37. Obter Configuração do Webhook
-
-**Endpoint:** `GET /mbcortex/master/api/v1/webhook`
-
-Retorna configuração do webhook.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK",
-  "enabled": 1,
-  "url": "https://example.com/webhook",
-  "events": ["access_granted", "access_denied"],
-  "secret": "webhook_secret"
-}
-```
-
----
-
-### 38. Criar/Atualizar Webhook
-
-**Endpoint:** `POST /mbcortex/master/api/v1/webhook`
-
-Cria ou atualiza configuração do webhook.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body
-```json
-{
-  "enabled": 1,
-  "url": "https://example.com/webhook",
-  "events": ["access_granted", "access_denied"],
-  "secret": "webhook_secret"
-}
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK"
-}
-```
-
----
-
-### 39. Remover Webhook
-
-**Endpoint:** `DELETE /mbcortex/master/api/v1/webhook`
-
-Remove a configuração do webhook.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK"
-}
-```
-
----
-
-## Endpoints de Device Info
-
-### 40. Informações do Dispositivo
-
-**Endpoint:** `GET /mbcortex/master/api/v1/device-info`
-
-Retorna informações do hardware.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK",
+  "ret": 0,
+  "gid": 123456,
+  "gid_str": "000-000-123456",
   "hw_model": "RXPPRO-MASTER",
-  "hw_version": "1.0",
-  "fw_version": "1.0.0",
-  "build_date": "2026-02-27",
-  "uptime": 86400,
-  "mac": "AA:BB:CC:DD:EE:FF",
-  "ip": "192.168.1.100"
+  "fw_version": "1.2.3",
+  "datetime_utc": "2026-03-09T12:00:00Z",
+  "uptime_sec": 86400
 }
 ```
 
----
+## Configuracao
 
-## Endpoints de Dashboard
+### GET `/config`
 
-### 41. Estatísticas do Dashboard
+Retorna configuracao consolidada da controladora.
 
-**Endpoint:** `GET /mbcortex/master/api/v1/dashboard`
+Campos usuais:
+- `model`
+- `eth`
+- `wifi`
+- `volume_master`
+- `volumes`
+- `LPR`
+- `FACIAL`
+- `BARCODE`
+- `VOIP`
+- `masters`
+- `cvideoia`
+- `master`
+- `devgid`
+- `ret`
 
-Retorna estatísticas do sistema.
+### POST `/config`
 
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
+Request parcial:
 
-#### Response (200 OK)
 ```json
 {
-  "ret": "OK",
-  "total_cadastros": 150,
-  "total_entidades": 5000,
-  "total_midias": 8500,
-  "eventos_hoje": 1250,
-  "ultimos_eventos": [...]
+  "devgid": 123456,
+  "master": {
+    "id": 1,
+    "frase": "NOVA FRASE",
+    "app": "RXPPRO"
+  }
 }
 ```
 
----
+Notas:
+- `devgid` deve ser o ID real do equipamento
+- o endpoint aceita body parcial
 
-## Endpoints de Vehicle Drivers
+## Webhooks
 
-### 42. Listar Motoristas de Veículos
+Slots suportados:
+- `id=1..4`
 
-**Endpoint:** `GET /mbcortex/master/api/v1/vehicle-drivers`
+### GET `/webhook`
 
-Retorna lista de motoristas vinculados a veículos.
+Response `200`:
 
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
 ```json
 {
-  "ret": "OK",
-  "drivers": [
-    {
-      "vehicle_id": 12345,
-      "driver_id": 67890,
-      "vinculado_em": 1709000000
-    }
-  ]
-}
-```
-
----
-
-### 43. Atualizar Motorista de Veículo
-
-**Endpoint:** `PUT /mbcortex/master/api/v1/vehicle-drivers`
-
-Vincula/desvincula motorista a veículo.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body
-```json
-{
-  "vehicle_id": 12345,
-  "driver_id": 67890
-}
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK"
-}
-```
-
----
-
-## Endpoints de Smart Slaves
-
-### 44. Comunicação com Slave Smart
-
-**Endpoint:** `POST /mbcortex/master/api/v1/SlaveSmart.MCUT`
-
-Comunicação com slaves smart.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
----
-
-### 45. Comunicação com M1127
-
-**Endpoint:** `GET /mbcortex/master/api/v1/M1127.MCUT`
-
-Comunicação com módulo M1127.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
----
-
-### 46. Lista de Slaves Smart
-
-**Endpoint:** `GET /mbcortex/master/api/v1/SlaveSmartList.MCUT`
-
-Lista slaves smart conectados.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK",
-  "slaves": [
+  "ret": 0,
+  "items": [
     {
       "id": 1,
-      "type": "M1127",
-      "address": "192.168.1.50",
-      "status": "online"
+      "url": "https://example.com/webhook",
+      "registered": 1,
+      "unregistered": 1,
+      "sensors": 0,
+      "logs": 0
     }
   ]
 }
 ```
 
----
+### GET `/webhook?id=1`
 
-## Endpoints de Arquivos
+Consulta um slot especifico.
 
-### 47. Listar Arquivos
+### POST `/webhook?id=1`
 
-**Endpoint:** `GET /mbcortex/master/api/v1/files`
+Request:
 
-Lista arquivos do sistema.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
-#### Response (200 OK)
 ```json
 {
-  "ret": "OK",
-  "files": [
-    {
-      "name": "config.json",
-      "size": 1024,
-      "modified": "2026-02-27T10:00:00"
-    }
-  ]
+  "url": "https://example.com/webhook",
+  "registered": 1,
+  "unregistered": 1,
+  "sensors": 0,
+  "logs": 0
 }
 ```
 
----
+Response `200`:
 
-## Endpoints de Comandos
-
-### 48. Executar Comando
-
-**Endpoint:** `GET /mbcortex/master/api/v1/command`
-
-Envia comandos para a controladora.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-```
-
----
-
-## Endpoints de Teste
-
-### 49. Auditoria de Integridade de Dados
-
-**Endpoint:** `POST /mbcortex/master/api/v1/test/data-integrity-audit`
-
-Executa auditoria de integridade dos dados.
-
-#### Headers
-```
-Authorization: Bearer <session_key>
-Content-Type: application/json
-```
-
-#### Request Body
 ```json
 {
-  "check_entities": true,
-  "check_media": true,
-  "check_indexes": true
+  "ret": 0
 }
 ```
 
-#### Response (200 OK)
+### DELETE `/webhook?id=1`
+
+Response `200`:
+
 ```json
 {
-  "ret": "OK",
-  "audit_result": {
-    "entities_ok": true,
-    "media_ok": true,
-    "indexes_ok": true,
-    "errors_found": 0,
-    "fixed": 0
-  }
+  "ret": 0
 }
 ```
 
----
+## MQTT via WebSocket
 
-## Compatibilidade CTID
+Endpoint:
 
-Estes endpoints mantêm compatibilidade com o protocolo ControlID.
-
-### 50. Login CTID
-
-**Endpoint:** `POST /login.fcgi`
-
-Login compatível com CTID.
-
-#### Request Body
-```json
-{
-  "login": "admin",
-  "password": "admin"
-}
+```text
+wss://<host>/mbcortex/master/api/v1/mqtt
 ```
 
-#### Response (200 OK)
-```json
-{
-  "session": "session_id"
-}
-```
-
----
-
-### 51. Criar Objetos CTID
-
-**Endpoint:** `POST /create_objects.fcgi`
-
-Cria objetos (compatível CTID).
-
-#### Headers
-```
-Content-Type: application/json
-```
-
----
-
-### 52. Carregar Objetos CTID
-
-**Endpoint:** `POST /load_objects.fcgi`
-
-Carrega objetos (compatível CTID).
-
-#### Headers
-```
-Content-Type: application/json
-```
-
----
-
-### 53. Destruir Objetos CTID
-
-**Endpoint:** `POST /destroy_objects.fcgi`
-
-Remove objetos (compatível CTID).
-
-#### Headers
-```
-Content-Type: application/json
-```
-
----
-
-### 54. Validar Sessão CTID
-
-**Endpoint:** `POST /session_is_valid.fcgi`
-
-Valida sessão CTID.
-
----
-
-### 55. Definir Imagem do Usuário CTID
-
-**Endpoint:** `POST /user_set_image.fcgi`
-
-Define imagem do usuário.
-
----
-
-### 56. Obter Imagem do Usuário CTID
-
-**Endpoint:** `GET /user_get_image.fcgi`
-
-Obtém imagem do usuário.
-
----
-
-### 57. Remover Imagem do Usuário CTID
-
-**Endpoint:** `POST /user_destroy_image.fcgi`
-
-Remove imagem do usuário.
-
----
-
-## Compatibilidade Hikvision
-
-Estes endpoints mantêm compatibilidade com o protocolo Hikvision ISAPI.
-
-**Autenticação:** Digest Auth
-
-### 58. Registrar Usuário Hikvision
-
-**Endpoint:** `POST /ISAPI/AccessControl/UserInfo/Record`
-
-Cria/atualiza usuário (formato Hikvision).
-
----
-
-### 59. Buscar Usuários Hikvision
-
-**Endpoint:** `POST /ISAPI/AccessControl/UserInfo/Search`
-
-Busca usuários (formato Hikvision).
-
----
-
-### 60. Remover Usuários Hikvision
-
-**Endpoint:** `POST /ISAPI/AccessControl/UserInfo/Delete`
-
-Remove usuários (formato Hikvision).
-
----
-
-### 61. Registrar Cartão Hikvision
-
-**Endpoint:** `POST /ISAPI/AccessControl/CardInfo/Record`
-
-Cria/atualiza cartão (formato Hikvision).
-
----
-
-### 62. Capacidades Access Control Hikvision
-
-**Endpoint:** `GET /ISAPI/AccessControl/Capabilities`
-
-Retorna capacidades de controle de acesso.
-
----
-
-### 63. Registrar Face Hikvision
-
-**Endpoint:** `POST /ISAPI/Intelligent/FD/FaceData/Record`
-
-Cria dados faciais (formato Hikvision).
-
----
-
-### 64. Verificar Usuário Hikvision
-
-**Endpoint:** `GET /ISAPI/Security/userCheck`
-
-Verifica credenciais do usuário.
-
----
-
-### 65. Capacidades de Segurança Hikvision
-
-**Endpoint:** `GET /ISAPI/Security/capabilities`
-
-Retorna capacidades de segurança.
-
----
-
-### 66. Login de Sessão Hikvision
-
-**Endpoint:** `POST /ISAPI/Security/sessionLogin`
-
-Login de sessão (formato XML).
-
----
-
-### 67. Token de Segurança Hikvision
-
-**Endpoint:** `GET /ISAPI/Security/token`
-
-Obtém token de segurança.
-
----
-
-## Endpoints de Informações
-
-### 68. Informações do Sistema
-
-**Endpoint:** `GET /mbcortex/master/api/v1/info`
-
-Retorna informações gerais do sistema.
-
-#### Response (200 OK)
-```json
-{
-  "ret": "OK",
-  "name": "MobiCortex Master",
-  "version": "1.0.0"
-}
-```
-
----
-
-## Modelos de Dados
-
-### Entity (Entidade)
-
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| entity_id | uint32 | ID único da entidade |
-| cadastro_id | uint32 | ID do cadastro vinculado |
-| tipo | int | Tipo da entidade (1=pessoa, 2=veículo, etc) |
-| habilitado | int | 1=habilitado, 0=desabilitado |
-| name | string | Nome da entidade |
-| doc | string | Documento (CPF/CNPJ/Placa) |
-| lpr_ativo | int | 1=possui mídia LPR, 0=não possui |
-| created_at | int | Timestamp de criação |
-| updated_at | int | Timestamp de atualização |
-
-### Media (Mídia)
-
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| media_id | uint32 | ID único da mídia |
-| entity_id | uint32 | ID da entidade vinculada |
-| cadastro_id | uint32 | ID do cadastro |
-| tipo | int | Tipo da mídia (veja tabela abaixo) |
-| descricao | string | Descrição da mídia |
-| ns32_0 | int | Dados binários da mídia (parte baixa) |
-| ns32_1 | int | Dados binários da mídia (parte alta) |
-| habilitado | int | 1=habilitado, 0=desabilitado |
-
-#### Tipos de Mídia
-
-| Valor | Constante | Descrição | Observações |
-|-------|-----------|-----------|-------------|
-| 0 | ControleRemoto | Controle remoto HT | - |
-| 1 | Hcs | HCS | - |
-| 5 | Bio | Biometria | - |
-| 8 | Teclado | Senha via teclado | - |
-| 15 | Bio3 | Biometria 3 | - |
-| 17 | Lpr | Placa (LPR) | Requer ns32_0=0, ns32_1=0 |
-| 18 | BioHikvision | Biometria Hikvision | - |
-| 20 | Facial | Reconhecimento facial | - |
-| 21 | Wiegand26 | RFID Wiegand 26 bits | Formato: "123,45678" |
-| 22 | Wiegand34 | RFID Wiegand 34 bits | Formato: "1234,567890" |
-
-#### Campos ns32_0 e ns32_1
-
-Estes campos armazenam os dados binários da mídia (número serial, código RFID, etc).
-
-- **RFID**: Não enviar - o backend calcula automaticamente a partir da `descricao`
-- **LPR/Facial/Outros**: Enviar `0` para evitar validação de formato RFID
-
-### Central Registry (Cadastro)
-
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | uint32 | ID único do cadastro |
-| name | string | Nome do cadastro |
-| enabled | int | 1=habilitado, 0=desabilitado |
-| slots1 | int | Slots tipo 1 |
-| slots2 | int | Slots tipo 2 |
-| type | int | Tipo do cadastro |
-
----
-
-## Códigos de Retorno
-
-| Código | Descrição |
-|--------|-----------|
-| "OK" | Sucesso |
-| 0 | Sucesso (numérico) |
-| -1 | Erro genérico |
-| -2 | Parâmetros inválidos |
-| -3 | Não autorizado |
-| -4 | Recurso não encontrado |
-| -5 | Recurso já existe |
-
----
-
-## Notas Gerais
-
-- Todas as requisições protegidas requerem o header `Authorization: Bearer <session_key>`
-- A session key expira após 15 minutos de inatividade (renew automático a cada requisição válida)
-- O arquivo de senha fica em `/var/mcut/.data/passwd` (MD5 hex)
-- Senha padrão quando o arquivo não existe: "admin" (MD5: 21232f297a57a5a743894a0e4a801fc3)
-- Máximo de 10 sessões simultâneas por dispositivo
-- Máximo de 64 tokens de API por dispositivo
-- IDs na faixa >= 4294000000 são reservados para uso web
-- Placas de veículos são normalizadas (maiúsculas, sem espaços/hífens) antes de salvar
-- UTF-8 é usado em todos os campos de texto
-
----
-
-## Changelog
-
-### 2026-03-05
-- Adicionados endpoints de Vehicle Drivers
-- Adicionados endpoints de Data Integrity Audit
-- Documentado campo `lpr_ativo` em entidades
-- Adicionados métodos PUT para entities e media
-- Adicionado endpoint DELETE para webhook
-- Documentados endpoints de Dashboard e Info
-
-### 2026-02-28
-- Adicionado suporte a paginação em entidades
-- Adicionado cascade delete em entidades
-- Adicionado campo lpr_ativo
-
-### 2026-02-27
-- Documentação inicial
+Notas:
+- a autenticacao usa a mesma `session_key` do login HTTP
+- use este endpoint para integracoes nativas via WebSocket/MQTT

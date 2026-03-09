@@ -266,7 +266,6 @@ if (!test.Success) {
     ```csharp
     var info = await client.Sistema.ObterDeviceInfoAsync();
     var stats = await client.Sistema.ObterDashboardAsync();
-    var rede = await client.Sistema.ObterConfiguracaoRedeAsync();
     ```
 
     ## Security Notes

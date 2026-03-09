@@ -129,7 +129,6 @@ namespace SmartSdk
             btnCadastroCompleto.Enabled = enabled;
             btnCadastroSimples.Enabled = enabled;
             btnMonitoramento.Enabled = enabled;
-            btnRede.Enabled = enabled;
             btnDashboard.Enabled = enabled;
             btnMqttCliente.Enabled = enabled; // Precisa de conexão prévia para obter session key
             // btnMqttBroker e btnWebhookServer não precisam de conexão - funcionam standalone
@@ -156,12 +155,6 @@ namespace SmartSdk
         {
             // Abre o formulário de monitoramento MQTT em tempo real
             new FormMonitoramento(_api).Show();
-        }
-
-        private void btnRede_Click(object? sender, EventArgs e)
-        {
-            // Abre o formulário de configuração de rede
-            new FormRede(_api).Show();
         }
 
         private void btnDashboard_Click(object? sender, EventArgs e)

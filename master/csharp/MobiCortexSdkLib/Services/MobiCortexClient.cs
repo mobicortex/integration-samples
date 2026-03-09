@@ -264,55 +264,6 @@ namespace MobiCortex.Sdk.Services
             return await GetAsync<VehicleCatalogsResponse>("/vehicle-catalogs");
         }
 
-        async Task<ApiResult<NetworkCableConfig>> ISistemaService.ObterConfiguracaoRedeAsync()
-        {
-            return await GetAsync<NetworkCableConfig>("/network-config-cable");
-        }
-
-        async Task<ApiResult<ApiRetResponse>> ISistemaService.SalvarConfiguracaoRedeAsync(NetworkCableConfig config)
-        {
-            return await PostAsync<ApiRetResponse>("/network-config-cable", config);
-        }
-
-        async Task<ApiResult<NetworkWifiApConfig>> ISistemaService.ObterConfiguracaoWifiApAsync()
-        {
-            return await GetAsync<NetworkWifiApConfig>("/network-config-wifi-ap");
-        }
-
-        async Task<ApiResult<ApiRetResponse>> ISistemaService.SalvarConfiguracaoWifiApAsync(NetworkWifiApConfig config)
-        {
-            return await PostAsync<ApiRetResponse>("/network-config-wifi-ap", config);
-        }
-
-        async Task<ApiResult<NetworkWifiStationConfig>> ISistemaService.ObterConfiguracaoWifiStationAsync()
-        {
-            return await GetAsync<NetworkWifiStationConfig>("/network-config-wifi-st");
-        }
-
-        async Task<ApiResult<ApiRetResponse>> ISistemaService.SalvarConfiguracaoWifiStationAsync(NetworkWifiStationConfig config)
-        {
-            return await PostAsync<ApiRetResponse>("/network-config-wifi-st", config);
-        }
-
-        async Task<ApiResult<NetworkInterfacesResponse>> ISistemaService.ListarInterfacesRedeAsync()
-        {
-            return await GetAsync<NetworkInterfacesResponse>("/network-interfaces");
-        }
-
-        async Task<ApiResult<WifiScanResponse>> ISistemaService.EscanearRedesWifiAsync()
-        {
-            return await GetAsync<WifiScanResponse>("/network-wifi-scan");
-        }
-
-        async Task<ApiResult<WifiApClientsResponse>> ISistemaService.ListarClientesWifiApAsync()
-        {
-            return await GetAsync<WifiApClientsResponse>("/network-wifi-clients");
-        }
-
-        async Task<ApiResult<WifiSignalResponse>> ISistemaService.ObterSinalWifiAsync()
-        {
-            return await GetAsync<WifiSignalResponse>("/network-wifi-signal");
-        }
         #endregion
 
         #region IAccessService
