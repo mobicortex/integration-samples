@@ -208,9 +208,9 @@ namespace MobiCortex.Sdk.Services
             return await PostAsync<CriarMidiaResponse>("/media", request);
         }
 
-        async Task<ApiResult<ApiRetResponse>> IMidiaService.AlterarStatusAsync(uint mediaId, int habilitado)
+        async Task<ApiResult<ApiRetResponse>> IMidiaService.AlterarStatusAsync(uint mediaId, bool enabled)
         {
-            return await PutAsync<ApiRetResponse>($"/media?id={mediaId}", new { habilitado });
+            return await PutAsync<ApiRetResponse>($"/media?id={mediaId}", new { enabled });
         }
 
         async Task<ApiResult<ApiRetResponse>> IMidiaService.AlterarDataBloqueioAsync(uint mediaId, uint dtBlock)

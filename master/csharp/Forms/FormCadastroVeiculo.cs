@@ -16,7 +16,7 @@ namespace SmartSdk
         public string Cor { get; private set; } = string.Empty;
         public string Placa { get; private set; } = string.Empty;
         public int LprAtivo { get; private set; }
-        public int EntidadeHabilitado { get; private set; } = 1;
+        public bool EntidadeEnabled { get; private set; } = true;
 
         // Modo edição
         private readonly bool _modoEdicao = false;
@@ -116,7 +116,7 @@ namespace SmartSdk
             _chkLpr.Checked = _entidadeExistente.LprAtivo == 1;
 
             // Enabled
-            EntidadeHabilitado = _entidadeExistente.Habilitado;
+            EntidadeEnabled = _entidadeExistente.Enabled;
         }
 
         private void BtnSalvar_Click(object? sender, EventArgs e)

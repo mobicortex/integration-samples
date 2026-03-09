@@ -114,7 +114,7 @@ namespace SmartSdk
                 {
                     var item = new ListViewItem(c.Id.ToString());
                     item.SubItems.Add(c.Name);
-                    item.SubItems.Add(c.Enabled == 1 ? "Sim" : "Não");
+                    item.SubItems.Add(c.Enabled ? "Sim" : "Não");
                     item.SubItems.Add($"{c.PeopleCount}P / {c.VehicleCount}V");
                     item.Tag = c;
                     listCadastros.Items.Add(item);
@@ -148,7 +148,7 @@ namespace SmartSdk
                 var c = result.Data;
                 var item = new ListViewItem(c.Id.ToString());
                 item.SubItems.Add(c.Name);
-                item.SubItems.Add(c.Enabled == 1 ? "Sim" : "Não");
+                item.SubItems.Add(c.Enabled ? "Sim" : "Não");
                 item.SubItems.Add($"{c.PeopleCount}P / {c.VehicleCount}V");
                 item.Tag = c;
                 listCadastros.Items.Add(item);
@@ -409,7 +409,7 @@ namespace SmartSdk
                 {
                     Name = formVeiculo.NomeEntidadeGerado,
                     Doc = formVeiculo.Placa,
-                    Habilitado = formVeiculo.EntidadeHabilitado,
+                    Enabled = formVeiculo.EntidadeEnabled,
                     Brand = string.IsNullOrWhiteSpace(formVeiculo.Marca) ? null : formVeiculo.Marca,
                     Model = string.IsNullOrWhiteSpace(formVeiculo.Modelo) ? null : formVeiculo.Modelo,
                     Color = string.IsNullOrWhiteSpace(formVeiculo.Cor) ? null : formVeiculo.Cor,
@@ -447,13 +447,14 @@ namespace SmartSdk
             {
                 Name = form.Nome,
                 Doc = docLimpo, // null se vazio (não será enviado no JSON)
-                Habilitado = form.EntidadeHabilitado,
+                Enabled = form.EntidadeEnabled,
                 // Pessoas (tipo 1) não usam LPR - não envia o campo (null)
                 // Veículos (tipo 2) enviam 0 ou 1
-                LprAtivo = entidade.Tipo == 1 ? null : form.EntidadeHabilitado
+                LprAtivo = entidade.Tipo == 1 ? null : (entidade.LprAtivo == 1 ? 1 : 0)
             };
 
             // DEBUG: Log do JSON sendo enviado
+            System.Diagnostics.Debug.WriteLine($"[DEBUG] Form.EntidadeEnabled = {form.EntidadeEnabled}");
             var jsonDebugPessoa = System.Text.Json.JsonSerializer.Serialize(entidadeAtualizadaPessoa);
             Log($"DEBUG PUT /entities?id={entidade.EntityId}: {jsonDebugPessoa}");
 
@@ -524,7 +525,7 @@ namespace SmartSdk
                     Name = formPessoa.Nome,
                     Doc = formPessoa.Documento,
                     LprAtivo = formPessoa.LprAtivo,
-                    Habilitado = formPessoa.EntidadeHabilitado
+                    Enabled = formPessoa.EntidadeEnabled
                 };
                 nomeLog = formPessoa.Nome;
             }
@@ -601,7 +602,7 @@ namespace SmartSdk
                     var item = new ListViewItem(m.MediaId.ToString());
                     item.SubItems.Add(m.TipoNome);
                     item.SubItems.Add(m.Descricao);
-                    item.SubItems.Add(m.Habilitado == 1 ? "Sim" : "Não");
+                    item.SubItems.Add(m.Enabled ? "Sim" : "Não");
                     item.Tag = m;
                     listMidias.Items.Add(item);
                 }
@@ -769,9 +770,9 @@ namespace SmartSdk
                 string mensagem = "";
 
                 // Atualiza o estado de habilitação se alterado
-                if (midia.Habilitado != form.NovoEstadoHabilitado)
+                if (midia.Enabled != form.NovoEstadoEnabled)
                 {
-                    var result = await _api.Midias.AlterarStatusAsync(midia.MediaId, form.NovoEstadoHabilitado);
+                    var result = await _api.Midias.AlterarStatusAsync(midia.MediaId, form.NovoEstadoEnabled);
                     if (!result.Success)
                     {
                         sucesso = false;
@@ -779,7 +780,7 @@ namespace SmartSdk
                     }
                     else
                     {
-                        var status = form.NovoEstadoHabilitado == 1 ? "liberada" : "bloqueada";
+                        var status = form.NovoEstadoEnabled ? "liberada" : "bloqueada";
                         Log($"Mídia {midia.Descricao} {status} com sucesso!");
                     }
                 }

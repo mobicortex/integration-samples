@@ -27,8 +27,8 @@ namespace MobiCortex.Sdk.Interfaces
         /// Atualiza o status de habilitação de uma mídia.
         /// </summary>
         /// <param name="mediaId">ID da mídia</param>
-        /// <param name="habilitado">1=habilitada, 0=bloqueada</param>
-        Task<ApiResult<ApiRetResponse>> AlterarStatusAsync(uint mediaId, int habilitado);
+        /// <param name="enabled">true=habilitada, false=bloqueada</param>
+        Task<ApiResult<ApiRetResponse>> AlterarStatusAsync(uint mediaId, bool enabled);
 
         /// <summary>
         /// Atualiza a data de bloqueio de uma mídia.

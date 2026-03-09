@@ -5,28 +5,57 @@ namespace MobiCortex.Sdk.Models
 
 {
     /// <summary>
-    /// Conversor JSON para o campo 'enabled' do CadastroCentral.
-    /// O backend retorna como booleano (true/false) mas espera receber como inteiro (0/1).
+    /// Conversor JSON para campos booleanos que o backend retorna como int (1/0).
     /// </summary>
-    public class EnabledConverter : JsonConverter<int>
+    public class BoolIntConverter : JsonConverter<bool>
     {
-        public override int Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             // Aceita tanto booleano quanto inteiro na leitura
             if (reader.TokenType == JsonTokenType.True)
-                return 1;
+                return true;
             if (reader.TokenType == JsonTokenType.False)
-                return 0;
+                return false;
             if (reader.TokenType == JsonTokenType.Number)
-                return reader.GetInt32();
+                return reader.GetInt32() != 0;
             
-            throw new JsonException($"Unexpected token type for enabled: {reader.TokenType}");
+            throw new JsonException($"Unexpected token type for boolean: {reader.TokenType}");
         }
 
-        public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
         {
-            // Sempre escreve como inteiro (0 ou 1)
-            writer.WriteNumberValue(value);
+            // Escreve como booleano true/false
+            writer.WriteBooleanValue(value);
+        }
+    }
+
+    /// <summary>
+    /// Conversor JSON para campos booleanos nullable que o backend retorna como int (1/0).
+    /// </summary>
+    public class BoolIntNullableConverter : JsonConverter<bool?>
+    {
+        public override bool? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            // Aceita tanto booleano quanto inteiro na leitura
+            if (reader.TokenType == JsonTokenType.True)
+                return true;
+            if (reader.TokenType == JsonTokenType.False)
+                return false;
+            if (reader.TokenType == JsonTokenType.Number)
+                return reader.GetInt32() != 0;
+            if (reader.TokenType == JsonTokenType.Null)
+                return null;
+            
+            throw new JsonException($"Unexpected token type for boolean: {reader.TokenType}");
+        }
+
+        public override void Write(Utf8JsonWriter writer, bool? value, JsonSerializerOptions options)
+        {
+            // Escreve como booleano true/false ou null
+            if (value.HasValue)
+                writer.WriteBooleanValue(value.Value);
+            else
+                writer.WriteNullValue();
         }
     }
 
@@ -140,13 +169,10 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;
 
-        /// <summary>
-        /// 1 = habilitado, 0 = desabilitado.
-        /// A API retorna como booleano (true/false) mas espera receber como inteiro (0/1).
-        /// </summary>
+        /// <summary>true = habilitado, false = desabilitado</summary>
         [JsonPropertyName("enabled")]
-        [JsonConverter(typeof(EnabledConverter))]
-        public int Enabled { get; set; } = 1;
+        [JsonConverter(typeof(BoolIntConverter))]
+        public bool Enabled { get; set; } = true;
 
         /// <summary>Tipo de cadastro (uso livre pelo integrador)</summary>
         [JsonPropertyName("type")]
@@ -282,9 +308,10 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("tipo")]
         public int Tipo { get; set; }
 
-        /// <summary>1=habilitado, 0=desabilitado. API usa inteiro.</summary>
-        [JsonPropertyName("habilitado")]
-        public int Habilitado { get; set; } = 1;
+        /// <summary>true = habilitado, false = desabilitado</summary>
+        [JsonPropertyName("enabled")]
+        [JsonConverter(typeof(BoolIntConverter))]
+        public bool Enabled { get; set; } = true;
 
         [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;
@@ -373,8 +400,8 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("tipo")]
         public int Tipo { get; set; } = 1;
 
-        [JsonPropertyName("habilitado")]
-        public int Habilitado { get; set; } = 1;
+        [JsonPropertyName("enabled")]
+        public bool Enabled { get; set; } = true;
 
         [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;
@@ -453,9 +480,10 @@ namespace MobiCortex.Sdk.Models
     /// </summary>
     public class AtualizarEntidadeRequest
     {
-        [JsonPropertyName("habilitado")]
+        [JsonPropertyName("enabled")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? Habilitado { get; set; }
+        [JsonConverter(typeof(BoolIntNullableConverter))]
+        public bool? Enabled { get; set; }
 
         [JsonPropertyName("name")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -585,9 +613,9 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("descricao")]
         public string Descricao { get; set; } = string.Empty;
 
-        /// <summary>1=habilitada, 0=desabilitada</summary>
-        [JsonPropertyName("habilitado")]
-        public int Habilitado { get; set; }
+        /// <summary>true = habilitada, false = desabilitada</summary>
+        [JsonPropertyName("enabled")]
+        public bool Enabled { get; set; } = true;
 
         [JsonPropertyName("created_at")]
         public uint CreatedAt { get; set; }

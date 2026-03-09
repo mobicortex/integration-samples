@@ -360,7 +360,7 @@ namespace SmartSdk
                     var item = new ListViewItem(m.MediaId.ToString());
                     item.SubItems.Add(m.TipoNome);
                     item.SubItems.Add(m.Descricao);
-                    item.SubItems.Add(m.Habilitado == 1 ? "Sim" : "Não");
+                    item.SubItems.Add(m.Enabled ? "Sim" : "Não");
                     item.Tag = m;
                     listMidias.Items.Add(item);
                 }
@@ -486,9 +486,9 @@ namespace SmartSdk
                 string mensagem = "";
 
                 // Atualiza o estado de habilitação se alterado
-                if (midia.Habilitado != form.NovoEstadoHabilitado)
+                if (midia.Enabled != form.NovoEstadoEnabled)
                 {
-                    var result = await _api.Midias.AlterarStatusAsync(midia.MediaId, form.NovoEstadoHabilitado);
+                    var result = await _api.Midias.AlterarStatusAsync(midia.MediaId, form.NovoEstadoEnabled);
                     if (!result.Success)
                     {
                         sucesso = false;
@@ -496,7 +496,7 @@ namespace SmartSdk
                     }
                     else
                     {
-                        var status = form.NovoEstadoHabilitado == 1 ? "liberada" : "bloqueada";
+                        var status = form.NovoEstadoEnabled ? "liberada" : "bloqueada";
                         Log($"Mídia {midia.Descricao} {status} com sucesso!");
                     }
                 }

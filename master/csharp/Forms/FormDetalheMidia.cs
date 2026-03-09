@@ -16,9 +16,9 @@ namespace SmartSdk
         public bool FoiModificada { get; private set; }
 
         /// <summary>
-        /// Retorna o novo estado de habilitação (1=habilitada, 0=bloqueada).
+        /// Retorna o novo estado de habilitação (true=habilitada, false=bloqueada).
         /// </summary>
-        public int NovoEstadoHabilitado => chkBloqueada.Checked ? 0 : 1;
+        public bool NovoEstadoEnabled => !chkBloqueada.Checked;
 
         /// <summary>
         /// Retorna a data limite de permissão (0 = sem limite).
@@ -50,8 +50,8 @@ namespace SmartSdk
             lblDataEdicaoValor.Text = _midia.AtualizadoEm;
 
             // Configura checkbox de bloqueio total
-            // Habilitado=1 significa liberada, Habilitado=0 significa bloqueada
-            chkBloqueada.Checked = _midia.Habilitado == 0;
+            // Enabled=true significa liberada, Enabled=false significa bloqueada
+            chkBloqueada.Checked = !_midia.Enabled;
 
             // Configura data de permissão (dt_block = data em que a mídia será bloqueada)
             if (_midia.DtBlock > 0)
@@ -95,8 +95,8 @@ namespace SmartSdk
         private void btnSalvar_Click(object sender, EventArgs e)
         {
             // Verifica se houve alteração no estado
-            int estadoAnterior = _midia.Habilitado;
-            int estadoNovo = chkBloqueada.Checked ? 0 : 1;
+            bool estadoAnterior = _midia.Enabled;
+            bool estadoNovo = !chkBloqueada.Checked;
 
             bool estadoAlterado = estadoAnterior != estadoNovo;
             bool dataPermissaoAlterada = DataPermissaoAlterada;
