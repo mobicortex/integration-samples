@@ -213,7 +213,7 @@ var request = new CriarMidiaRequest
 var result = await _api.CriarMidiaAsync(request);
 ```
 
-Abordagem recomendada: usar `lpr_ativo=1` no cadastro da entidade de veiculo. O backend converte automaticamente a placa para o formato binario exigido.
+Abordagem recomendada: usar `lpr_ativo=true` no cadastro da entidade de veiculo. O backend converte automaticamente a placa para o formato binario exigido.
 
 ```csharp
 var request = new CriarEntidadeRequest
@@ -222,7 +222,7 @@ var request = new CriarEntidadeRequest
     Tipo = (int)TipoEntidade.Veiculo,
     Name = "Civic Preto",
     Doc = "ABC1D23",
-    LprAtivo = 1
+    LprAtivo = true
 };
 ```
 
@@ -258,6 +258,10 @@ Ou execute o binario diretamente:
 ```bash
 bin\Debug\net8.0-windows\SmartSdk.exe
 ```
+
+## Changelog
+
+Consulte [CHANGELOG-ptbr.md](CHANGELOG-ptbr.md) (pt-BR) e [CHANGELOG.md](CHANGELOG.md) (English).
 
 ## Licenca
 

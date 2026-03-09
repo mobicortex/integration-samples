@@ -8,7 +8,7 @@ namespace SmartSdk
     public partial class FormDetalheMidia : Form
     {
         private readonly MidiaAcesso _midia;
-        private uint _dtBlockOriginal;
+        private uint _expirationOriginal;
 
         /// <summary>
         /// Retorna true se a mídia foi modificada.
@@ -30,13 +30,13 @@ namespace SmartSdk
         /// <summary>
         /// Retorna true se a data de permissão foi alterada.
         /// </summary>
-        public bool DataPermissaoAlterada => NovaDataPermissao != _dtBlockOriginal;
+        public bool DataPermissaoAlterada => NovaDataPermissao != _expirationOriginal;
 
         public FormDetalheMidia(MidiaAcesso midia)
         {
             InitializeComponent();
             _midia = midia;
-            _dtBlockOriginal = midia.DtBlock;
+            _expirationOriginal = midia.Expiration;
             CarregarDados();
         }
 
@@ -53,13 +53,13 @@ namespace SmartSdk
             // Enabled=true significa liberada, Enabled=false significa bloqueada
             chkBloqueada.Checked = !_midia.Enabled;
 
-            // Configura data de permissão (dt_block = data em que a mídia será bloqueada)
-            if (_midia.DtBlock > 0)
+            // Configura data de permissão (expiration = data em que a mídia expira)
+            if (_midia.Expiration > 0)
             {
                 chkBloqueioPorData.Checked = true;
                 dtpDataBloqueio.Enabled = true;
                 btnLimparData.Enabled = true;
-                dtpDataBloqueio.Value = DateTimeOffset.FromUnixTimeSeconds(_midia.DtBlock).LocalDateTime;
+                dtpDataBloqueio.Value = DateTimeOffset.FromUnixTimeSeconds(_midia.Expiration).LocalDateTime;
             }
             else
             {

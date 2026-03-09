@@ -212,7 +212,7 @@ var request = new CriarMidiaRequest
 var result = await _api.CriarMidiaAsync(request);
 ```
 
-Recommended approach: use `lpr_ativo=1` on the vehicle entity record. The backend then converts the vehicle plate into the required binary data automatically.
+Recommended approach: use `lpr_ativo=true` on the vehicle entity record. The backend then converts the vehicle plate into the required binary data automatically.
 
 ```csharp
 var request = new CriarEntidadeRequest
@@ -221,7 +221,7 @@ var request = new CriarEntidadeRequest
     Tipo = (int)TipoEntidade.Veiculo,
     Name = "Black Civic",
     Doc = "ABC1D23",
-    LprAtivo = 1
+    LprAtivo = true
 };
 ```
 
@@ -257,6 +257,10 @@ Or run the executable directly:
 ```bash
 bin\Debug\net8.0-windows\SmartSdk.exe
 ```
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) (English) and [CHANGELOG-ptbr.md](CHANGELOG-ptbr.md) (pt-BR).
 
 ## License
 

@@ -341,11 +341,12 @@ namespace MobiCortex.Sdk.Models
         public string? Obs { get; set; }
 
         /// <summary>
-        /// 1 = LPR ativo. Quando ativado, o controlador cria automaticamente
+        /// true = LPR ativo. Quando ativado, o controlador cria automaticamente
         /// uma mídia do tipo LPR usando o campo "doc" como placa.
         /// </summary>
         [JsonPropertyName("lpr_ativo")]
-        public int LprAtivo { get; set; }
+        [JsonConverter(typeof(BoolIntConverter))]
+        public bool LprAtivo { get; set; }
 
         [JsonPropertyName("created_at")]
         public uint CreatedAt { get; set; }
@@ -430,9 +431,9 @@ namespace MobiCortex.Sdk.Models
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Obs { get; set; }
 
-        /// <summary>1 = ativar reconhecimento de placa via LPR</summary>
+        /// <summary>true = ativar reconhecimento de placa via LPR</summary>
         [JsonPropertyName("lpr_ativo")]
-        public int LprAtivo { get; set; }
+        public bool LprAtivo { get; set; }
 
         /// <summary>
         /// true = gera entity_id e cadastro_id automaticamente.
@@ -511,7 +512,8 @@ namespace MobiCortex.Sdk.Models
 
         [JsonPropertyName("lpr_ativo")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? LprAtivo { get; set; }
+        [JsonConverter(typeof(BoolIntNullableConverter))]
+        public bool? LprAtivo { get; set; }
     }
 
     /// <summary>
@@ -551,7 +553,7 @@ namespace MobiCortex.Sdk.Models
     /// - Ao criar uma mídia LPR manualmente via POST /media, é necessário enviar
     ///   os campos ns32_0 e ns32_1 para evitar que o backend tente validar a placa
     ///   como se fosse um formato RFID (Wiegand/CODE/HEX).
-    /// - A forma RECOMENDADA de criar LPR é usando lpr_ativo=1 no cadastro da entidade
+    /// - A forma RECOMENDADA de criar LPR é usando lpr_ativo=true no cadastro da entidade
     ///   (veículo), pois o backend converte automaticamente a placa em dados binários.
     /// </summary>
     public static class TipoMidia
@@ -615,6 +617,7 @@ namespace MobiCortex.Sdk.Models
 
         /// <summary>true = habilitada, false = desabilitada</summary>
         [JsonPropertyName("enabled")]
+        [JsonConverter(typeof(BoolIntConverter))]
         public bool Enabled { get; set; } = true;
 
         [JsonPropertyName("created_at")]
@@ -623,19 +626,26 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("updated_at")]
         public uint UpdatedAt { get; set; }
 
-        /// <summary>Data/hora de bloqueio (timestamp UNIX). 0 = sem bloqueio.</summary>
-        [JsonPropertyName("dt_block")]
-        public uint DtBlock { get; set; }
+        /// <summary>Data/hora de expiração (timestamp UNIX). 0 = sem expiração.</summary>
+        [JsonPropertyName("expiration")]
+        public uint Expiration { get; set; }
+
+        [JsonIgnore]
+        public uint DtBlock
+        {
+            get => Expiration;
+            set => Expiration = value;
+        }
 
         [JsonIgnore]
         public string TipoNome => TipoMidia.GetNome(Tipo);
 
         [JsonIgnore]
-        public bool TemBloqueioPorData => DtBlock > 0 && DtBlock > DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        public bool TemBloqueioPorData => Expiration > 0 && Expiration > DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         [JsonIgnore]
-        public string BloqueioAte => DtBlock > 0
-            ? DateTimeOffset.FromUnixTimeSeconds(DtBlock).LocalDateTime.ToString("dd/MM/yyyy HH:mm")
+        public string BloqueioAte => Expiration > 0
+            ? DateTimeOffset.FromUnixTimeSeconds(Expiration).LocalDateTime.ToString("dd/MM/yyyy HH:mm")
             : "-";
 
         [JsonIgnore]
@@ -663,7 +673,7 @@ namespace MobiCortex.Sdk.Models
     ///    - Envie entity_id, cadastro_id, tipo=17, descricao="ABC1D23"
     ///    - IMPORTANTE: também envie ns32_0=0 e ns32_1=0
     ///    - Sem ns32_0/ns32_1, o backend tenta validar a placa como RFID e dá erro
-    ///    - NOTA: A forma recomendada é usar lpr_ativo=1 no cadastro da entidade (veículo)
+    ///    - NOTA: A forma recomendada é usar lpr_ativo=true no cadastro da entidade (veículo)
     ///      pois o backend converte a placa automaticamente em dados binários
     /// 
     /// 3. Facial, Biometria, etc:
@@ -749,6 +759,48 @@ namespace MobiCortex.Sdk.Models
     #endregion
 
     #region Dashboard e Dispositivo
+
+    /// <summary>
+    /// Item de cor padrão retornado por GET /vehicle-catalogs.
+    /// </summary>
+    public class VehicleColorCatalogItem
+    {
+        [JsonPropertyName("code")]
+        public int Code { get; set; }
+
+        [JsonPropertyName("label")]
+        public string Label { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// Item de marca sugerida retornado por GET /vehicle-catalogs.
+    /// </summary>
+    public class VehicleBrandCatalogItem
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// GET /vehicle-catalogs - catálogos auxiliares para cadastro de veículos.
+    /// </summary>
+    public class VehicleCatalogsResponse
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("colors")]
+        public List<VehicleColorCatalogItem> Colors { get; set; } = new();
+
+        [JsonPropertyName("brands")]
+        public List<VehicleBrandCatalogItem> Brands { get; set; } = new();
+
+        [JsonPropertyName("colors_count")]
+        public int ColorsCount { get; set; }
+
+        [JsonPropertyName("brands_count")]
+        public int BrandsCount { get; set; }
+    }
 
     /// <summary>
     /// GET /dashboard - Estatísticas gerais do controlador

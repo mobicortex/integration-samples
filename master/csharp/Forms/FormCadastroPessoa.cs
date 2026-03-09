@@ -11,7 +11,7 @@ namespace SmartSdk
         public uint Id { get; private set; }
         public string Nome { get; private set; } = string.Empty;
         public string Documento { get; private set; } = string.Empty;
-        public int LprAtivo { get; private set; }
+        public bool LprAtivo { get; private set; }
         public bool EntidadeEnabled { get; private set; } = true;
         
         // Modo edição
@@ -75,7 +75,7 @@ namespace SmartSdk
             
             txtNome.Text = _entidadeExistente.Name;
             txtDocumento.Text = _entidadeExistente.Doc;
-            chkLprAtivo.Checked = _entidadeExistente.LprAtivo == 1;
+            chkLprAtivo.Checked = _entidadeExistente.LprAtivo;
             chkHabilitado.Checked = _entidadeExistente.Enabled;
         }
         
@@ -98,7 +98,7 @@ namespace SmartSdk
             Id = (uint)numId.Value;
             Nome = txtNome.Text.Trim();
             Documento = txtDocumento.Text.Trim();
-            LprAtivo = chkLprAtivo.Checked ? 1 : 0;
+            LprAtivo = chkLprAtivo.Checked;
             EntidadeEnabled = chkHabilitado.Checked;
             
             // Em modo criação com ID 0, confirma geração automática

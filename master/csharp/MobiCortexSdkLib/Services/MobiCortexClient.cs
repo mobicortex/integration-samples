@@ -213,9 +213,9 @@ namespace MobiCortex.Sdk.Services
             return await PutAsync<ApiRetResponse>($"/media?id={mediaId}", new { enabled });
         }
 
-        async Task<ApiResult<ApiRetResponse>> IMidiaService.AlterarDataBloqueioAsync(uint mediaId, uint dtBlock)
+        async Task<ApiResult<ApiRetResponse>> IMidiaService.AlterarExpiracaoAsync(uint mediaId, uint expiration)
         {
-            return await PutAsync<ApiRetResponse>($"/media?id={mediaId}", new { dt_block = dtBlock });
+            return await PutAsync<ApiRetResponse>($"/media?id={mediaId}", new { expiration });
         }
 
         async Task<ApiResult<ApiRetResponse>> IMidiaService.ExcluirAsync(uint mediaId)
@@ -233,6 +233,11 @@ namespace MobiCortex.Sdk.Services
         async Task<ApiResult<DashboardStats>> ISistemaService.ObterDashboardAsync()
         {
             return await GetAsync<DashboardStats>("/dashboard");
+        }
+
+        async Task<ApiResult<VehicleCatalogsResponse>> ISistemaService.ObterCatalogosVeiculoAsync()
+        {
+            return await GetAsync<VehicleCatalogsResponse>("/vehicle-catalogs");
         }
 
         async Task<ApiResult<NetworkCableConfig>> ISistemaService.ObterConfiguracaoRedeAsync()

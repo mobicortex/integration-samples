@@ -135,7 +135,7 @@ namespace SmartSdk
             // Preenche campos
             txtNome.Text = _entidadeExistente.Name;
             txtDocumento.Text = _entidadeExistente.Doc;
-            chkLprAtivo.Checked = _entidadeExistente.LprAtivo == 1;
+            chkLprAtivo.Checked = _entidadeExistente.LprAtivo;
             
             AtualizarLabelsPorTipo();
         }

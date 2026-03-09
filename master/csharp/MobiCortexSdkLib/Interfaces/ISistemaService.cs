@@ -18,6 +18,11 @@ namespace MobiCortex.Sdk.Interfaces
         Task<ApiResult<DashboardStats>> ObterDashboardAsync();
 
         /// <summary>
+        /// Obtém catálogos de veículo expostos pelo backend (cores padrão e marcas sugeridas).
+        /// </summary>
+        Task<ApiResult<VehicleCatalogsResponse>> ObterCatalogosVeiculoAsync();
+
+        /// <summary>
         /// Obtém configuração de rede (ethernet).
         /// </summary>
         Task<ApiResult<NetworkCableConfig>> ObterConfiguracaoRedeAsync();

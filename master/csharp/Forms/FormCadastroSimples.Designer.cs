@@ -23,6 +23,7 @@ namespace SmartSdk
             colEntTipo = new ColumnHeader();
             colEntNome = new ColumnHeader();
             colEntDoc = new ColumnHeader();
+            colEntAtivo = new ColumnHeader();
             colEntCadId = new ColumnHeader();
             panelPaginacao = new FlowLayoutPanel();
             btnAnterior = new Button();
@@ -104,7 +105,7 @@ namespace SmartSdk
             // 
             // listEntidades
             // 
-            listEntidades.Columns.AddRange(new ColumnHeader[] { colEntId, colEntTipo, colEntNome, colEntDoc, colEntCadId });
+            listEntidades.Columns.AddRange(new ColumnHeader[] { colEntId, colEntTipo, colEntNome, colEntDoc, colEntAtivo, colEntCadId });
             listEntidades.Dock = DockStyle.Fill;
             listEntidades.FullRowSelect = true;
             listEntidades.GridLines = true;
@@ -135,6 +136,11 @@ namespace SmartSdk
             // 
             colEntDoc.Text = "Doc/Placa";
             colEntDoc.Width = 90;
+            // 
+            // colEntAtivo
+            // 
+            colEntAtivo.Text = "Ativo";
+            colEntAtivo.Width = 50;
             // 
             // colEntCadId
             // 
@@ -450,6 +456,7 @@ namespace SmartSdk
         private ColumnHeader colEntTipo;
         private ColumnHeader colEntNome;
         private ColumnHeader colEntDoc;
+        private ColumnHeader colEntAtivo;
         private ColumnHeader colEntCadId;
 
         // -- Mídias --

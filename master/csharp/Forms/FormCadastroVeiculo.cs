@@ -1,3 +1,4 @@
+using MobiCortex.Sdk.Interfaces;
 using MobiCortex.Sdk.Models;
 
 namespace SmartSdk
@@ -15,12 +16,27 @@ namespace SmartSdk
         public string Modelo { get; private set; } = string.Empty;
         public string Cor { get; private set; } = string.Empty;
         public string Placa { get; private set; } = string.Empty;
-        public int LprAtivo { get; private set; }
+        public bool LprAtivo { get; private set; }
         public bool EntidadeEnabled { get; private set; } = true;
 
         // Modo edição
         private readonly bool _modoEdicao = false;
         private readonly Entidade? _entidadeExistente;
+        private readonly IMobiCortexClient? _api;
+
+        private static readonly string[] FallbackVehicleColors =
+        {
+            "Amarela", "Azul", "Bege", "Branca", "Cinza", "Dourada", "Grena",
+            "Laranja", "Marrom", "Prata", "Preta", "Rosa", "Roxa", "Verde",
+            "Vermelha", "Fantasia"
+        };
+
+        private static readonly string[] FallbackVehicleBrands =
+        {
+            "Fiat", "Volkswagen", "Chevrolet", "Toyota", "Hyundai", "Honda", "Jeep",
+            "Renault", "Nissan", "Ford", "BYD", "Peugeot", "Citroen", "CAOA Chery",
+            "Mitsubishi", "Kia", "Mercedes-Benz", "BMW", "Audi", "Volvo", "Ram"
+        };
 
         /// <summary>
         /// Nome tecnico da entidade enviado para API.
@@ -44,31 +60,148 @@ namespace SmartSdk
         {
             InitializeComponent();
             CadastroId = 0;
+            ConfigurarFallbackCatalogos();
         }
 
-        public FormCadastroVeiculo(uint cadastroId)
+        public FormCadastroVeiculo(uint cadastroId, IMobiCortexClient? api = null)
         {
             CadastroId = cadastroId;
+            _api = api;
             InitializeComponent();
+            ConfigurarFallbackCatalogos();
             lblCadastro.Text = $"Cadastro selecionado: {CadastroId}";
         }
 
         /// <summary>
         /// Construtor para edição de veículo existente
         /// </summary>
-        public FormCadastroVeiculo(Entidade entidade) : this()
+        public FormCadastroVeiculo(Entidade entidade, IMobiCortexClient? api = null) : this(entidade.CadastroId, api)
         {
             _modoEdicao = true;
             _entidadeExistente = entidade;
-            CadastroId = entidade.CadastroId;
         }
 
-        private void FormCadastroVeiculo_Load(object? sender, EventArgs e)
+        private async void FormCadastroVeiculo_Load(object? sender, EventArgs e)
         {
+            await CarregarCatalogosVeiculoAsync();
+
             if (_modoEdicao && _entidadeExistente != null)
             {
                 ConfigurarModoEdicao();
+                return;
             }
+
+            _chkHabilitado.Checked = true;
+            EntidadeEnabled = true;
+        }
+
+        private void ConfigurarFallbackCatalogos()
+        {
+            PreencherCores(FallbackVehicleColors);
+            PreencherMarcas(FallbackVehicleBrands);
+        }
+
+        private async Task CarregarCatalogosVeiculoAsync()
+        {
+            if (_api == null) return;
+
+            var result = await _api.Sistema.ObterCatalogosVeiculoAsync();
+            if (!result.Success || result.Data == null || result.Data.Ret != 0)
+            {
+                return;
+            }
+
+            var colors = result.Data.Colors
+                .Select(color => color.Label?.Trim())
+                .Where(label => !string.IsNullOrWhiteSpace(label))
+                .Cast<string>()
+                .ToArray();
+
+            var brands = result.Data.Brands
+                .Select(brand => brand.Name?.Trim())
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Cast<string>()
+                .ToArray();
+
+            if (colors.Length > 0)
+            {
+                PreencherCores(colors);
+            }
+
+            if (brands.Length > 0)
+            {
+                PreencherMarcas(brands);
+            }
+        }
+
+        private void PreencherCores(IEnumerable<string> colors)
+        {
+            var selected = _cmbCor.SelectedItem?.ToString() ?? _cmbCor.Text;
+            _cmbCor.BeginUpdate();
+            _cmbCor.Items.Clear();
+            _cmbCor.Items.Add("Selecionar...");
+
+            foreach (var color in colors.Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                _cmbCor.Items.Add(color);
+            }
+
+            if (!string.IsNullOrWhiteSpace(selected))
+            {
+                var index = _cmbCor.FindStringExact(selected);
+                if (index >= 0)
+                {
+                    _cmbCor.SelectedIndex = index;
+                }
+                else if (!string.Equals(selected, "Selecionar...", StringComparison.OrdinalIgnoreCase))
+                {
+                    _cmbCor.Items.Add(selected);
+                    _cmbCor.SelectedIndex = _cmbCor.Items.Count - 1;
+                }
+                else
+                {
+                    _cmbCor.SelectedIndex = 0;
+                }
+            }
+            else
+            {
+                _cmbCor.SelectedIndex = 0;
+            }
+
+            _cmbCor.EndUpdate();
+        }
+
+        private void PreencherMarcas(IEnumerable<string> brands)
+        {
+            var selected = _txtMarca.Text;
+            var orderedBrands = brands
+                .Where(brand => !string.IsNullOrWhiteSpace(brand))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            _txtMarca.BeginUpdate();
+            _txtMarca.Items.Clear();
+            _txtMarca.Items.AddRange(orderedBrands);
+
+            if (!string.IsNullOrWhiteSpace(selected))
+            {
+                var index = _txtMarca.FindStringExact(selected);
+                if (index >= 0)
+                {
+                    _txtMarca.SelectedIndex = index;
+                }
+                else
+                {
+                    _txtMarca.Text = selected;
+                }
+            }
+            else
+            {
+                _txtMarca.SelectedIndex = -1;
+                _txtMarca.Text = string.Empty;
+            }
+
+            _txtMarca.EndUpdate();
         }
 
         private void ConfigurarModoEdicao()
@@ -105,18 +238,22 @@ namespace SmartSdk
                 _txtModelo.Text = _entidadeExistente.Model;
             if (!string.IsNullOrEmpty(_entidadeExistente.Color))
             {
-                var colorIndex = _cmbCor.Items.IndexOf(_entidadeExistente.Color);
+                var colorIndex = _cmbCor.FindStringExact(_entidadeExistente.Color);
                 if (colorIndex >= 0)
                     _cmbCor.SelectedIndex = colorIndex;
                 else
-                    _cmbCor.Text = _entidadeExistente.Color;
+                {
+                    _cmbCor.Items.Add(_entidadeExistente.Color);
+                    _cmbCor.SelectedIndex = _cmbCor.Items.Count - 1;
+                }
             }
 
             // LPR
-            _chkLpr.Checked = _entidadeExistente.LprAtivo == 1;
+            _chkLpr.Checked = _entidadeExistente.LprAtivo;
 
             // Enabled
             EntidadeEnabled = _entidadeExistente.Enabled;
+            _chkHabilitado.Checked = _entidadeExistente.Enabled;
         }
 
         private void BtnSalvar_Click(object? sender, EventArgs e)
@@ -150,7 +287,8 @@ namespace SmartSdk
             Modelo = _txtModelo.Text.Trim();
             Cor = _cmbCor.SelectedIndex <= 0 ? string.Empty : _cmbCor.SelectedItem?.ToString() ?? string.Empty;
             Placa = placaNormalizada;
-            LprAtivo = _chkLpr.Checked ? 1 : 0;
+            LprAtivo = _chkLpr.Checked;
+            EntidadeEnabled = _chkHabilitado.Checked;
 
             if (IdVeiculo == 0)
             {

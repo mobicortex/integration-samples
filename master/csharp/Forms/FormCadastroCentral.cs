@@ -29,7 +29,7 @@ namespace SmartSdk
         {
             InitializeComponent();
             ModoEdicao = false;
-            // Cadastro ativado por padrão
+            // O checkbox na UI significa "cadastro ativo".
             chkBloqueado.Checked = true;
         }
         
@@ -56,7 +56,7 @@ namespace SmartSdk
             {
                 // Modo criação - valores padrão
                 numId.Value = 0;
-                chkBloqueado.Checked = true; // Ativado por padrão
+                chkBloqueado.Checked = true;
                 lblIdInfo.Text = "0 = geracao automatica pelo servidor";
             }
         }
@@ -82,7 +82,7 @@ namespace SmartSdk
             txtField3.Text = _cadastroExistente.Field3 ?? "";
             txtField4.Text = _cadastroExistente.Field4 ?? "";
             
-            chkBloqueado.Checked = !_cadastroExistente.Enabled;
+            chkBloqueado.Checked = _cadastroExistente.Enabled;
         }
         
         /// <summary>
@@ -107,7 +107,7 @@ namespace SmartSdk
             Field2 = string.IsNullOrWhiteSpace(txtField2.Text) ? null : txtField2.Text.Trim();
             Field3 = string.IsNullOrWhiteSpace(txtField3.Text) ? null : txtField3.Text.Trim();
             Field4 = string.IsNullOrWhiteSpace(txtField4.Text) ? null : txtField4.Text.Trim();
-            CadastroEnabled = !chkBloqueado.Checked; // chkBloqueado.Checked = true significa bloqueado (Enabled = false)
+            CadastroEnabled = chkBloqueado.Checked;
             
             // Em modo criação com ID 0, confirma geração automática
             if (!ModoEdicao && IdCadastro == 0)

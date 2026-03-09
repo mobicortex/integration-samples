@@ -107,6 +107,7 @@ namespace SmartSdk
                 item.SubItems.Add(ent.TipoNome);
                 item.SubItems.Add(ent.Name);
                 item.SubItems.Add(ent.Doc);
+                item.SubItems.Add(ent.Enabled ? "S" : "N");
                 item.SubItems.Add(ent.CadastroId.ToString());
                 item.Tag = ent;
                 listEntidades.Items.Add(item);
@@ -134,6 +135,7 @@ namespace SmartSdk
                 item.SubItems.Add(ent.TipoNome);
                 item.SubItems.Add(ent.Name);
                 item.SubItems.Add(ent.Doc);
+                item.SubItems.Add(ent.Enabled ? "S" : "N");
                 item.SubItems.Add(ent.CadastroId.ToString());
                 item.Tag = ent;
                 listEntidades.Items.Add(item);
@@ -205,7 +207,7 @@ namespace SmartSdk
             string? model = null;
             string? color = null;
             string? obs = null;
-            int lprAtivo = 0;
+            bool lprAtivo = false;
 
             if (tipo == (int)TipoEntidade.Veiculo)
             {
@@ -411,7 +413,7 @@ namespace SmartSdk
                 // já foram processados, então ele não aplica a validação RFID.
                 // Para LPR manual, enviamos 0 em ambos (o backend ignora para LPR).
                 // 
-                // NOTA: A forma RECOMENDADA de criar LPR é usando lpr_ativo=1 no cadastro
+                // NOTA: A forma RECOMENDADA de criar LPR é usando lpr_ativo=true no cadastro
                 // da entidade (veículo), não via POST /media manual.
                 if (form.TipoMidiaSelecionado == TipoMidia.Lpr)
                 {
@@ -504,7 +506,7 @@ namespace SmartSdk
                 // Atualiza a data de permissao se alterada
                 if (sucesso && form.DataPermissaoAlterada)
                 {
-                    var result = await _api.Midias.AlterarDataBloqueioAsync(midia.MediaId, form.NovaDataPermissao);
+                    var result = await _api.Midias.AlterarExpiracaoAsync(midia.MediaId, form.NovaDataPermissao);
                     if (!result.Success)
                     {
                         sucesso = false;
@@ -575,8 +577,8 @@ namespace SmartSdk
             return form.ShowDialog() == DialogResult.OK ? combo.SelectedIndex : -1;
         }
 
-        /// <summary>Exibe diálogo Sim/Não e retorna 1 (sim) ou 0 (não).</summary>
-        private int ConfirmarSimNao(string pergunta, string titulo)
+        /// <summary>Exibe diálogo Sim/Não e retorna true para sim.</summary>
+        private bool ConfirmarSimNao(string pergunta, string titulo)
         {
             var resposta = MessageBox.Show(
                 pergunta,
@@ -584,7 +586,7 @@ namespace SmartSdk
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question,
                 MessageBoxDefaultButton.Button1);
-            return resposta == DialogResult.Yes ? 1 : 0;
+            return resposta == DialogResult.Yes;
         }
     }
 }

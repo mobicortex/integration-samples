@@ -31,11 +31,11 @@ namespace MobiCortex.Sdk.Interfaces
         Task<ApiResult<ApiRetResponse>> AlterarStatusAsync(uint mediaId, bool enabled);
 
         /// <summary>
-        /// Atualiza a data de bloqueio de uma mídia.
+        /// Atualiza a expiração de uma mídia.
         /// </summary>
         /// <param name="mediaId">ID da mídia</param>
-        /// <param name="dtBlock">Timestamp UNIX (0 = sem bloqueio)</param>
-        Task<ApiResult<ApiRetResponse>> AlterarDataBloqueioAsync(uint mediaId, uint dtBlock);
+        /// <param name="expiration">Timestamp UNIX (0 = sem expiração)</param>
+        Task<ApiResult<ApiRetResponse>> AlterarExpiracaoAsync(uint mediaId, uint expiration);
 
         /// <summary>
         /// Remove uma mídia.

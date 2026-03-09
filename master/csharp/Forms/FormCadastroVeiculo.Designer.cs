@@ -35,11 +35,14 @@ namespace SmartSdk
             lblModelo = new Label();
             _txtNomeProprietario = new TextBox();
             lblNomeProprietario = new Label();
-            _txtMarca = new TextBox();
+            _txtMarca = new ComboBox();
             lblMarca = new Label();
             panelLpr = new Panel();
             lblLprInfo = new Label();
             _chkLpr = new CheckBox();
+            panelStatus = new Panel();
+            lblStatusInfo = new Label();
+            _chkHabilitado = new CheckBox();
             panelBotoes = new Panel();
             btnCancelar = new Button();
             btnSalvar = new Button();
@@ -48,6 +51,7 @@ namespace SmartSdk
             ((System.ComponentModel.ISupportInitialize)_numId).BeginInit();
             panelDados.SuspendLayout();
             panelLpr.SuspendLayout();
+            panelStatus.SuspendLayout();
             panelBotoes.SuspendLayout();
             SuspendLayout();
             // 
@@ -235,9 +239,11 @@ namespace SmartSdk
             // 
             // _txtMarca
             // 
+            _txtMarca.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            _txtMarca.AutoCompleteSource = AutoCompleteSource.ListItems;
+            _txtMarca.FormattingEnabled = true;
             _txtMarca.Location = new Point(16, 49);
             _txtMarca.Name = "_txtMarca";
-            _txtMarca.PlaceholderText = "Ex: Honda";
             _txtMarca.Size = new Size(270, 23);
             _txtMarca.TabIndex = 1;
             // 
@@ -281,16 +287,48 @@ namespace SmartSdk
             _chkLpr.Text = "Leitura de Placa (LPR)";
             _chkLpr.UseVisualStyleBackColor = true;
             // 
+            // panelStatus
+            // 
+            panelStatus.BackColor = Color.FromArgb(248, 250, 252);
+            panelStatus.BorderStyle = BorderStyle.FixedSingle;
+            panelStatus.Controls.Add(lblStatusInfo);
+            panelStatus.Controls.Add(_chkHabilitado);
+            panelStatus.Location = new Point(20, 448);
+            panelStatus.Name = "panelStatus";
+            panelStatus.Size = new Size(590, 44);
+            panelStatus.TabIndex = 6;
+            // 
+            // lblStatusInfo
+            // 
+            lblStatusInfo.ForeColor = Color.FromArgb(95, 102, 109);
+            lblStatusInfo.Location = new Point(236, 13);
+            lblStatusInfo.Name = "lblStatusInfo";
+            lblStatusInfo.Size = new Size(330, 15);
+            lblStatusInfo.TabIndex = 1;
+            lblStatusInfo.Text = "Desmarque para desativar o acesso deste veiculo";
+            // 
+            // _chkHabilitado
+            // 
+            _chkHabilitado.AutoSize = true;
+            _chkHabilitado.Checked = true;
+            _chkHabilitado.CheckState = CheckState.Checked;
+            _chkHabilitado.Location = new Point(12, 11);
+            _chkHabilitado.Name = "_chkHabilitado";
+            _chkHabilitado.Size = new Size(91, 19);
+            _chkHabilitado.TabIndex = 0;
+            _chkHabilitado.Text = "Veiculo ativo";
+            _chkHabilitado.UseVisualStyleBackColor = true;
+            // 
             // panelBotoes
             // 
             panelBotoes.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panelBotoes.BackColor = Color.FromArgb(244, 246, 248);
             panelBotoes.Controls.Add(btnCancelar);
             panelBotoes.Controls.Add(btnSalvar);
-            panelBotoes.Location = new Point(0, 448);
+            panelBotoes.Location = new Point(0, 498);
             panelBotoes.Name = "panelBotoes";
             panelBotoes.Size = new Size(624, 42);
-            panelBotoes.TabIndex = 6;
+            panelBotoes.TabIndex = 7;
             // 
             // btnCancelar
             // 
@@ -323,8 +361,9 @@ namespace SmartSdk
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             CancelButton = btnCancelar;
-            ClientSize = new Size(624, 490);
+            ClientSize = new Size(624, 540);
             Controls.Add(panelBotoes);
+            Controls.Add(panelStatus);
             Controls.Add(panelLpr);
             Controls.Add(panelDados);
             Controls.Add(lblDados);
@@ -347,6 +386,8 @@ namespace SmartSdk
             panelDados.PerformLayout();
             panelLpr.ResumeLayout(false);
             panelLpr.PerformLayout();
+            panelStatus.ResumeLayout(false);
+            panelStatus.PerformLayout();
             panelBotoes.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -365,7 +406,7 @@ namespace SmartSdk
         private Label lblDados;
         private Panel panelDados;
         private Label lblMarca;
-        private TextBox _txtMarca;
+        private ComboBox _txtMarca;
         private Label lblNomeProprietario;
         private TextBox _txtNomeProprietario;
         private Label lblModelo;
@@ -377,6 +418,9 @@ namespace SmartSdk
         private Panel panelLpr;
         private CheckBox _chkLpr;
         private Label lblLprInfo;
+        private Panel panelStatus;
+        private Label lblStatusInfo;
+        private CheckBox _chkHabilitado;
         private Panel panelBotoes;
         private Button btnSalvar;
         private Button btnCancelar;

@@ -39,6 +39,7 @@ namespace SmartSdk
             colEntTipo = new ColumnHeader();
             colEntNome = new ColumnHeader();
             colEntDoc = new ColumnHeader();
+            colEntAtivo = new ColumnHeader();
             colEntLpr = new ColumnHeader();
             panelEntidadesBotoes = new FlowLayoutPanel();
             btnNovaEntidade = new Button();
@@ -352,7 +353,7 @@ namespace SmartSdk
             // 
             // listEntidades
             // 
-            listEntidades.Columns.AddRange(new ColumnHeader[] { colEntId, colEntTipo, colEntNome, colEntDoc, colEntLpr });
+            listEntidades.Columns.AddRange(new ColumnHeader[] { colEntId, colEntTipo, colEntNome, colEntDoc, colEntAtivo, colEntLpr });
             listEntidades.Dock = DockStyle.Fill;
             listEntidades.FullRowSelect = true;
             listEntidades.GridLines = true;
@@ -385,6 +386,11 @@ namespace SmartSdk
             // 
             colEntDoc.Text = "Doc";
             colEntDoc.Width = 70;
+            // 
+            // colEntAtivo
+            // 
+            colEntAtivo.Text = "Ativo";
+            colEntAtivo.Width = 45;
             // 
             // colEntLpr
             // 
@@ -577,6 +583,7 @@ namespace SmartSdk
         private ColumnHeader colEntTipo;
         private ColumnHeader colEntNome;
         private ColumnHeader colEntDoc;
+        private ColumnHeader colEntAtivo;
         private ColumnHeader colEntLpr;
         private Panel panelMidias;
         private Label lblMidiasTitulo;

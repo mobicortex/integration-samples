@@ -16,7 +16,7 @@ namespace SmartSdk
     ///    - Formato: placa do veículo (ex: "ABC1D23" - modelo Mercosul)
     ///    - IMPORTANTE: Ao criar via API, enviar ns32_0=0 e ns32_1=0 para evitar
     ///      que o backend tente validar a placa como formato RFID
-    ///    - A forma recomendada é usar lpr_ativo=1 no cadastro do veículo
+    ///    - A forma recomendada é usar lpr_ativo=true no cadastro do veículo
     /// 
     /// 3. FACIAL (tipo 20), BIOMETRIA (tipo 5/15/18), etc:
     ///    - Geralmente requerem integração com hardware específico

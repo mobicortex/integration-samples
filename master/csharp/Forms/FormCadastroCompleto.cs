@@ -362,7 +362,8 @@ namespace SmartSdk
                     item.SubItems.Add(ent.TipoNome);
                     item.SubItems.Add(ent.Name);
                     item.SubItems.Add(ent.Doc);
-                    item.SubItems.Add(ent.LprAtivo == 1 ? "Sim" : "");
+                    item.SubItems.Add(ent.Enabled ? "S" : "N");
+                    item.SubItems.Add(ent.LprAtivo ? "Sim" : "");
                     item.Tag = ent;
                     listEntidades.Items.Add(item);
                 }
@@ -401,7 +402,7 @@ namespace SmartSdk
             if (entidade.Tipo == (int)TipoEntidade.Veiculo)
             {
                 // Abre formulário de edição de veículo
-                using var formVeiculo = new FormCadastroVeiculo(entidade);
+                using var formVeiculo = new FormCadastroVeiculo(entidade, _api);
                 if (formVeiculo.ShowDialog(this) != DialogResult.OK) return;
 
                 // Cria o request de atualização (PUT /entities?id=X)
@@ -449,8 +450,7 @@ namespace SmartSdk
                 Doc = docLimpo, // null se vazio (não será enviado no JSON)
                 Enabled = form.EntidadeEnabled,
                 // Pessoas (tipo 1) não usam LPR - não envia o campo (null)
-                // Veículos (tipo 2) enviam 0 ou 1
-                LprAtivo = entidade.Tipo == 1 ? null : (entidade.LprAtivo == 1 ? 1 : 0)
+                LprAtivo = entidade.Tipo == 1 ? null : entidade.LprAtivo
             };
 
             // DEBUG: Log do JSON sendo enviado
@@ -494,7 +494,7 @@ namespace SmartSdk
 
             if (tipo == (int)TipoEntidade.Veiculo)
             {
-                using var formVeiculo = new FormCadastroVeiculo(_cadastroSelecionado.Id);
+                using var formVeiculo = new FormCadastroVeiculo(_cadastroSelecionado.Id, _api);
                 if (formVeiculo.ShowDialog(this) != DialogResult.OK) return;
 
                 request = new CriarEntidadeRequest
@@ -682,7 +682,7 @@ namespace SmartSdk
             // já foram processados, então ele não aplica a validação RFID.
             // Para LPR manual, enviamos 0 em ambos (o backend ignora para LPR).
             // 
-            // NOTA: A forma RECOMENDADA de criar LPR é usando lpr_ativo=1 no cadastro
+            // NOTA: A forma RECOMENDADA de criar LPR é usando lpr_ativo=true no cadastro
             // da entidade (veículo), não via POST /media manual.
             if (tipoMidia == TipoMidia.Lpr)
             {
@@ -788,7 +788,7 @@ namespace SmartSdk
                 // Atualiza a data de permissao se alterada
                 if (sucesso && form.DataPermissaoAlterada)
                 {
-                    var result = await _api.Midias.AlterarDataBloqueioAsync(midia.MediaId, form.NovaDataPermissao);
+                    var result = await _api.Midias.AlterarExpiracaoAsync(midia.MediaId, form.NovaDataPermissao);
                     if (!result.Success)
                     {
                         sucesso = false;
