@@ -129,7 +129,7 @@ namespace SmartSdk
             // 
             // colEntNome
             // 
-            colEntNome.Text = "Nome";
+            colEntNome.Text = "Descrição";
             colEntNome.Width = 150;
             // 
             // colEntDoc

@@ -105,7 +105,7 @@ namespace SmartSdk
             {
                 var item = new ListViewItem(ent.EntityId.ToString());
                 item.SubItems.Add(ent.TipoNome);
-                item.SubItems.Add(ent.Name);
+                item.SubItems.Add(ent.NomeExibicao);
                 item.SubItems.Add(ent.Doc);
                 item.SubItems.Add(ent.Enabled ? "S" : "N");
                 item.SubItems.Add(ent.CadastroId.ToString());
@@ -133,7 +133,7 @@ namespace SmartSdk
                 var ent = result.Data;
                 var item = new ListViewItem(ent.EntityId.ToString());
                 item.SubItems.Add(ent.TipoNome);
-                item.SubItems.Add(ent.Name);
+                item.SubItems.Add(ent.NomeExibicao);
                 item.SubItems.Add(ent.Doc);
                 item.SubItems.Add(ent.Enabled ? "S" : "N");
                 item.SubItems.Add(ent.CadastroId.ToString());
@@ -174,7 +174,7 @@ namespace SmartSdk
             _entidadeSelecionada = listEntidades.SelectedItems[0].Tag as Entidade;
             if (_entidadeSelecionada == null) return;
 
-            lblMidiasTitulo.Text = $"Mídias de: {_entidadeSelecionada.Name}";
+            lblMidiasTitulo.Text = $"Mídias de: {_entidadeSelecionada.NomeExibicao}";
             await CarregarMidias(_entidadeSelecionada.EntityId);
         }
 
@@ -196,41 +196,43 @@ namespace SmartSdk
             if (formTipo.ShowDialog(this) != DialogResult.OK) return;
             int tipo = formTipo.TipoEntidadeSelecionado;
 
-            var nome = InputBox("Nova Entidade",
-                tipo == 1 ? "Nome da pessoa:" : "Nome do proprietário:");
-            if (string.IsNullOrEmpty(nome)) return;
-
-            var doc = InputBox("Documento",
-                tipo == 1 ? "CPF (opcional):" : "Placa (ex: ABC1D23):");
-
+            string? nome;
+            string doc;
             string? brand = null;
             string? model = null;
             string? color = null;
             string? obs = null;
-            bool lprAtivo = false;
+            bool lprAtivo;
+            bool enabled;
 
-            if (tipo == (int)TipoEntidade.Veiculo)
+            if (tipo == (int)TipoEntidade.Pessoa)
             {
-                var placaNormalizada = (doc ?? string.Empty).Trim().ToUpper().Replace("-", "");
-                if (string.IsNullOrWhiteSpace(placaNormalizada))
-                {
-                    Aviso("Placa é obrigatória para veículo.");
-                    return;
-                }
+                using var formPessoa = new FormCadastroPessoa(0);
+                if (formPessoa.ShowDialog(this) != DialogResult.OK) return;
 
-                if (!System.Text.RegularExpressions.Regex.IsMatch(placaNormalizada, @"^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$") &&
-                    !System.Text.RegularExpressions.Regex.IsMatch(placaNormalizada, @"^[A-Z]{3}[0-9]{4}$"))
-                {
-                    Aviso("Placa inválida. Formatos aceitos: ABC1234 ou ABC1D23.");
-                    return;
-                }
+                nome = formPessoa.Nome;
+                doc = formPessoa.Documento;
+                lprAtivo = formPessoa.LprAtivo;
+                enabled = formPessoa.EntidadeEnabled;
+            }
+            else if (tipo == (int)TipoEntidade.Veiculo)
+            {
+                using var formVeiculo = new FormCadastroVeiculo(0, _api);
+                if (formVeiculo.ShowDialog(this) != DialogResult.OK) return;
 
-                doc = placaNormalizada;
-                brand = InputBox("Opcional - Marca", "Marca do veículo (opcional):")?.Trim();
-                model = InputBox("Opcional - Modelo", "Modelo do veículo (opcional):")?.Trim();
-                color = InputBox("Opcional - Cor", "Cor do veículo (opcional):")?.Trim();
-                obs = InputBox("Opcional - Observações", "Observações (opcional):")?.Trim();
-                lprAtivo = ConfirmarSimNao("Ativar LPR automático para esta placa?", "LPR");
+                nome = null;
+                doc = formVeiculo.Placa;
+                brand = string.IsNullOrWhiteSpace(formVeiculo.Marca) ? null : formVeiculo.Marca;
+                model = string.IsNullOrWhiteSpace(formVeiculo.Modelo) ? null : formVeiculo.Modelo;
+                color = string.IsNullOrWhiteSpace(formVeiculo.Cor) ? null : formVeiculo.Cor;
+                lprAtivo = formVeiculo.LprAtivo;
+                enabled = formVeiculo.EntidadeEnabled;
+                obs = null;
+            }
+            else
+            {
+                Aviso("Tipo de entidade não suportado no cadastro simplificado.");
+                return;
             }
 
             // *** CREATEID = TRUE ***  ← Esta é a diferença principal!
@@ -240,19 +242,20 @@ namespace SmartSdk
                 Id = 0,
                 CreateId = true,     // ← Gera IDs automaticamente
                 Tipo = tipo,
+                Enabled = enabled,
                 Name = nome,
-                Doc = doc ?? "",
-                Brand = string.IsNullOrWhiteSpace(brand) ? null : brand,
-                Model = string.IsNullOrWhiteSpace(model) ? null : model,
-                Color = string.IsNullOrWhiteSpace(color) ? null : color,
-                Obs = string.IsNullOrWhiteSpace(obs) ? null : obs,
+                Doc = doc,
+                Brand = brand,
+                Model = model,
+                Color = color,
+                Obs = obs,
                 LprAtivo = lprAtivo
             };
 
             var result = await _api.Entidades.CriarAsync(request);
             if (result.Success && result.Data?.Ret == 0)
             {
-                Log($"Entidade criada: {nome}");
+                Log($"Entidade criada: {nome ?? doc}");
                 Log($"  → entity_id={result.Data.EntityId}, cadastro_id={result.Data.CadastroId}");
                 if (result.Data.CreatedCentral == 1)
                     Log($"  → Cadastro central criado automaticamente");
@@ -276,14 +279,14 @@ namespace SmartSdk
             if (_entidadeSelecionada == null) { Aviso("Selecione uma entidade"); return; }
 
             var confirm = MessageBox.Show(
-                $"Excluir '{_entidadeSelecionada.Name}' e todas suas mídias?",
+                $"Excluir '{_entidadeSelecionada.NomeExibicao}' e todas suas mídias?",
                 "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
 
             var result = await _api.Entidades.ExcluirAsync(_entidadeSelecionada.EntityId);
             if (result.Success)
             {
-                Log($"Entidade excluída: {_entidadeSelecionada.Name}");
+                Log($"Entidade excluída: {_entidadeSelecionada.NomeExibicao}");
                 _currentOffset = 0;
                 await CarregarEntidades();
             }

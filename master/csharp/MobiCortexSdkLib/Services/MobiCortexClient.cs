@@ -130,10 +130,12 @@ namespace MobiCortex.Sdk.Services
         }
 
         #region ICadastroService
-        async Task<ApiResult<CadastroListResponse>> ICadastroService.ListarAsync(int offset, int count, string? nameFilter)
+        async Task<ApiResult<CadastroListResponse>> ICadastroService.ListarAsync(int offset, int count, string? nameFilter, string? searchFilter)
         {
             var url = $"/central-registry?offset={offset}&count={count}";
-            if (!string.IsNullOrEmpty(nameFilter))
+            if (!string.IsNullOrEmpty(searchFilter))
+                url += $"&search={Uri.EscapeDataString(searchFilter)}";
+            else if (!string.IsNullOrEmpty(nameFilter))
                 url += $"&name={Uri.EscapeDataString(nameFilter)}";
             return await GetAsync<CadastroListResponse>(url);
         }
@@ -166,9 +168,9 @@ namespace MobiCortex.Sdk.Services
         #endregion
 
         #region IEntidadeService
-        async Task<ApiResult<EntidadeListResponse>> IEntidadeService.ListarPorCadastroAsync(uint cadastroId)
+        async Task<ApiResult<EntidadeListResponse>> IEntidadeService.ListarPorCadastroAsync(uint centralRegistryId)
         {
-            return await GetAsync<EntidadeListResponse>($"/entities?cadastro_id={cadastroId}");
+            return await GetAsync<EntidadeListResponse>($"/entities?central_registry_id={centralRegistryId}");
         }
 
         async Task<ApiResult<EntidadeListResponse>> IEntidadeService.ListarTodosAsync(int offset, int count, string? nome)

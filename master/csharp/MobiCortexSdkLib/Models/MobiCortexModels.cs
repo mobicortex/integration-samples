@@ -233,7 +233,8 @@ namespace MobiCortex.Sdk.Models
         public uint Id { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; } = string.Empty;
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Name { get; set; }
 
         /// <summary>true = habilitado, false = desabilitado</summary>
         [JsonPropertyName("enabled")]
@@ -243,10 +244,6 @@ namespace MobiCortex.Sdk.Models
         /// <summary>Tipo de cadastro (uso livre pelo integrador)</summary>
         [JsonPropertyName("type")]
         public int Type { get; set; }
-
-        /// <summary>Vagas permitidas (para controle de estacionamento)</summary>
-        [JsonPropertyName("vagas")]
-        public int Vagas { get; set; }
 
         /// <summary>Campos livres para dados adicionais</summary>
         [JsonPropertyName("field1")]
@@ -279,11 +276,36 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("vehicle_count")]
         public uint VehicleCount { get; set; }
 
+        /// <summary>Motivo do match retornado pela busca cruzada (?search=).</summary>
+        [JsonPropertyName("match_source")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? MatchSource { get; set; }
+
+        /// <summary>Valor exato que causou o match retornado pela busca cruzada.</summary>
+        [JsonPropertyName("match_value")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? MatchValue { get; set; }
+
         [JsonPropertyName("created_at")]
         public uint CreatedAt { get; set; }
 
         [JsonPropertyName("updated_at")]
         public uint UpdatedAt { get; set; }
+
+        /// <summary>
+        /// Alias local legado para a composição interna de vagas.
+        /// O contrato público usa apenas slots1/slots2.
+        /// </summary>
+        [JsonIgnore]
+        public int Vagas
+        {
+            get => (Slots2 << 4) | (Slots1 & 0x0F);
+            set
+            {
+                Slots1 = value & 0x0F;
+                Slots2 = (value >> 4) & 0x0F;
+            }
+        }
 
         // Helpers para exibição - Converte de UTC para horário de Brasília (UTC-3)
         [JsonIgnore]
@@ -367,12 +389,12 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("entity_id")]
         public uint EntityId { get; set; }
 
-        [JsonPropertyName("cadastro_id")]
-        public uint CadastroId { get; set; }
+        [JsonPropertyName("central_registry_id")]
+        public uint CentralRegistryId { get; set; }
 
         /// <summary>1=Pessoa, 2=Veículo, 3=Animal</summary>
-        [JsonPropertyName("tipo")]
-        public int Tipo { get; set; }
+        [JsonPropertyName("type")]
+        public int Type { get; set; }
 
         /// <summary>true = habilitado, false = desabilitado</summary>
         [JsonPropertyName("enabled")]
@@ -410,9 +432,9 @@ namespace MobiCortex.Sdk.Models
         /// true = LPR ativo. Quando ativado, o controlador cria automaticamente
         /// uma mídia do tipo LPR usando o campo "doc" como placa.
         /// </summary>
-        [JsonPropertyName("lpr_ativo")]
+        [JsonPropertyName("lpr_enabled")]
         [JsonConverter(typeof(BoolIntConverter))]
-        public bool LprAtivo { get; set; }
+        public bool LprEnabled { get; set; }
 
         [JsonPropertyName("created_at")]
         public uint CreatedAt { get; set; }
@@ -422,13 +444,63 @@ namespace MobiCortex.Sdk.Models
 
         // Helpers
         [JsonIgnore]
-        public string TipoNome => (TipoEntidade)Tipo switch
+        public uint CadastroId
+        {
+            get => CentralRegistryId;
+            set => CentralRegistryId = value;
+        }
+
+        [JsonIgnore]
+        public int Tipo
+        {
+            get => Type;
+            set => Type = value;
+        }
+
+        [JsonIgnore]
+        public bool LprAtivo
+        {
+            get => LprEnabled;
+            set => LprEnabled = value;
+        }
+
+        [JsonIgnore]
+        public string TipoNome => (TipoEntidade)Type switch
         {
             TipoEntidade.Pessoa => "Pessoa",
             TipoEntidade.Veiculo => "Veículo",
             TipoEntidade.Animal => "Animal",
             _ => $"Tipo {Tipo}"
         };
+
+        [JsonIgnore]
+        public string NomeExibicao
+        {
+            get
+            {
+                if ((TipoEntidade)Type != TipoEntidade.Veiculo)
+                {
+                    return Name;
+                }
+
+                var partes = new[] { Brand, Model, Color }
+                    .Where(valor => !string.IsNullOrWhiteSpace(valor))
+                    .Select(valor => valor!.Trim());
+
+                var descricao = string.Join(" / ", partes);
+                if (!string.IsNullOrWhiteSpace(descricao))
+                {
+                    return descricao;
+                }
+
+                if (!string.IsNullOrWhiteSpace(Doc))
+                {
+                    return $"Veículo {Doc}";
+                }
+
+                return Name;
+            }
+        }
 
         [JsonIgnore]
         public string CriadoEm => CreatedAt > 0
@@ -459,13 +531,13 @@ namespace MobiCortex.Sdk.Models
         /// ID do cadastro central ao qual vincular a entidade.
         /// Obrigatório no modelo MobiCortex. Ignorado se createid=true.
         /// </summary>
-        [JsonPropertyName("cadastro_id")]
+        [JsonPropertyName("central_registry_id")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public uint? CadastroId { get; set; }
+        public uint? CentralRegistryId { get; set; }
 
         /// <summary>1=Pessoa, 2=Veículo, 3=Animal</summary>
-        [JsonPropertyName("tipo")]
-        public int Tipo { get; set; } = 1;
+        [JsonPropertyName("type")]
+        public int Type { get; set; } = 1;
 
         [JsonPropertyName("enabled")]
         public bool Enabled { get; set; } = true;
@@ -498,8 +570,8 @@ namespace MobiCortex.Sdk.Models
         public string? Obs { get; set; }
 
         /// <summary>true = ativar reconhecimento de placa via LPR</summary>
-        [JsonPropertyName("lpr_ativo")]
-        public bool LprAtivo { get; set; }
+        [JsonPropertyName("lpr_enabled")]
+        public bool LprEnabled { get; set; }
 
         /// <summary>
         /// true = gera entity_id e cadastro_id automaticamente.
@@ -514,6 +586,27 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("overwrite")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? Overwrite { get; set; }
+
+        [JsonIgnore]
+        public uint? CadastroId
+        {
+            get => CentralRegistryId;
+            set => CentralRegistryId = value;
+        }
+
+        [JsonIgnore]
+        public int Tipo
+        {
+            get => Type;
+            set => Type = value;
+        }
+
+        [JsonIgnore]
+        public bool LprAtivo
+        {
+            get => LprEnabled;
+            set => LprEnabled = value;
+        }
     }
 
     /// <summary>
@@ -527,12 +620,19 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("entity_id")]
         public uint EntityId { get; set; }
 
-        [JsonPropertyName("cadastro_id")]
-        public uint CadastroId { get; set; }
+        [JsonPropertyName("central_registry_id")]
+        public uint CentralRegistryId { get; set; }
 
         /// <summary>1 se criou o cadastro central automaticamente</summary>
         [JsonPropertyName("created_central")]
         public int CreatedCentral { get; set; }
+
+        [JsonIgnore]
+        public uint CadastroId
+        {
+            get => CentralRegistryId;
+            set => CentralRegistryId = value;
+        }
     }
 
     /// <summary>
@@ -576,14 +676,21 @@ namespace MobiCortex.Sdk.Models
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Obs { get; set; }
 
-        [JsonPropertyName("lpr_ativo")]
+        [JsonPropertyName("lpr_enabled")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonConverter(typeof(BoolIntNullableConverter))]
-        public bool? LprAtivo { get; set; }
+        public bool? LprEnabled { get; set; }
+
+        [JsonIgnore]
+        public bool? LprAtivo
+        {
+            get => LprEnabled;
+            set => LprEnabled = value;
+        }
     }
 
     /// <summary>
-    /// GET /entities?cadastro_id=X  → lista entidades de um cadastro (sem paginação)
+    /// GET /entities?central_registry_id=X  → lista entidades de um cadastro (sem paginação)
     /// GET /entities?offset=X&amp;count=Y  → lista global paginada
     /// GET /entities?offset=X&amp;count=Y&amp;name=filtro  → com filtro server-side
     /// </summary>
@@ -599,12 +706,19 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("count")]
         public uint Count { get; set; }
 
-        /// <summary>Presente apenas quando filtrado por cadastro_id</summary>
-        [JsonPropertyName("cadastro_id")]
-        public uint? CadastroId { get; set; }
+        /// <summary>Presente apenas quando filtrado por central_registry_id</summary>
+        [JsonPropertyName("central_registry_id")]
+        public uint? CentralRegistryId { get; set; }
 
         [JsonPropertyName("items")]
         public List<Entidade> Items { get; set; } = new();
+
+        [JsonIgnore]
+        public uint? CadastroId
+        {
+            get => CentralRegistryId;
+            set => CentralRegistryId = value;
+        }
     }
 
     /// <summary>
@@ -710,15 +824,15 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("entity_id")]
         public uint EntityId { get; set; }
 
-        [JsonPropertyName("cadastro_id")]
-        public uint CadastroId { get; set; }
+        [JsonPropertyName("central_registry_id")]
+        public uint CentralRegistryId { get; set; }
 
         /// <summary>Tipo da mídia (ver constantes em TipoMidia)</summary>
-        [JsonPropertyName("tipo")]
-        public int Tipo { get; set; }
+        [JsonPropertyName("type")]
+        public int Type { get; set; }
 
-        [JsonPropertyName("descricao")]
-        public string Descricao { get; set; } = string.Empty;
+        [JsonPropertyName("description")]
+        public string Description { get; set; } = string.Empty;
 
         /// <summary>true = habilitada, false = desabilitada</summary>
         [JsonPropertyName("enabled")]
@@ -743,7 +857,28 @@ namespace MobiCortex.Sdk.Models
         }
 
         [JsonIgnore]
-        public string TipoNome => TipoMidia.GetNome(Tipo);
+        public uint CadastroId
+        {
+            get => CentralRegistryId;
+            set => CentralRegistryId = value;
+        }
+
+        [JsonIgnore]
+        public int Tipo
+        {
+            get => Type;
+            set => Type = value;
+        }
+
+        [JsonIgnore]
+        public string Descricao
+        {
+            get => Description;
+            set => Description = value;
+        }
+
+        [JsonIgnore]
+        public string TipoNome => TipoMidia.GetNome(Type);
 
         [JsonIgnore]
         public bool TemBloqueioPorData => Expiration > 0 && Expiration > DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -770,19 +905,19 @@ namespace MobiCortex.Sdk.Models
     /// COMO CADASTRAR DIFERENTES TIPOS DE MÍDIA:
     /// 
     /// 1. RFID (Wiegand/CODE/HEX):
-    ///    - Envie apenas entity_id, cadastro_id, tipo e descricao
+    ///    - Envie apenas entity_id, central_registry_id, type e description
     ///    - O backend detecta automaticamente o formato (Wiegand 123,45678 / CODE / HEX)
     ///    - Exemplo: descricao = "123,45678" ou "HEX: FF FF FF"
     /// 
     /// 2. LPR (Placa de veículo):
-    ///    - Envie entity_id, cadastro_id, tipo=17, descricao="ABC1D23"
+    ///    - Envie entity_id, central_registry_id, type=17, description="ABC1D23"
     ///    - IMPORTANTE: também envie ns32_0=0 e ns32_1=0
     ///    - Sem ns32_0/ns32_1, o backend tenta validar a placa como RFID e dá erro
     ///    - NOTA: A forma recomendada é usar lpr_ativo=true no cadastro da entidade (veículo)
     ///      pois o backend converte a placa automaticamente em dados binários
     /// 
     /// 3. Facial, Biometria, etc:
-    ///    - Envie entity_id, cadastro_id, tipo e descricao
+    ///    - Envie entity_id, central_registry_id, type e description
     ///    - Para evitar validação RFID, envie ns32_0=0 e ns32_1=0
     /// </summary>
     public class CriarMidiaRequest
@@ -790,12 +925,12 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("entity_id")]
         public uint EntityId { get; set; }
 
-        [JsonPropertyName("cadastro_id")]
-        public uint CadastroId { get; set; }
+        [JsonPropertyName("central_registry_id")]
+        public uint CentralRegistryId { get; set; }
 
         /// <summary>Tipo da mídia (ver constantes TipoMidia.*)</summary>
-        [JsonPropertyName("tipo")]
-        public int Tipo { get; set; } = TipoMidia.Wiegand26;
+        [JsonPropertyName("type")]
+        public int Type { get; set; } = TipoMidia.Wiegand26;
 
         /// <summary>
         /// Descrição/valor da mídia.
@@ -803,8 +938,8 @@ namespace MobiCortex.Sdk.Models
         /// - LPR: placa do veículo (ex: "ABC1D23")
         /// - Facial/Outros: identificador descritivo
         /// </summary>
-        [JsonPropertyName("descricao")]
-        public string Descricao { get; set; } = string.Empty;
+        [JsonPropertyName("description")]
+        public string Description { get; set; } = string.Empty;
 
         /// <summary>
         /// Valor numérico NS32_0 - usado internamente pelo backend para armazenar
@@ -829,6 +964,27 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("ns32_1")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public uint? Ns32_1 { get; set; }
+
+        [JsonIgnore]
+        public uint CadastroId
+        {
+            get => CentralRegistryId;
+            set => CentralRegistryId = value;
+        }
+
+        [JsonIgnore]
+        public int Tipo
+        {
+            get => Type;
+            set => Type = value;
+        }
+
+        [JsonIgnore]
+        public string Descricao
+        {
+            get => Description;
+            set => Description = value;
+        }
     }
 
     /// <summary>

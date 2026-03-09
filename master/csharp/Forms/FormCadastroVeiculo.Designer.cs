@@ -33,8 +33,6 @@ namespace SmartSdk
             lblCor = new Label();
             _txtModelo = new TextBox();
             lblModelo = new Label();
-            _txtNomeProprietario = new TextBox();
-            lblNomeProprietario = new Label();
             _txtMarca = new ComboBox();
             lblMarca = new Label();
             panelLpr = new Panel();
@@ -162,8 +160,6 @@ namespace SmartSdk
             panelDados.Controls.Add(lblCor);
             panelDados.Controls.Add(_txtModelo);
             panelDados.Controls.Add(lblModelo);
-            panelDados.Controls.Add(_txtNomeProprietario);
-            panelDados.Controls.Add(lblNomeProprietario);
             panelDados.Controls.Add(_txtMarca);
             panelDados.Controls.Add(lblMarca);
             panelDados.Location = new Point(20, 206);
@@ -192,17 +188,17 @@ namespace SmartSdk
             _cmbCor.DropDownStyle = ComboBoxStyle.DropDownList;
             _cmbCor.FormattingEnabled = true;
             _cmbCor.Items.AddRange(new object[] { "Selecionar...", "Branco", "Preto", "Prata", "Cinza", "Azul", "Vermelho", "Verde", "Amarelo", "Marrom", "Outro" });
-            _cmbCor.Location = new Point(302, 105);
+            _cmbCor.Location = new Point(302, 49);
             _cmbCor.Name = "_cmbCor";
             _cmbCor.Size = new Size(270, 23);
-            _cmbCor.TabIndex = 7;
+            _cmbCor.TabIndex = 3;
             // 
             // lblCor
             // 
-            lblCor.Location = new Point(302, 86);
+            lblCor.Location = new Point(302, 30);
             lblCor.Name = "lblCor";
             lblCor.Size = new Size(140, 15);
-            lblCor.TabIndex = 6;
+            lblCor.TabIndex = 2;
             lblCor.Text = "Cor";
             // 
             // _txtModelo
@@ -221,26 +217,11 @@ namespace SmartSdk
             lblModelo.TabIndex = 4;
             lblModelo.Text = "Modelo";
             // 
-            // _txtNomeProprietario
-            // 
-            _txtNomeProprietario.Location = new Point(302, 49);
-            _txtNomeProprietario.Name = "_txtNomeProprietario";
-            _txtNomeProprietario.PlaceholderText = "Opcional";
-            _txtNomeProprietario.Size = new Size(270, 23);
-            _txtNomeProprietario.TabIndex = 3;
-            // 
-            // lblNomeProprietario
-            // 
-            lblNomeProprietario.Location = new Point(302, 30);
-            lblNomeProprietario.Name = "lblNomeProprietario";
-            lblNomeProprietario.Size = new Size(180, 15);
-            lblNomeProprietario.TabIndex = 2;
-            lblNomeProprietario.Text = "Nome do Proprietario";
-            // 
             // _txtMarca
             // 
             _txtMarca.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             _txtMarca.AutoCompleteSource = AutoCompleteSource.ListItems;
+            _txtMarca.DropDownStyle = ComboBoxStyle.DropDown;
             _txtMarca.FormattingEnabled = true;
             _txtMarca.Location = new Point(16, 49);
             _txtMarca.Name = "_txtMarca";
@@ -407,8 +388,6 @@ namespace SmartSdk
         private Panel panelDados;
         private Label lblMarca;
         private ComboBox _txtMarca;
-        private Label lblNomeProprietario;
-        private TextBox _txtNomeProprietario;
         private Label lblModelo;
         private TextBox _txtModelo;
         private Label lblCor;

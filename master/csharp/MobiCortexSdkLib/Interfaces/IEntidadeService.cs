@@ -10,8 +10,8 @@ namespace MobiCortex.Sdk.Interfaces
         /// <summary>
         /// Lista entidades de um cadastro específico.
         /// </summary>
-        /// <param name="cadastroId">ID do cadastro central</param>
-        Task<ApiResult<EntidadeListResponse>> ListarPorCadastroAsync(uint cadastroId);
+        /// <param name="centralRegistryId">ID do cadastro central</param>
+        Task<ApiResult<EntidadeListResponse>> ListarPorCadastroAsync(uint centralRegistryId);
 
         /// <summary>
         /// Lista todas as entidades (paginado, opcionalmente filtrado por nome).
@@ -32,7 +32,7 @@ namespace MobiCortex.Sdk.Interfaces
         /// Atualiza uma entidade existente (PUT /entities?id=X).
         /// 
         /// IMPORTANTE: Este endpoint faz atualização PARCIAL. Use AtualizarEntidadeRequest
-        /// e preencha APENAS os campos que deseja modificar (name, doc, enabled, lpr_ativo).
+        /// e preencha APENAS os campos que deseja modificar (name, doc, enabled, lpr_enabled).
         /// Campos não preenchidos (null) não serão alterados no servidor.
         /// 
         /// NÃO use a classe Entidade completa aqui - ela contém campos readonly

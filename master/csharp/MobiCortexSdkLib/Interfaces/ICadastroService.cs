@@ -12,9 +12,10 @@ namespace MobiCortex.Sdk.Interfaces
         /// </summary>
         /// <param name="offset">Índice inicial</param>
         /// <param name="count">Quantidade de registros</param>
-        /// <param name="nameFilter">Filtro por nome (opcional)</param>
+        /// <param name="nameFilter">Filtro simples por nome (opcional)</param>
+        /// <param name="searchFilter">Busca cruzada canônica do backend (opcional, tem precedência sobre nameFilter)</param>
         /// <returns>Lista de cadastros</returns>
-        Task<ApiResult<CadastroListResponse>> ListarAsync(int offset = 0, int count = 20, string? nameFilter = null);
+        Task<ApiResult<CadastroListResponse>> ListarAsync(int offset = 0, int count = 20, string? nameFilter = null, string? searchFilter = null);
 
         /// <summary>
         /// Obtém um cadastro pelo ID.

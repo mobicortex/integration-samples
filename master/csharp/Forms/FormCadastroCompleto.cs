@@ -360,7 +360,7 @@ namespace SmartSdk
                 {
                     var item = new ListViewItem(ent.EntityId.ToString());
                     item.SubItems.Add(ent.TipoNome);
-                    item.SubItems.Add(ent.Name);
+                    item.SubItems.Add(ent.NomeExibicao);
                     item.SubItems.Add(ent.Doc);
                     item.SubItems.Add(ent.Enabled ? "S" : "N");
                     item.SubItems.Add(ent.LprAtivo ? "Sim" : "");
@@ -382,7 +382,7 @@ namespace SmartSdk
             _entidadeSelecionada = listEntidades.SelectedItems[0].Tag as Entidade;
             if (_entidadeSelecionada == null) return;
 
-            lblMidiasTitulo.Text = $"Mídias de: {_entidadeSelecionada.Name}";
+            lblMidiasTitulo.Text = $"Mídias de: {_entidadeSelecionada.NomeExibicao}";
             await CarregarMidias(_entidadeSelecionada.EntityId);
         }
 
@@ -408,7 +408,7 @@ namespace SmartSdk
                 // Cria o request de atualização (PUT /entities?id=X)
                 var entidadeAtualizada = new AtualizarEntidadeRequest
                 {
-                    Name = formVeiculo.NomeEntidadeGerado,
+                    Name = null,
                     Doc = formVeiculo.Placa,
                     Enabled = formVeiculo.EntidadeEnabled,
                     Brand = string.IsNullOrWhiteSpace(formVeiculo.Marca) ? null : formVeiculo.Marca,
@@ -424,7 +424,7 @@ namespace SmartSdk
                 var result = await _api.Entidades.AtualizarAsync(entidade.EntityId, entidadeAtualizada);
                 if (result.Success)
                 {
-                    Log($"Veículo atualizado: {formVeiculo.NomeEntidadeGerado}");
+                    Log($"Veículo atualizado: {entidade.NomeExibicao}");
                     if (_cadastroSelecionado != null)
                         await CarregarEntidades(_cadastroSelecionado.Id);
                 }
@@ -502,7 +502,7 @@ namespace SmartSdk
                     Id = formVeiculo.IdVeiculo,
                     CadastroId = _cadastroSelecionado.Id,
                     Tipo = (int)TipoEntidade.Veiculo,
-                    Name = formVeiculo.NomeEntidadeGerado,
+                    Name = null,
                     Doc = formVeiculo.Placa,
                     Brand = string.IsNullOrWhiteSpace(formVeiculo.Marca) ? null : formVeiculo.Marca,
                     Model = string.IsNullOrWhiteSpace(formVeiculo.Modelo) ? null : formVeiculo.Modelo,
@@ -557,14 +557,14 @@ namespace SmartSdk
             if (_entidadeSelecionada == null) { Aviso("Selecione uma entidade"); return; }
 
             var confirm = MessageBox.Show(
-                $"Excluir '{_entidadeSelecionada.Name}' e todas suas mídias?",
+                $"Excluir '{_entidadeSelecionada.NomeExibicao}' e todas suas mídias?",
                 "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
 
             var result = await _api.Entidades.ExcluirAsync(_entidadeSelecionada.EntityId);
             if (result.Success)
             {
-                Log($"Entidade excluída: {_entidadeSelecionada.Name}");
+                Log($"Entidade excluída: {_entidadeSelecionada.NomeExibicao}");
                 if (_cadastroSelecionado != null)
                     await CarregarEntidades(_cadastroSelecionado.Id);
             }

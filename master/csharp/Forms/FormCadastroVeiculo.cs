@@ -11,7 +11,6 @@ namespace SmartSdk
     {
         public uint CadastroId { get; }
         public uint IdVeiculo { get; private set; }
-        public string NomeProprietario { get; private set; } = string.Empty;
         public string Marca { get; private set; } = string.Empty;
         public string Modelo { get; private set; } = string.Empty;
         public string Cor { get; private set; } = string.Empty;
@@ -37,21 +36,6 @@ namespace SmartSdk
             "Renault", "Nissan", "Ford", "BYD", "Peugeot", "Citroen", "CAOA Chery",
             "Mitsubishi", "Kia", "Mercedes-Benz", "BMW", "Audi", "Volvo", "Ram"
         };
-
-        /// <summary>
-        /// Nome tecnico da entidade enviado para API.
-        /// O backend exige "name", entao geramos automaticamente com base nos campos do veiculo.
-        /// </summary>
-        public string NomeEntidadeGerado
-        {
-            get
-            {
-                if (!string.IsNullOrWhiteSpace(NomeProprietario)) return NomeProprietario;
-                var baseNome = $"{Marca} {Modelo}".Trim();
-                if (!string.IsNullOrWhiteSpace(baseNome)) return baseNome;
-                return $"Veiculo {Placa}";
-            }
-        }
 
         /// <summary>
         /// Construtor padrão para o Designer do Visual Studio.
@@ -182,6 +166,7 @@ namespace SmartSdk
             _txtMarca.BeginUpdate();
             _txtMarca.Items.Clear();
             _txtMarca.Items.AddRange(orderedBrands);
+            _txtMarca.DropDownStyle = ComboBoxStyle.DropDown;
 
             if (!string.IsNullOrWhiteSpace(selected))
             {
@@ -217,16 +202,6 @@ namespace SmartSdk
             _numId.Maximum = uint.MaxValue;
             _numId.Value = _entidadeExistente.EntityId;
             _numId.Enabled = false; // ID não pode ser alterado
-
-            // O nome pode conter: "Proprietario", "Marca Modelo" ou "Veiculo PLACA"
-            // Tenta extrair o nome do proprietário se não parecer ser gerado
-            var name = _entidadeExistente.Name;
-            if (!name.StartsWith("Veiculo ") && !name.Contains(" ") == false)
-            {
-                // Pode ser "Marca Modelo" ou nome do proprietário
-                // Se tiver mais de uma palavra e não começar com Veiculo, assume como proprietário
-                _txtNomeProprietario.Text = name;
-            }
 
             // Preenche placa
             _txtPlaca.Text = _entidadeExistente.Doc;
@@ -282,7 +257,6 @@ namespace SmartSdk
             }
 
             IdVeiculo = (uint)_numId.Value;
-            NomeProprietario = _txtNomeProprietario.Text.Trim();
             Marca = _txtMarca.Text.Trim();
             Modelo = _txtModelo.Text.Trim();
             Cor = _cmbCor.SelectedIndex <= 0 ? string.Empty : _cmbCor.SelectedItem?.ToString() ?? string.Empty;
