@@ -1,8 +1,8 @@
 # MobiCortex Master - API Endpoints
 
-Documentacao operacional da API HTTP do MobiCortex Master.
+Documentação operacional da API HTTP do MobiCortex Master.
 
-## Base URL e autenticacao
+## Base URL e autenticação
 
 Base URLs usuais:
 
@@ -12,9 +12,9 @@ https://<ip-da-controladora>
 ```
 
 Notas:
-- `https://<ip-da-controladora>` representa HTTPS na porta padrao `443`
-- explicite a porta apenas quando ela for diferente da padrao, como `4449`
-- `4449` e tipicamente usada em ambiente de desenvolvimento ou debug
+- `https://<ip-da-controladora>` representa HTTPS na porta padrão `443`
+- explicite a porta apenas quando ela for diferente da padrão, como `4449`
+- `4449` é tipicamente usada em ambiente de desenvolvimento ou debug
 
 Base path:
 
@@ -22,22 +22,22 @@ Base path:
 /mbcortex/master/api/v1
 ```
 
-Autenticacao:
+Autenticação:
 
 ```text
 Authorization: Bearer <session_key>
 ```
 
 Notas:
-- TTL padrao da sessao: 900 segundos
-- renovacao deslizante: cada request autenticado renova o TTL
-- a collection Postman deste repositorio salva `sessionKey` automaticamente apos o login
+- TTL padrão da sessão: 900 segundos
+- renovação deslizante: cada request autenticado renova o TTL
+- a collection Postman deste repositório salva `sessionKey` automaticamente após o login
 
-## Autenticacao
+## Autenticação
 
 ### POST `/login`
 
-Obtem a `session_key` para todos os endpoints autenticados.
+Obtém a `session_key` para todos os endpoints autenticados.
 
 Request:
 
@@ -84,12 +84,12 @@ Response `200`:
 ```
 
 Erros comuns:
-- `400`: campos ausentes, JSON invalido ou confirmacao divergente
+- `400`: campos ausentes, JSON inválido ou confirmação divergente
 - `401`: senha atual incorreta
 
 ### DELETE `/login`
 
-Invalida a sessao atual.
+Invalida a sessão atual.
 
 Request:
 
@@ -111,7 +111,7 @@ Response `200`:
 
 ### GET `/token`
 
-Lista tokens de integracao existentes.
+Lista tokens de integração existentes.
 
 Response `200`:
 
@@ -149,11 +149,11 @@ Com `expires_at`:
 }
 ```
 
-Sem expiracao:
+Sem expiração:
 
 ```json
 {
-  "label": "Integracao permanente"
+  "label": "Integração permanente"
 }
 ```
 
@@ -169,7 +169,7 @@ Response `201`:
 ```
 
 Notas:
-- maximo de 64 tokens
+- máximo de 64 tokens
 - `expires_at` aceita `YYYY-MM-DDTHH:MM:SS` ou `YYYY-MM-DD`
 
 ### DELETE `/token`
@@ -192,13 +192,13 @@ Response `200`:
 
 ## Cadastro Central
 
-Contrato publico:
-- `id`: `0` para geracao automatica
-- `name`: obrigatorio
+Contrato público:
+- `id`: `0` para geração automática
+- `name`: obrigatório
 - `field1`: bloco
 - `field2`: apartamento
 - `field3`: departamento
-- `field4`: divisao
+- `field4`: divisão
 - `enabled`: `1|0` ou `true|false`
 - `slots1`, `slots2`, `type`
 
@@ -211,9 +211,9 @@ Consultas suportadas:
 - `?offset=<n>&count=<n>&name=<texto>`
 
 Comportamento atual do backend:
-- `offset`: padrao `0`
-- `count`: padrao `10`
-- `count`: maximo `200`
+- `offset`: padrão `0`
+- `count`: padrão `10`
+- `count`: máximo `200`
 
 ### GET `/central-registry?id=123`
 
@@ -267,7 +267,7 @@ Response `200`:
 
 ### GET `/central-registry?search=ABC1D23`
 
-Busca consolidada por nome do cadastro, entidade, documento/placa ou descricao de midia.
+Busca consolidada por nome do cadastro, entidade, documento/placa ou descrição de mídia.
 
 Response `200`:
 
@@ -328,14 +328,14 @@ Response `200`:
 ```
 
 Notas:
-- `POST` cobre criacao e atualizacao
+- `POST` cobre criação e atualização
 - `id=0` gera ID automaticamente
-- se `id=0` e `name` ja existir, o backend pode retornar `409`
-- nao omita `field1..field4` da integracao; envie apenas os que tiver valor
+- se `id=0` e `name` já existir, o backend pode retornar `409`
+- não omita `field1..field4` da integração; envie apenas os que tiver valor
 
 ### DELETE `/central-registry?id=123`
 
-Tambem pode receber body com `id`.
+Também pode receber body com `id`.
 
 Response `200`:
 
@@ -363,23 +363,23 @@ Response `200`:
 
 Tipos principais:
 - `1`: pessoa
-- `2`: veiculo
+- `2`: veículo
 
-Campos principais de integracao:
+Campos principais de integração:
 - `id`: `0` para auto-ID
 - `type`
 - `name`
 - `doc`
 - `central_registry_id`
 - `enabled`
-- `brand`, `model`, `color` para veiculos
-- `lpr_enabled` para veiculos
+- `brand`, `model`, `color` para veículos
+- `lpr_enabled` para veículos
 
 Regras importantes:
-- `doc` de veiculo representa a placa
-- normalizar placa para maiusculo e sem separadores
+- `doc` de veículo representa a placa
+- normalizar placa para maiúsculo e sem separadores
 - validar formato brasileiro antes de enviar
-- `lpr_enabled=true` cria/atualiza a midia LPR automaticamente
+- `lpr_enabled=true` cria/atualiza a mídia LPR automaticamente
 
 ### GET `/entities`
 
@@ -394,7 +394,7 @@ Consultas suportadas:
 Comportamento atual do backend:
 - `offset=0`
 - `count=10`
-- `count` maximo:
+- `count` máximo:
   - Linux embarcado: `100`
   - ESP32/targets menores: `10`
 
@@ -409,7 +409,7 @@ Response `200`:
   "central_registry_id": 123,
   "type": 2,
   "enabled": true,
-  "name": "Joao Silva Santos",
+  "name": "João Silva Santos",
   "doc": "ABC1D23",
   "brand": "Toyota",
   "model": "Corolla",
@@ -420,7 +420,7 @@ Response `200`:
 
 ### GET `/entities?central_registry_id=123`
 
-Lista completa de pessoas e veiculos vinculados ao cadastro.
+Lista completa de pessoas e veículos vinculados ao cadastro.
 
 Response `200`:
 
@@ -443,7 +443,7 @@ Response `200`:
       "central_registry_id": 123,
       "type": 2,
       "enabled": true,
-      "name": "Joao Silva Santos",
+      "name": "João Silva Santos",
       "doc": "ABC1D23",
       "brand": "Toyota",
       "model": "Corolla",
@@ -456,7 +456,7 @@ Response `200`:
 
 ### GET `/entities?offset=0&count=10&name=joao&doc=ABC1D23&type=2`
 
-Busca avancada com filtros combinados.
+Busca avançada com filtros combinados.
 
 Response `200`:
 
@@ -471,7 +471,7 @@ Response `200`:
       "central_registry_id": 123,
       "type": 2,
       "enabled": true,
-      "name": "Joao Silva Santos",
+      "name": "João Silva Santos",
       "doc": "ABC1D23",
       "brand": "Toyota",
       "model": "Corolla",
@@ -497,13 +497,13 @@ Pessoa:
 }
 ```
 
-Veiculo:
+Veículo:
 
 ```json
 {
   "id": 0,
   "type": 2,
-  "name": "Joao Silva Santos",
+  "name": "João Silva Santos",
   "doc": "ABC1D23",
   "central_registry_id": 123,
   "lpr_enabled": true,
@@ -514,14 +514,14 @@ Veiculo:
 }
 ```
 
-Auto-ID com criacao automatica:
+Auto-ID com criação automática:
 
 ```json
 {
   "id": 0,
   "createid": true,
   "type": 1,
-  "name": "Cadastro automatico",
+  "name": "Cadastro automático",
   "doc": "",
   "enabled": true
 }
@@ -541,19 +541,19 @@ Response `200`:
 ```
 
 Erros comuns:
-- `400`: nome ausente, placa invalida, payload invalido
-- `404`: cadastro nao encontrado
+- `400`: nome ausente, placa inválida, payload inválido
+- `404`: cadastro não encontrado
 - `409`: placa duplicada ou ID existente
 
 ### PUT `/entities?id=456`
 
-Atualizacao parcial.
+Atualização parcial.
 
 Request:
 
 ```json
 {
-  "name": "Joao Silva Santos",
+  "name": "João Silva Santos",
   "brand": "Toyota",
   "model": "Corolla XEI",
   "color": "Prata",
@@ -581,7 +581,7 @@ Response `200`:
 }
 ```
 
-## Condutores de veiculo
+## Condutores de veículo
 
 ### GET `/vehicle-drivers?vehicle_id=456`
 
@@ -616,10 +616,10 @@ Response `200`:
 ```
 
 Erros comuns:
-- `400`: `driver_ids` invalido, pessoa inexistente ou de outro cadastro
-- `404`: veiculo nao encontrado
+- `400`: `driver_ids` inválido, pessoa inexistente ou de outro cadastro
+- `404`: veículo não encontrado
 
-## Midias
+## Mídias
 
 Campos principais:
 - `entity_id`
@@ -711,9 +711,9 @@ Response `200`:
 ```
 
 Notas:
-- `entity_id` e `central_registry_id` sao obrigatorios
-- para veiculos, prefira `lpr_enabled=true` no cadastro da entidade em vez de criar LPR manualmente
-- duplicidade de midia pode retornar `409`
+- `entity_id` e `central_registry_id` são obrigatórios
+- para veículos, prefira `lpr_enabled=true` no cadastro da entidade em vez de criar LPR manualmente
+- duplicidade de mídia pode retornar `409`
 
 ### PUT `/media?id=789`
 
@@ -787,11 +787,11 @@ Response `200`:
 }
 ```
 
-## Configuracao
+## Configuração
 
 ### GET `/config`
 
-Retorna configuracao consolidada da controladora.
+Retorna configuração consolidada da controladora.
 
 Campos usuais:
 - `model`
@@ -855,7 +855,7 @@ Response `200`:
 
 ### GET `/webhook?id=1`
 
-Consulta um slot especifico.
+Consulta um slot específico.
 
 ### POST `/webhook?id=1`
 
@@ -898,5 +898,5 @@ wss://<host>/mbcortex/master/api/v1/mqtt
 ```
 
 Notas:
-- a autenticacao usa a mesma `session_key` do login HTTP
-- use este endpoint para integracoes nativas via WebSocket/MQTT
+- a autenticação usa a mesma `session_key` do login HTTP
+- use este endpoint para integrações nativas via WebSocket/MQTT

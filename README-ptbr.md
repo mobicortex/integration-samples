@@ -264,4 +264,4 @@ Se voce estiver comecando do zero, a sequencia mais simples e:
 ## Versoes do Documento
 
 - English: `README.md`
-- Portugues do Brasil: `README-ptr.md`
+- Português do Brasil: `README-ptbr.md`

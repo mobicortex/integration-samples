@@ -1,21 +1,21 @@
-﻿# MobiCortex.Sdk
+# MobiCortex.Sdk
 
-SDK .NET para integraÃ§Ã£o com controladores de acesso MobiCortex.
+SDK .NET para integração com controladores de acesso MobiCortex.
 
-## ðŸ“¦ InstalaÃ§Ã£o
+## 📦 Instalação
 
 ```bash
 dotnet add package MobiCortex.Sdk
 ```
 
-Ou adicione a referÃªncia de projeto:
+Ou adicione a referência de projeto:
 ```xml
 <ProjectReference Include="MobiCortexSdkLib\MobiCortex.Sdk.csproj" />
 ```
 
-## ðŸš€ Uso BÃ¡sico
+## 🚀 Uso Básico
 
-### 1. API REST (Cadastros, Entidades, MÃ­dias)
+### 1. API REST (Cadastros, Entidades, Mídias)
 
 ```csharp
 using MobiCortex.Sdk;
@@ -28,259 +28,224 @@ var client = new MobiCortexClient();
 // Configurar URL do controlador
 client.ConfigureBaseUrl("https://192.168.0.100:4449");
 
-// Testar conexÃ£o
+// Testar conexão
 var test = await client.TestConnectionAsync();
 if (!test.Success) {
     Console.WriteLine($"Erro: {test.Message}");
-    # MobiCortex.Sdk
+    return;
+}
+
+// Login
+var login = await client.LoginAsync("senha_admin");
+if (login.Success && login.Data?.Ret == 0)
+{
+    Console.WriteLine($"Conectado. Session: {login.Data.SessionKey}");
+}
+
+// Operações
+var cadastros = await client.Cadastros.ListarAsync(offset: 0, count: 20);
+var entidades = await client.Entidades.ListarPorCadastroAsync(centralRegistryId: 1);
+var midias = await client.Midias.ListarPorEntidadeAsync(entityId: 1);
+var device = await client.Sistema.ObterDeviceInfoAsync();
+```
+
+### 2. MQTT Client (Receber Eventos em Tempo Real)
+
+```csharp
+using MobiCortex.Sdk.Interfaces;
+using MobiCortex.Sdk.Services;
+
+var mqttClient = new MqttClientService();
+
+mqttClient.MessageReceived += (s, e) =>
+{
+    Console.WriteLine($"[{e.ReceivedAt:HH:mm:ss}] {e.Topic}");
+    Console.WriteLine($"Payload: {e.Payload}");
+};
+
+var wsUrl = "wss://192.168.0.100:4449/mbcortex/master/api/v1/mqtt";
+var sessionKey = "...";
+var topics = new[]
+{
+    "mbcortex/master/events/#",
+    "mbcortex/master/logs/#"
+};
+
+var connected = await mqttClient.ConnectAsync(wsUrl, sessionKey, topics);
+if (connected)
+{
+    Console.WriteLine("Conectado ao MQTT.");
+}
 
-    .NET SDK for integration with MobiCortex access control devices.
+await mqttClient.DisconnectAsync();
+```
+
+### 3. MQTT Broker (Dispositivos Conectam ao Seu Servidor)
+
+Aviso: esta implementação é destinada apenas a referência e testes. Não foi validada para cenários de produção de alta carga.
+
+```csharp
+using MobiCortex.Sdk.Interfaces;
+using MobiCortex.Sdk.Services;
+
+var broker = new MqttBrokerService();
+
+broker.ClientConnected += (s, e) =>
+{
+    Console.WriteLine($"Dispositivo conectado: {e.ClientId}");
+};
 
-    This SDK can be embedded or referenced in your own customer projects. You may freely use, copy, modify, and distribute it under the MIT License, provided the integration is used with MobiCortex devices.
+broker.MessageReceived += (s, e) =>
+{
+    Console.WriteLine($"[{e.ClientId}] {e.Topic}: {e.Payload}");
+};
 
-    ## Installation
+var started = await broker.StartAsync(
+    port: 1883,
+    allowAnonymous: true
+);
 
-    ```bash
-    dotnet add package MobiCortex.Sdk
-    ```
+if (started)
+{
+    Console.WriteLine("Broker ouvindo na porta 1883");
+    Console.WriteLine("Configure as controladoras para publicar MQTT em:");
+    Console.WriteLine("  mqtt://seu-servidor:1883");
+}
+
+await broker.StopAsync();
+```
+
+### 4. Webhook Server (Receber Eventos HTTP)
 
-    Or add a project reference:
+Aviso: esta implementação é destinada apenas a referência e testes. Não foi validada para cenários de produção de alta carga.
 
-    ```xml
-    <ProjectReference Include="MobiCortexSdkLib\MobiCortex.Sdk.csproj" />
-    ```
+```csharp
+using MobiCortex.Sdk.Interfaces;
+using MobiCortex.Sdk.Services;
+
+var server = new WebhookServerService();
+
+server.WebhookReceived += (s, e) =>
+{
+    Console.WriteLine($"[{e.ReceivedAt:HH:mm:ss}] POST {e.Path}");
+    Console.WriteLine($"De: {e.RemoteIp}");
+    Console.WriteLine($"Body: {e.Body}");
+};
+
+var started = await server.StartAsync(
+    port: 8080,
+    authToken: null
+);
 
-    ## Basic Usage
+if (started)
+{
+    Console.WriteLine("Servidor webhook ouvindo em http://localhost:8080/");
+    Console.WriteLine("Configure as controladoras para enviar webhooks para:");
+    Console.WriteLine("  http://seu-servidor:8080/webhook");
+}
 
-    ### 1. REST API (Registries, Entities, Media)
+await server.StopAsync();
+```
 
-    ```csharp
-    using MobiCortex.Sdk;
-    using MobiCortex.Sdk.Interfaces;
-    using MobiCortex.Sdk.Models;
+## Hierarquia de Dados
 
-    var client = new MobiCortexClient();
+```text
+Cadastro Central (Unidade/Empresa)
+  `-- Entidade (Pessoa/Veículo/Animal)
+        `-- Mídia de Acesso (Cartão, Biometria, Placa)
+```
 
-    client.ConfigureBaseUrl("https://192.168.0.100:4449");
+## Limitações Importantes
 
-    var test = await client.TestConnectionAsync();
-    if (!test.Success)
-    {
-        Console.WriteLine($"Error: {test.Message}");
-        return;
-    }
+### Servidores Embutidos (MQTT Broker e Webhook Server)
 
-    var login = await client.LoginAsync("admin_password");
-    if (login.Success && login.Data?.Ret == 0)
-    {
-        Console.WriteLine($"Connected. Session: {login.Data.SessionKey}");
-    }
+`MqttBrokerService` e `WebhookServerService` são fornecidos como implementações de referência.
 
-    var cadastros = await client.Cadastros.ListarAsync(offset: 0, count: 20);
-    var entidades = await client.Entidades.ListarPorCadastroAsync(centralRegistryId: 1);
-    var midias = await client.Midias.ListarPorEntidadeAsync(entityId: 1);
-    var device = await client.Sistema.ObterDeviceInfoAsync();
-    ```
+| Aspecto | Capacidade Aproximada |
+|---------|----------------------|
+| MQTT Broker | Até 10-20 conexões simultâneas |
+| Webhook Server | Até 10-20 requisições/segundo |
+| Uso recomendado | Desenvolvimento, testes, demos |
 
-    ### 2. MQTT Client (Receive Real-Time Events)
+Não use estas implementações de servidor embutidas como estão para ambientes de produção de alta escala.
 
-    ```csharp
-    using MobiCortex.Sdk.Interfaces;
-    using MobiCortex.Sdk.Services;
+### Para Cenários de Maior Carga
 
-    var mqttClient = new MqttClientService();
+Se você precisar suportar dezenas, centenas ou milhares de controladoras, considere:
 
-    mqttClient.MessageReceived += (s, e) =>
-    {
-        Console.WriteLine($"[{e.ReceivedAt:HH:mm:ss}] {e.Topic}");
-        Console.WriteLine($"Payload: {e.Payload}");
-    };
+Para MQTT:
+- Eclipse Mosquitto
+- EMQX
+- HiveMQ
+- AWS IoT Core
+- Azure IoT Hub
 
-    var wsUrl = "wss://192.168.0.100:4449/mbcortex/master/api/v1/mqtt";
-    var sessionKey = "...";
-    var topics = new[]
-    {
-        "mbcortex/master/events/#",
-        "mbcortex/master/logs/#"
-    };
+Para webhooks HTTP:
+- ASP.NET Core com Kestrel + IIS/NGINX
+- AWS API Gateway + Lambda
+- Azure Functions
+- Google Cloud Functions
+- Servidores dedicados com balanceamento de carga
 
-    var connected = await mqttClient.ConnectAsync(wsUrl, sessionKey, topics);
-    if (connected)
-    {
-        Console.WriteLine("Connected to MQTT.");
-    }
+## Exemplos de Serviços
 
-    await mqttClient.DisconnectAsync();
-    ```
+### ICadastroService
 
-    ### 3. MQTT Broker (Devices Connect To Your Server)
+```csharp
+var lista = await client.Cadastros.ListarAsync(offset: 0, count: 20);
 
-    Warning: this implementation is intended for reference and testing only. It has not been validated for high-load production scenarios.
+var cadastro = new CadastroCentral { Id = 0, Name = "Apt 101", Enabled = true };
+var result = await client.Cadastros.CriarAsync(cadastro);
+```
 
-    ```csharp
-    using MobiCortex.Sdk.Interfaces;
-    using MobiCortex.Sdk.Services;
+### IEntidadeService
 
-    var broker = new MqttBrokerService();
+```csharp
+var entidades = await client.Entidades.ListarPorCadastroAsync(centralRegistryId: 1);
 
-    broker.ClientConnected += (s, e) =>
-    {
-        Console.WriteLine($"Device connected: {e.ClientId}");
-    };
+var pessoa = new CriarEntidadeRequest
+{
+    CentralRegistryId = 1,
+    Type = (int)TipoEntidade.Pessoa,
+    Name = "João Silva",
+    Doc = "12345678900"
+};
+var result = await client.Entidades.CriarAsync(pessoa);
+```
 
-    broker.MessageReceived += (s, e) =>
-    {
-        Console.WriteLine($"[{e.ClientId}] {e.Topic}: {e.Payload}");
-    };
+### IMidiaService
 
-    var started = await broker.StartAsync(
-        port: 1883,
-        allowAnonymous: true
-    );
+```csharp
+var midias = await client.Midias.ListarPorEntidadeAsync(entityId: 1);
 
-    if (started)
-    {
-        Console.WriteLine("Broker listening on port 1883");
-        Console.WriteLine("Configure the controllers to publish MQTT to:");
-        Console.WriteLine("  mqtt://your-server:1883");
-    }
+var cartao = new CriarMidiaRequest
+{
+    EntityId = 1,
+    CentralRegistryId = 1,
+    Type = TipoMidia.Wiegand26,
+    Description = "123,45678"
+};
+var result = await client.Midias.CriarAsync(cartao);
+```
 
-    await broker.StopAsync();
-    ```
+### ISistemaService
 
-    ### 4. Webhook Server (Receive HTTP Events)
+```csharp
+var info = await client.Sistema.ObterDeviceInfoAsync();
+var stats = await client.Sistema.ObterDashboardAsync();
+```
 
-    Warning: this implementation is intended for reference and testing only. It has not been validated for high-load production scenarios.
+## Notas de Segurança
 
-    ```csharp
-    using MobiCortex.Sdk.Interfaces;
-    using MobiCortex.Sdk.Services;
+- O cliente HTTP aceita certificados SSL/TLS autoassinados.
+- O cliente MQTT usa `session_key` como senha.
+- O servidor webhook suporta autenticação Bearer opcionalmente.
+- O broker MQTT suporta autenticação usuário/senha opcionalmente.
 
-    var server = new WebhookServerService();
+## Licença
 
-    server.WebhookReceived += (s, e) =>
-    {
-        Console.WriteLine($"[{e.ReceivedAt:HH:mm:ss}] POST {e.Path}");
-        Console.WriteLine($"From: {e.RemoteIp}");
-        Console.WriteLine($"Body: {e.Body}");
-    };
+Este SDK está licenciado sob a Licença MIT.
 
-    var started = await server.StartAsync(
-        port: 8080,
-        authToken: null
-    );
+Você pode usar livremente o SDK em aplicações de clientes sob a Licença MIT, desde que a integração seja destinada a dispositivos MobiCortex.
 
-    if (started)
-    {
-        Console.WriteLine("Webhook server listening on http://localhost:8080/");
-        Console.WriteLine("Configure the controllers to send webhooks to:");
-        Console.WriteLine("  http://your-server:8080/webhook");
-    }
-
-    await server.StopAsync();
-    ```
-
-    ## Data Hierarchy
-
-    ```text
-    Central Registry (Unit/Company)
-      `-- Entity (Person/Vehicle/Animal)
-            `-- Access Media (Card, Biometric, Plate)
-    ```
-
-    ## Important Limitations
-
-    ### Embedded Servers (MQTT Broker and Webhook)
-
-    `MqttBrokerService` and `WebhookServerService` are provided as reference implementations.
-
-    | Aspect | Approximate Capacity |
-    |--------|----------------------|
-    | MQTT Broker | Up to 10-20 concurrent connections |
-    | Webhook Server | Up to 10-20 requests/second |
-    | Recommended use | Development, tests, demos |
-
-    Do not use these embedded server implementations as-is for high-scale production environments.
-
-    ### For Higher-Load Scenarios
-
-    If you need to support dozens, hundreds, or thousands of controllers, consider:
-
-    For MQTT:
-    - Eclipse Mosquitto
-    - EMQX
-    - HiveMQ
-    - AWS IoT Core
-    - Azure IoT Hub
-
-    For HTTP webhooks:
-    - ASP.NET Core with Kestrel + IIS/NGINX
-    - AWS API Gateway + Lambda
-    - Azure Functions
-    - Google Cloud Functions
-    - Dedicated servers with load balancing
-
-    ## Service Examples
-
-    ### ICadastroService
-
-    ```csharp
-    var lista = await client.Cadastros.ListarAsync(offset: 0, count: 20);
-
-    var cadastro = new CadastroCentral { Id = 0, Name = "Apt 101", Enabled = true };
-    var result = await client.Cadastros.CriarAsync(cadastro);
-    ```
-
-    ### IEntidadeService
-
-    ```csharp
-    var entidades = await client.Entidades.ListarPorCadastroAsync(centralRegistryId: 1);
-
-    var pessoa = new CriarEntidadeRequest
-    {
-        CentralRegistryId = 1,
-        Type = (int)TipoEntidade.Pessoa,
-        Name = "John Doe",
-        Doc = "12345678900"
-    };
-    var result = await client.Entidades.CriarAsync(pessoa);
-    ```
-
-    ### IMidiaService
-
-    ```csharp
-    var midias = await client.Midias.ListarPorEntidadeAsync(entityId: 1);
-
-    var cartao = new CriarMidiaRequest
-    {
-        EntityId = 1,
-        CentralRegistryId = 1,
-        Type = TipoMidia.Wiegand26,
-        Description = "123,45678"
-    };
-    var result = await client.Midias.CriarAsync(cartao);
-    ```
-
-    ### ISistemaService
-
-    ```csharp
-    var info = await client.Sistema.ObterDeviceInfoAsync();
-    var stats = await client.Sistema.ObterDashboardAsync();
-    ```
-
-    ## Security Notes
-
-    - The HTTP client accepts self-signed SSL/TLS certificates.
-    - The MQTT client uses `session_key` as the password.
-    - The webhook server optionally supports Bearer authentication.
-    - The MQTT broker optionally supports username/password authentication.
-
-    ## License
-
-    This SDK is licensed under the MIT License.
-
-    You may freely use the SDK in customer applications under the MIT License, provided the integration targets MobiCortex devices.
-
-    For the full license text, see the repository `LICENSE` file.
-
-
+Para o texto completo da licença, consulte o arquivo `LICENSE` do repositório.
