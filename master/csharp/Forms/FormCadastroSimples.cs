@@ -16,7 +16,7 @@ namespace SmartSdk
     //
     //  FLUXO:
     //  1. Criar Entidade com createid=true (o controlador cria tudo)
-    //  2. Adicionar Mídias à entidade
+    //  2. Adicionar MÃ­dias Ã  entidade
     //
     //  DIFERENÇA DO MODELO COMPLETO:
     //  - Completo: Cadastro → Entidade → Mídia (3 níveis, o integrador gerencia tudo)
@@ -34,7 +34,7 @@ namespace SmartSdk
         private IMobiCortexClient _api = null!;
         private Entidade? _entidadeSelecionada;
 
-        // Estado de paginação server-side
+        // Estado de paginaÃ§Ã£o server-side
         private int _currentOffset = 0;
         private uint _totalEntidades = 0;
         private const int PageSize = 10;
@@ -52,7 +52,7 @@ namespace SmartSdk
         }
 
         /// <summary>
-        /// Construtor padrão para o Designer do Visual Studio.
+        /// Construtor padrÃ£o para o Designer do Visual Studio.
         /// </summary>
         public FormCadastroSimples()
         {
@@ -65,7 +65,7 @@ namespace SmartSdk
         }
 
         // =====================================================================
-        //  ENTIDADES (Nível 1 no modelo simplificado)
+        //  ENTIDADES (NÃ­vel 1 no modelo simplificado)
         //  Diferença: usamos createid=true para criar
         // =====================================================================
 
@@ -185,13 +185,13 @@ namespace SmartSdk
         /// Quando createid=true, o controlador:
         /// 1. Gera um entity_id automaticamente
         /// 2. Cria um cadastro central automaticamente (ou reutiliza um existente)
-        /// 3. Retorna entity_id e cadastro_id na resposta
+        /// 3. Retorna entity_id e central_registry_id na resposta
         ///
-        /// O integrador NÃO precisa criar o cadastro central antes.
+        /// O integrador não precisa criar o cadastro central antes.
         /// </summary>
         private async void btnNovaEntidade_Click(object? sender, EventArgs e)
         {
-            // Seleciona o tipo em um formulario dedicado (mais claro do que Yes/No).
+            // Seleciona o tipo em um formulário dedicado (mais claro do que Yes/No).
             using var formTipo = new FormSelecionarTipoEntidade();
             if (formTipo.ShowDialog(this) != DialogResult.OK) return;
             int tipo = formTipo.TipoEntidadeSelecionado;
@@ -201,7 +201,6 @@ namespace SmartSdk
             string? brand = null;
             string? model = null;
             string? color = null;
-            string? obs = null;
             bool lprAtivo;
             bool enabled;
 
@@ -220,14 +219,13 @@ namespace SmartSdk
                 using var formVeiculo = new FormCadastroVeiculo(0, _api);
                 if (formVeiculo.ShowDialog(this) != DialogResult.OK) return;
 
-                nome = null;
+                nome = string.Empty;
                 doc = formVeiculo.Placa;
                 brand = string.IsNullOrWhiteSpace(formVeiculo.Marca) ? null : formVeiculo.Marca;
                 model = string.IsNullOrWhiteSpace(formVeiculo.Modelo) ? null : formVeiculo.Modelo;
                 color = string.IsNullOrWhiteSpace(formVeiculo.Cor) ? null : formVeiculo.Cor;
                 lprAtivo = formVeiculo.LprAtivo;
                 enabled = formVeiculo.EntidadeEnabled;
-                obs = null;
             }
             else
             {
@@ -235,12 +233,13 @@ namespace SmartSdk
                 return;
             }
 
-            // *** CREATEID = TRUE ***  ← Esta é a diferença principal!
+            // *** CREATEID = TRUE ***  <- Esta e a diferenca principal!
             var request = new CriarEntidadeRequest
             {
-                // NÃO informamos cadastro_id (será gerado automaticamente)
+                // Não informamos central_registry_id.
+                // A controladora gera entity_id e central_registry_id automaticamente.
                 Id = 0,
-                CreateId = true,     // ← Gera IDs automaticamente
+                CreateId = true,
                 Tipo = tipo,
                 Enabled = enabled,
                 Name = nome,
@@ -248,17 +247,17 @@ namespace SmartSdk
                 Brand = brand,
                 Model = model,
                 Color = color,
-                Obs = obs,
                 LprAtivo = lprAtivo
             };
 
             var result = await _api.Entidades.CriarAsync(request);
             if (result.Success && result.Data?.Ret == 0)
             {
-                Log($"Entidade criada: {nome ?? doc}");
-                Log($"  → entity_id={result.Data.EntityId}, cadastro_id={result.Data.CadastroId}");
+                var nomeLog = !string.IsNullOrWhiteSpace(nome) ? nome : doc;
+                Log($"Entidade criada: {nomeLog}");
+                Log($"  -> entity_id={result.Data.EntityId}, central_registry_id={result.Data.CadastroId}");
                 if (result.Data.CreatedCentral == 1)
-                    Log($"  → Cadastro central criado automaticamente");
+                    Log($"  -> Cadastro central criado automaticamente");
                 _currentOffset = 0;
                 await CarregarEntidades();
             }
@@ -377,8 +376,8 @@ namespace SmartSdk
         }
 
         /// <summary>
-        /// Abre o formulário de cadastro de mídia para criar uma nova mídia
-        /// vinculada à entidade selecionada.
+        /// Abre o formulÃ¡rio de cadastro de mÃ­dia para criar uma nova mÃ­dia
+        /// vinculada Ã  entidade selecionada.
         /// </summary>
         private async void btnNovaMidia_Click(object? sender, EventArgs e)
         {
@@ -415,9 +414,8 @@ namespace SmartSdk
                 // SOLUÇÃO: Enviar ns32_0 e ns32_1 indica ao backend que os dados binários
                 // já foram processados, então ele não aplica a validação RFID.
                 // Para LPR manual, enviamos 0 em ambos (o backend ignora para LPR).
-                // 
-                // NOTA: A forma RECOMENDADA de criar LPR é usando lpr_ativo=true no cadastro
-                // da entidade (veículo), não via POST /media manual.
+                // NOTA: A forma recomendada é usar lpr_enabled=true na entidade do veiculo,
+                // não via POST /media manual.
                 if (form.TipoMidiaSelecionado == TipoMidia.Lpr)
                 {
                     request.Ns32_0 = 0;
@@ -432,7 +430,7 @@ namespace SmartSdk
                 }
                 else
                 {
-                    var msg = $"Erro ao criar mídia:\n{result.Message}";
+                    var msg = $"Erro ao criar mÃ­dia:\n{result.Message}";
                     Log(msg);
                     Aviso(msg);
                 }
@@ -441,7 +439,7 @@ namespace SmartSdk
 
         private async void btnExcluirMidia_Click(object? sender, EventArgs e)
         {
-            if (listMidias.SelectedItems.Count == 0) { Aviso("Selecione uma mídia"); return; }
+            if (listMidias.SelectedItems.Count == 0) { Aviso("Selecione uma mÃ­dia"); return; }
 
             var midia = listMidias.SelectedItems[0].Tag as MidiaAcesso;
             if (midia == null) return;
@@ -463,7 +461,7 @@ namespace SmartSdk
             }
             else
             {
-                var msg = $"Erro ao excluir mídia:\n{result.Message}";
+                var msg = $"Erro ao excluir mÃ­dia:\n{result.Message}";
                 Log(msg);
                 Aviso(msg);
             }
@@ -474,7 +472,7 @@ namespace SmartSdk
         // =====================================================================
 
         /// <summary>
-        /// Abre o formulário de detalhes da mídia ao dar duplo clique.
+        /// Abre o formulÃ¡rio de detalhes da mÃ­dia ao dar duplo clique.
         /// </summary>
         private async void listMidias_DoubleClick(object? sender, EventArgs e)
         {
@@ -490,7 +488,7 @@ namespace SmartSdk
                 bool sucesso = true;
                 string mensagem = "";
 
-                // Atualiza o estado de habilitação se alterado
+                // Atualiza o estado de habilitaÃ§Ã£o se alterado
                 if (midia.Enabled != form.NovoEstadoEnabled)
                 {
                     var result = await _api.Midias.AlterarStatusAsync(midia.MediaId, form.NovoEstadoEnabled);
@@ -506,14 +504,14 @@ namespace SmartSdk
                     }
                 }
 
-                // Atualiza a data de permissao se alterada
+                // Atualiza a data de permissão se alterada
                 if (sucesso && form.DataPermissaoAlterada)
                 {
                     var result = await _api.Midias.AlterarExpiracaoAsync(midia.MediaId, form.NovaDataPermissao);
                     if (!result.Success)
                     {
                         sucesso = false;
-                        mensagem = result.Message ?? "Erro ao alterar data de permissao";
+                        mensagem = result.Message ?? "Erro ao alterar data de permissão";
                     }
                     else
                     {
@@ -527,7 +525,7 @@ namespace SmartSdk
                 // Se houve erro, mostra mensagem
                 if (!sucesso)
                 {
-                    var msg = $"Erro ao atualizar mídia:\n{mensagem}";
+                    var msg = $"Erro ao atualizar mÃ­dia:\n{mensagem}";
                     Log(msg);
                     Aviso(msg);
                 }
@@ -580,7 +578,7 @@ namespace SmartSdk
             return form.ShowDialog() == DialogResult.OK ? combo.SelectedIndex : -1;
         }
 
-        /// <summary>Exibe diálogo Sim/Não e retorna true para sim.</summary>
+        /// <summary>Exibe diÃ¡logo Sim/NÃ£o e retorna true para sim.</summary>
         private bool ConfirmarSimNao(string pergunta, string titulo)
         {
             var resposta = MessageBox.Show(
@@ -593,3 +591,6 @@ namespace SmartSdk
         }
     }
 }
+
+
+

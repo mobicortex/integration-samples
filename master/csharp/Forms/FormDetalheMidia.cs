@@ -70,7 +70,7 @@ namespace SmartSdk
             }
 
             // Atualiza título
-            Text = $"Detalhes da Midia - {_midia.Descricao}";
+            Text = $"Detalhes da Mídia - {_midia.Descricao}";
         }
 
         private void chkBloqueioPorData_CheckedChanged(object sender, EventArgs e)
@@ -106,7 +106,7 @@ namespace SmartSdk
             // Validação: não pode ter data de permissão no passado
             if (chkBloqueioPorData.Checked && dtpDataBloqueio.Value <= DateTime.Now)
             {
-                MessageBox.Show("A data de permissao deve ser futura.", "Validacao",
+                MessageBox.Show("A data de permissão deve ser futura.", "Validação",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 DialogResult = DialogResult.None;
                 return;

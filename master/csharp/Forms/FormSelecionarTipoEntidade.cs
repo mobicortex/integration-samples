@@ -3,7 +3,7 @@ using MobiCortex.Sdk.Models;
 namespace SmartSdk
 {
     /// <summary>
-    /// Dialogo simples para escolher o tipo da entidade a ser criada.
+    /// Diálogo simples para escolher o tipo da entidade a ser criada.
     /// </summary>
     public partial class FormSelecionarTipoEntidade : Form
     {

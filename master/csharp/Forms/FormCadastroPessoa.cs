@@ -54,6 +54,8 @@ namespace SmartSdk
                 numId.Value = 0;
                 chkHabilitado.Checked = true;
                 chkLprAtivo.Checked = false;
+                chkLprAtivo.Enabled = false;
+                chkLprAtivo.Text = "LPR não se aplica para pessoa";
                 lblIdInfo.Text = "0 = geração automática pelo servidor";
             }
         }
@@ -75,7 +77,9 @@ namespace SmartSdk
             
             txtNome.Text = _entidadeExistente.Name;
             txtDocumento.Text = _entidadeExistente.Doc;
-            chkLprAtivo.Checked = _entidadeExistente.LprAtivo;
+            chkLprAtivo.Checked = false;
+            chkLprAtivo.Enabled = false;
+            chkLprAtivo.Text = "LPR nao se aplica para pessoa";
             chkHabilitado.Checked = _entidadeExistente.Enabled;
         }
         
@@ -87,7 +91,7 @@ namespace SmartSdk
             // Valida nome
             if (string.IsNullOrWhiteSpace(txtNome.Text))
             {
-                MessageBox.Show("Informe o nome da pessoa.", "Validação", 
+                MessageBox.Show("Informe o nome da pessoa.", "Validação",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtNome.Focus();
                 DialogResult = DialogResult.None;
@@ -98,7 +102,7 @@ namespace SmartSdk
             Id = (uint)numId.Value;
             Nome = txtNome.Text.Trim();
             Documento = txtDocumento.Text.Trim();
-            LprAtivo = chkLprAtivo.Checked;
+            LprAtivo = false;
             EntidadeEnabled = chkHabilitado.Checked;
             
             // Em modo criação com ID 0, confirma geração automática
@@ -118,3 +122,4 @@ namespace SmartSdk
         }
     }
 }
+

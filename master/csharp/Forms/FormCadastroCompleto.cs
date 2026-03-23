@@ -1,4 +1,4 @@
-using MobiCortex.Sdk;
+﻿using MobiCortex.Sdk;
 using MobiCortex.Sdk.Services;
 using MobiCortex.Sdk.Models;
 using MobiCortex.Sdk.Interfaces;
@@ -6,26 +6,26 @@ using MobiCortex.Sdk.Interfaces;
 namespace SmartSdk
 {
     // =============================================================================
-    //  CADASTRO COMPLETO - Modelo MobiCortex (3 Níveis)
+    //  CADASTRO COMPLETO - Modelo MobiCortex (3 NÃ­veis)
     //
-    //  Este formulário demonstra o modelo hierárquico completo:
+    //  Este formulÃ¡rio demonstra o modelo hierÃ¡rquico completo:
     //
     //  1. CADASTRO CENTRAL (central-registry)
     //     Representa um "apartamento", "empresa", "unidade", etc.
-    //     É o nó raiz que agrupa entidades.
+    //     Ã‰ o nÃ³ raiz que agrupa entidades.
     //
     //  2. ENTIDADE (entities)
-    //     Representa uma pessoa, veículo ou animal vinculado ao cadastro.
-    //     Cada cadastro pode ter várias entidades.
+    //     Representa uma pessoa, veÃ­culo ou animal vinculado ao cadastro.
+    //     Cada cadastro pode ter vÃ¡rias entidades.
     //
-    //  3. MÍDIA DE ACESSO (media)
-    //     Representa uma credencial de acesso (cartão RFID, biometria, placa, etc).
-    //     Cada entidade pode ter várias mídias.
+    //  3. MÃDIA DE ACESSO (media)
+    //     Representa uma credencial de acesso (cartÃ£o RFID, biometria, placa, etc).
+    //     Cada entidade pode ter vÃ¡rias mÃ­dias.
     //
     //  FLUXO:
     //  1. Criar um Cadastro Central (ex: "Apt 101")
-    //  2. Adicionar Entidades ao cadastro (ex: "João Silva", "Carro ABC-1234")
-    //  3. Adicionar Mídias às entidades (ex: cartão RFID, placa LPR)
+    //  2. Adicionar Entidades ao cadastro (ex: "JoÃ£o Silva", "Carro ABC-1234")
+    //  3. Adicionar MÃ­dias Ã s entidades (ex: cartÃ£o RFID, placa LPR)
     //
     //  ENDPOINTS USADOS:
     //  - GET/POST/DELETE /central-registry
@@ -37,17 +37,17 @@ namespace SmartSdk
     {
         private IMobiCortexClient _api = null!;
 
-        // Itens selecionados atualmente (para navegação hierárquica)
+        // Itens selecionados atualmente (para navegaÃ§Ã£o hierÃ¡rquica)
         private CadastroCentral? _cadastroSelecionado;
         private Entidade? _entidadeSelecionada;
 
-        // Estado de paginação dos cadastros
+        // Estado de paginaÃ§Ã£o dos cadastros
         private int _currentOffset = 0;
         private const int PageSize = 20;
         private uint _totalCadastros = 0;
 
         /// <summary>
-        /// Serviço da API. Pode ser definido via propriedade para uso no designer.
+        /// ServiÃ§o da API. Pode ser definido via propriedade para uso no designer.
         /// </summary>
         public IMobiCortexClient ApiService
         {
@@ -56,7 +56,7 @@ namespace SmartSdk
         }
 
         /// <summary>
-        /// Construtor padrão para o Designer do Visual Studio.
+        /// Construtor padrÃ£o para o Designer do Visual Studio.
         /// </summary>
         public FormCadastroCompleto()
         {
@@ -69,27 +69,27 @@ namespace SmartSdk
         }
 
         // =====================================================================
-        //  CADASTROS CENTRAIS (Nível 1)
+        //  CADASTROS CENTRAIS (NÃ­vel 1)
         //  Endpoint: GET /central-registry?offset=0&count=20&name=filtro
         // =====================================================================
 
         private async void FormCadastroCompleto_Load(object? sender, EventArgs e)
         {
-            // No modo design do VS, _api pode ser null - não carregar dados
+            // No modo design do VS, _api pode ser null - nÃ£o carregar dados
             if (_api == null) return;
             await CarregarCadastros();
         }
 
         /// <summary>
-        /// Carrega a lista de cadastros centrais com paginação.
-        /// Se o campo de busca contém um número, busca pelo ID.
-        /// Se contém texto, filtra pelo nome.
+        /// Carrega a lista de cadastros centrais com paginaÃ§Ã£o.
+        /// Se o campo de busca contÃ©m um nÃºmero, busca pelo ID.
+        /// Se contÃ©m texto, filtra pelo nome.
         /// </summary>
         private async Task CarregarCadastros()
         {
             var filtro = txtFiltroCadastro.Text.Trim();
 
-            // Se digitou um número, busca direto pelo ID
+            // Se digitou um nÃºmero, busca direto pelo ID
             if (uint.TryParse(filtro, out uint idBusca))
             {
                 await BuscarCadastroPorId(idBusca);
@@ -114,7 +114,7 @@ namespace SmartSdk
                 {
                     var item = new ListViewItem(c.Id.ToString());
                     item.SubItems.Add(c.Name);
-                    item.SubItems.Add(c.Enabled ? "Sim" : "Não");
+                    item.SubItems.Add(c.Enabled ? "Sim" : "NÃ£o");
                     item.SubItems.Add($"{c.PeopleCount}P / {c.VehicleCount}V");
                     item.Tag = c;
                     listCadastros.Items.Add(item);
@@ -130,7 +130,7 @@ namespace SmartSdk
         }
 
         /// <summary>
-        /// Busca um cadastro específico pelo ID e exibe na lista.
+        /// Busca um cadastro especÃ­fico pelo ID e exibe na lista.
         /// GET /central-registry?id=X
         /// </summary>
         private async Task BuscarCadastroPorId(uint id)
@@ -148,13 +148,13 @@ namespace SmartSdk
                 var c = result.Data;
                 var item = new ListViewItem(c.Id.ToString());
                 item.SubItems.Add(c.Name);
-                item.SubItems.Add(c.Enabled ? "Sim" : "Não");
+                item.SubItems.Add(c.Enabled ? "Sim" : "NÃ£o");
                 item.SubItems.Add($"{c.PeopleCount}P / {c.VehicleCount}V");
                 item.Tag = c;
                 listCadastros.Items.Add(item);
 
                 _totalCadastros = 1;
-                lblStatusCadastros.Text = $"Busca por ID {id} — 1 resultado";
+                lblStatusCadastros.Text = $"Busca por ID {id} â€” 1 resultado";
                 btnAnterior.Enabled = false;
                 btnProxima.Enabled = false;
                 lblPagina.Text = "ID";
@@ -162,14 +162,14 @@ namespace SmartSdk
             else
             {
                 _totalCadastros = 0;
-                lblStatusCadastros.Text = $"ID {id} não encontrado";
+                lblStatusCadastros.Text = $"ID {id} nÃ£o encontrado";
                 btnAnterior.Enabled = false;
                 btnProxima.Enabled = false;
                 lblPagina.Text = "0/0";
             }
         }
 
-        /// <summary>Atualiza label de status e botões de paginação</summary>
+        /// <summary>Atualiza label de status e botÃµes de paginaÃ§Ã£o</summary>
         private void AtualizarPaginacao()
         {
             int totalPages = (int)((_totalCadastros + PageSize - 1) / PageSize);
@@ -181,7 +181,7 @@ namespace SmartSdk
             lblStatusCadastros.Text = $"{_totalCadastros} cadastro(s)";
         }
 
-        /// <summary>Ao selecionar um cadastro, carrega suas entidades (nível 2).</summary>
+        /// <summary>Ao selecionar um cadastro, carrega suas entidades (nÃ­vel 2).</summary>
         private async void listCadastros_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (listCadastros.SelectedItems.Count == 0) return;
@@ -194,7 +194,7 @@ namespace SmartSdk
         }
 
         /// <summary>
-        /// Cria um novo cadastro central usando o formulário completo.
+        /// Cria um novo cadastro central usando o formulÃ¡rio completo.
         /// POST /central-registry com body: { "id": auto, "name": "...", "enabled": true }
         /// </summary>
         private async void btnNovoCadastro_Click(object? sender, EventArgs e)
@@ -234,7 +234,7 @@ namespace SmartSdk
         /// </summary>
         private async void listCadastros_DoubleClick(object? sender, EventArgs e)
         {
-            // Obtém o item clicado diretamente (funciona mesmo se não estiver selecionado)
+            // ObtÃ©m o item clicado diretamente (funciona mesmo se nÃ£o estiver selecionado)
             if (listCadastros.SelectedItems.Count == 0) return;
             
             var cadastro = listCadastros.SelectedItems[0].Tag as CadastroCentral;
@@ -277,7 +277,7 @@ namespace SmartSdk
         }
 
         /// <summary>
-        /// Exclui o cadastro selecionado e todas suas entidades/mídias.
+        /// Exclui o cadastro selecionado e todas suas entidades/mÃ­dias.
         /// DELETE /central-registry?id=X
         /// </summary>
         private async void btnExcluirCadastro_Click(object? sender, EventArgs e)
@@ -285,14 +285,14 @@ namespace SmartSdk
             if (_cadastroSelecionado == null) { Aviso("Selecione um cadastro"); return; }
 
             var confirm = MessageBox.Show(
-                $"Excluir '{_cadastroSelecionado.Name}' e todas suas entidades/mídias?",
+                $"Excluir '{_cadastroSelecionado.Name}' e todas suas entidades/mÃ­dias?",
                 "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
 
             var result = await _api.Cadastros.ExcluirAsync(_cadastroSelecionado.Id);
             if (result.Success)
             {
-                Log($"Cadastro excluído: {_cadastroSelecionado.Name}");
+                Log($"Cadastro excluÃ­do: {_cadastroSelecionado.Name}");
                 await CarregarCadastros();
             }
             else
@@ -305,7 +305,7 @@ namespace SmartSdk
 
         private async void btnBuscarCadastro_Click(object? sender, EventArgs e)
         {
-            _currentOffset = 0; // Nova busca sempre começa do início
+            _currentOffset = 0; // Nova busca sempre comeÃ§a do inÃ­cio
             await CarregarCadastros();
         }
 
@@ -338,12 +338,12 @@ namespace SmartSdk
         }
 
         // =====================================================================
-        //  ENTIDADES (Nível 2)
-        //  Endpoint: GET /entities?cadastro_id=X
+        //  ENTIDADES (NÃ­vel 2)
+        //  Endpoint: GET /entities?central_registry_id=X
         // =====================================================================
 
         /// <summary>
-        /// Lista as entidades (pessoas/veículos) vinculadas ao cadastro selecionado.
+        /// Lista as entidades (pessoas/veÃ­culos) vinculadas ao cadastro selecionado.
         /// </summary>
         private async Task CarregarEntidades(uint cadastroId)
         {
@@ -374,7 +374,7 @@ namespace SmartSdk
             }
         }
 
-        /// <summary>Ao selecionar uma entidade, carrega suas mídias (nível 3).</summary>
+        /// <summary>Ao selecionar uma entidade, carrega suas mÃ­dias (nÃ­vel 3).</summary>
         private async void listEntidades_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (listEntidades.SelectedItems.Count == 0) return;
@@ -382,7 +382,7 @@ namespace SmartSdk
             _entidadeSelecionada = listEntidades.SelectedItems[0].Tag as Entidade;
             if (_entidadeSelecionada == null) return;
 
-            lblMidiasTitulo.Text = $"Mídias de: {_entidadeSelecionada.NomeExibicao}";
+            lblMidiasTitulo.Text = $"MÃ­dias de: {_entidadeSelecionada.NomeExibicao}";
             await CarregarMidias(_entidadeSelecionada.EntityId);
         }
 
@@ -401,14 +401,13 @@ namespace SmartSdk
             // Verifica o tipo de entidade
             if (entidade.Tipo == (int)TipoEntidade.Veiculo)
             {
-                // Abre formulário de edição de veículo
+                // Abre formulÃ¡rio de ediÃ§Ã£o de veÃ­culo
                 using var formVeiculo = new FormCadastroVeiculo(entidade, _api);
                 if (formVeiculo.ShowDialog(this) != DialogResult.OK) return;
 
-                // Cria o request de atualização (PUT /entities?id=X)
+                // Cria o request de atualizaÃ§Ã£o (PUT /entities?id=X)
                 var entidadeAtualizada = new AtualizarEntidadeRequest
                 {
-                    Name = null,
                     Doc = formVeiculo.Placa,
                     Enabled = formVeiculo.EntidadeEnabled,
                     Brand = string.IsNullOrWhiteSpace(formVeiculo.Marca) ? null : formVeiculo.Marca,
@@ -424,32 +423,32 @@ namespace SmartSdk
                 var result = await _api.Entidades.AtualizarAsync(entidade.EntityId, entidadeAtualizada);
                 if (result.Success)
                 {
-                    Log($"Veículo atualizado: {entidade.NomeExibicao}");
+                    Log($"VeÃ­culo atualizado: {entidade.NomeExibicao}");
                     if (_cadastroSelecionado != null)
                         await CarregarEntidades(_cadastroSelecionado.Id);
                 }
                 else
                 {
-                    var msg = $"Erro ao atualizar veículo:\n{result.Message}\nResposta: {result.RawResponse}";
+                    var msg = $"Erro ao atualizar veÃ­culo:\n{result.Message}\nResposta: {result.RawResponse}";
                     Log(msg);
                     Aviso(msg);
                 }
                 return;
             }
 
-            // Abre formulário de edição de pessoa
+            // Abre formulÃ¡rio de ediÃ§Ã£o de pessoa
             using var form = new FormCadastroPessoaEdit(entidade);
             if (form.ShowDialog(this) != DialogResult.OK) return;
 
-            // Cria o request de atualização (PUT /entities?id=X)
-            // Usa AtualizarEntidadeRequest - só envia os campos que quer alterar
+            // Cria o request de atualizaÃ§Ã£o (PUT /entities?id=X)
+            // Usa AtualizarEntidadeRequest - sÃ³ envia os campos que quer alterar
             var docLimpo = string.IsNullOrWhiteSpace(form.Documento) ? null : form.Documento.Trim();
             var entidadeAtualizadaPessoa = new AtualizarEntidadeRequest
             {
                 Name = form.Nome,
-                Doc = docLimpo, // null se vazio (não será enviado no JSON)
+                Doc = docLimpo, // null se vazio (nÃ£o serÃ¡ enviado no JSON)
                 Enabled = form.EntidadeEnabled,
-                // Pessoas (tipo 1) não usam LPR - não envia o campo (null)
+                // Pessoas (tipo 1) nÃ£o usam LPR - nÃ£o envia o campo (null)
                 LprAtivo = entidade.Tipo == 1 ? null : entidade.LprAtivo
             };
 
@@ -475,10 +474,10 @@ namespace SmartSdk
 
         /// <summary>
         /// Cria uma nova entidade vinculada ao cadastro selecionado.
-        /// POST /entities com body: { "cadastro_id": X, "tipo": 1, "name": "...", "doc": "..." }
+        /// POST /entities com body: { "central_registry_id": X, "type": 1, "name": "...", "doc": "..." }
         ///
-        /// NOTA: Neste modelo (completo), informamos o cadastro_id do cadastro existente.
-        /// O campo createid NÃO é usado aqui (é usado no modelo simples).
+        /// NOTA: Neste modelo (completo), informamos o central_registry_id do cadastro existente.
+        /// Se o ID da entidade for 0, o cliente envia createid=true para a controladora gerar o entity_id.
         /// </summary>
         private async void btnNovaEntidade_Click(object? sender, EventArgs e)
         {
@@ -500,10 +499,11 @@ namespace SmartSdk
                 request = new CriarEntidadeRequest
                 {
                     Id = formVeiculo.IdVeiculo,
+                    CreateId = formVeiculo.IdVeiculo == 0 ? true : null,
                     CadastroId = _cadastroSelecionado.Id,
                     Tipo = (int)TipoEntidade.Veiculo,
-                    Name = null,
                     Doc = formVeiculo.Placa,
+                    Enabled = formVeiculo.EntidadeEnabled,
                     Brand = string.IsNullOrWhiteSpace(formVeiculo.Marca) ? null : formVeiculo.Marca,
                     Model = string.IsNullOrWhiteSpace(formVeiculo.Modelo) ? null : formVeiculo.Modelo,
                     Color = string.IsNullOrWhiteSpace(formVeiculo.Cor) ? null : formVeiculo.Cor,
@@ -549,22 +549,22 @@ namespace SmartSdk
         }
 
         /// <summary>
-        /// Exclui a entidade selecionada e todas as suas mídias.
-        /// DELETE /entities?id=X (cascade: remove mídias vinculadas)
+        /// Exclui a entidade selecionada e todas as suas mÃ­dias.
+        /// DELETE /entities?id=X (cascade: remove mÃ­dias vinculadas)
         /// </summary>
         private async void btnExcluirEntidade_Click(object? sender, EventArgs e)
         {
             if (_entidadeSelecionada == null) { Aviso("Selecione uma entidade"); return; }
 
             var confirm = MessageBox.Show(
-                $"Excluir '{_entidadeSelecionada.NomeExibicao}' e todas suas mídias?",
+                $"Excluir '{_entidadeSelecionada.NomeExibicao}' e todas suas mÃ­dias?",
                 "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
 
             var result = await _api.Entidades.ExcluirAsync(_entidadeSelecionada.EntityId);
             if (result.Success)
             {
-                Log($"Entidade excluída: {_entidadeSelecionada.NomeExibicao}");
+                Log($"Entidade excluÃ­da: {_entidadeSelecionada.NomeExibicao}");
                 if (_cadastroSelecionado != null)
                     await CarregarEntidades(_cadastroSelecionado.Id);
             }
@@ -583,11 +583,11 @@ namespace SmartSdk
         }
 
         // =====================================================================
-        //  MÍDIAS DE ACESSO (Nível 3)
+        //  MÃDIAS DE ACESSO (NÃ­vel 3)
         //  Endpoint: GET /media?entity_id=X
         // =====================================================================
 
-        /// <summary>Lista as mídias de acesso da entidade selecionada.</summary>
+        /// <summary>Lista as mÃ­dias de acesso da entidade selecionada.</summary>
         private async Task CarregarMidias(uint entityId)
         {
             listMidias.Items.Clear();
@@ -596,13 +596,13 @@ namespace SmartSdk
 
             if (result.Success && result.Data != null)
             {
-                lblStatusMidias.Text = $"{result.Data.Count} mídia(s)";
+                lblStatusMidias.Text = $"{result.Data.Count} mÃ­dia(s)";
                 foreach (var m in result.Data.Items)
                 {
                     var item = new ListViewItem(m.MediaId.ToString());
                     item.SubItems.Add(m.TipoNome);
                     item.SubItems.Add(m.Descricao);
-                    item.SubItems.Add(m.Enabled ? "Sim" : "Não");
+                    item.SubItems.Add(m.Enabled ? "Sim" : "NÃ£o");
                     item.Tag = m;
                     listMidias.Items.Add(item);
                 }
@@ -614,22 +614,22 @@ namespace SmartSdk
         }
 
         /// <summary>
-        /// Cria uma nova mídia vinculada à entidade selecionada.
-        /// POST /media com body: { "entity_id": X, "cadastro_id": Y, "tipo": 21, "descricao": "..." }
+        /// Cria uma nova mÃ­dia vinculada Ã  entidade selecionada.
+        /// POST /media com body: { "entity_id": X, "central_registry_id": Y, "type": 21, "description": "..." }
         ///
         /// Tipos comuns:
-        /// - 21 = RFID Wiegand 26 (cartão de proximidade)
+        /// - 21 = RFID Wiegand 26 (cartÃ£o de proximidade)
         /// - 22 = RFID Wiegand 34
-        /// - 17 = LPR (placa de veículo)
+        /// - 17 = LPR (placa de veÃ­culo)
         /// - 20 = Facial
         /// </summary>
         private async void btnNovaMidia_Click(object? sender, EventArgs e)
         {
             if (_entidadeSelecionada == null) { Aviso("Selecione uma entidade"); return; }
 
-            // Seleciona o tipo de mídia
+            // Seleciona o tipo de mÃ­dia
             var tipos = new[] { "RFID Wiegand 26", "RFID Wiegand 34", "Placa (LPR)", "Facial" };
-            var tipoIdx = SelecionarOpcao("Tipo de Mídia", "Selecione o tipo:", tipos);
+            var tipoIdx = SelecionarOpcao("Tipo de MÃ­dia", "Selecione o tipo:", tipos);
             if (tipoIdx < 0) return;
 
             int tipoMidia = tipoIdx switch
@@ -641,27 +641,27 @@ namespace SmartSdk
                 _ => TipoMidia.Wiegand26
             };
 
-            // LPR só deve ser cadastrado para entidades do tipo veículo.
+            // LPR sÃ³ deve ser cadastrado para entidades do tipo veÃ­culo.
             if (tipoMidia == TipoMidia.Lpr && _entidadeSelecionada.Tipo != (int)TipoEntidade.Veiculo)
             {
-                Aviso("A mídia LPR (placa) só pode ser cadastrada para entidades do tipo Veículo.");
+                Aviso("A mÃ­dia LPR (placa) sÃ³ pode ser cadastrada para entidades do tipo VeÃ­culo.");
                 return;
             }
 
             string? descricao;
             if (tipoMidia == TipoMidia.Lpr)
             {
-                // Para veículo, reaproveita a própria placa da entidade sem perguntar novamente.
+                // Para veÃ­culo, reaproveita a prÃ³pria placa da entidade sem perguntar novamente.
                 descricao = _entidadeSelecionada.Doc;
                 if (string.IsNullOrWhiteSpace(descricao))
                 {
-                    Aviso("Este veículo não possui placa preenchida no campo documento.");
+                    Aviso("Este veÃ­culo nÃ£o possui placa preenchida no campo documento.");
                     return;
                 }
             }
             else
             {
-                descricao = InputBox("Nova Mídia", "Código/Descrição da mídia:");
+                descricao = InputBox("Nova MÃ­dia", "CÃ³digo/DescriÃ§Ã£o da mÃ­dia:");
             }
             if (string.IsNullOrEmpty(descricao)) return;
 
@@ -673,17 +673,17 @@ namespace SmartSdk
                 Descricao = descricao
             };
 
-            // EXPLICAÇÃO: O backend valida o formato da mídia baseado no conteúdo
+            // EXPLICAÃ‡ÃƒO: O backend valida o formato da mÃ­dia baseado no conteÃºdo
             // do campo "descricao". Para RFID, ele aceita formatos Wiegand/CODE/HEX.
             // Para LPR (placa), se enviarmos apenas a descricao, o backend tenta
             // validar como RFID e retorna erro "formato RFID invalido".
             // 
-            // SOLUÇÃO: Enviar ns32_0 e ns32_1 indica ao backend que os dados binários
-            // já foram processados, então ele não aplica a validação RFID.
+            // SOLUÃ‡ÃƒO: Enviar ns32_0 e ns32_1 indica ao backend que os dados binÃ¡rios
+            // jÃ¡ foram processados, entÃ£o ele nÃ£o aplica a validaÃ§Ã£o RFID.
             // Para LPR manual, enviamos 0 em ambos (o backend ignora para LPR).
             // 
-            // NOTA: A forma RECOMENDADA de criar LPR é usando lpr_ativo=true no cadastro
-            // da entidade (veículo), não via POST /media manual.
+            // NOTA: A forma RECOMENDADA de criar LPR Ã© usando lpr_ativo=true no cadastro
+            // da entidade (veÃ­culo), nÃ£o via POST /media manual.
             if (tipoMidia == TipoMidia.Lpr)
             {
                 request.Ns32_0 = 0;
@@ -697,32 +697,32 @@ namespace SmartSdk
             var result = await _api.Midias.CriarAsync(request);
             if (result.Success && result.Data?.Ret == 0)
             {
-                Log($"Mídia criada: {descricao} (ID: {result.Data.MediaId})");
+                Log($"MÃ­dia criada: {descricao} (ID: {result.Data.MediaId})");
                 await CarregarMidias(_entidadeSelecionada.EntityId);
             }
             else
             {
-                var msg = $"Erro ao criar mídia:\n{result.Message}\nJSON: {jsonDebug}";
+                var msg = $"Erro ao criar mÃ­dia:\n{result.Message}\nJSON: {jsonDebug}";
                 Log(msg);
                 Aviso(msg);
             }
         }
 
         /// <summary>
-        /// Exclui a mídia selecionada.
+        /// Exclui a mÃ­dia selecionada.
         /// DELETE /media?id=X
         /// </summary>
         private async void btnExcluirMidia_Click(object? sender, EventArgs e)
         {
-            if (listMidias.SelectedItems.Count == 0) { Aviso("Selecione uma mídia"); return; }
+            if (listMidias.SelectedItems.Count == 0) { Aviso("Selecione uma mÃ­dia"); return; }
 
             var midia = listMidias.SelectedItems[0].Tag as MidiaAcesso;
             if (midia == null) return;
 
-            // Confirmação antes de excluir
+            // ConfirmaÃ§Ã£o antes de excluir
             var confirm = MessageBox.Show(
-                $"Tem certeza que deseja excluir a mídia '{midia.Descricao}'?\n\nEsta ação não pode ser desfeita.",
-                "Confirmar Exclusão",
+                $"Tem certeza que deseja excluir a mÃ­dia '{midia.Descricao}'?\n\nEsta aÃ§Ã£o nÃ£o pode ser desfeita.",
+                "Confirmar ExclusÃ£o",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
@@ -730,13 +730,13 @@ namespace SmartSdk
             var result = await _api.Midias.ExcluirAsync(midia.MediaId);
             if (result.Success)
             {
-                Log($"Mídia excluída: {midia.Descricao}");
+                Log($"MÃ­dia excluÃ­da: {midia.Descricao}");
                 if (_entidadeSelecionada != null)
                     await CarregarMidias(_entidadeSelecionada.EntityId);
             }
             else
             {
-                var msg = $"Erro ao excluir mídia:\n{result.Message}";
+                var msg = $"Erro ao excluir mÃ­dia:\n{result.Message}";
                 Log(msg);
                 Aviso(msg);
             }
@@ -753,7 +753,7 @@ namespace SmartSdk
         // =====================================================================
 
         /// <summary>
-        /// Abre o formulário de detalhes da mídia ao dar duplo clique.
+        /// Abre o formulÃ¡rio de detalhes da mÃ­dia ao dar duplo clique.
         /// </summary>
         private async void listMidias_DoubleClick(object? sender, EventArgs e)
         {
@@ -769,7 +769,7 @@ namespace SmartSdk
                 bool sucesso = true;
                 string mensagem = "";
 
-                // Atualiza o estado de habilitação se alterado
+                // Atualiza o estado de habilitaÃ§Ã£o se alterado
                 if (midia.Enabled != form.NovoEstadoEnabled)
                 {
                     var result = await _api.Midias.AlterarStatusAsync(midia.MediaId, form.NovoEstadoEnabled);
@@ -781,7 +781,7 @@ namespace SmartSdk
                     else
                     {
                         var status = form.NovoEstadoEnabled ? "liberada" : "bloqueada";
-                        Log($"Mídia {midia.Descricao} {status} com sucesso!");
+                        Log($"MÃ­dia {midia.Descricao} {status} com sucesso!");
                     }
                 }
 
@@ -797,16 +797,16 @@ namespace SmartSdk
                     else
                     {
                         if (form.NovaDataPermissao > 0)
-                            Log($"Mídia {midia.Descricao} permitida até {DateTimeOffset.FromUnixTimeSeconds(form.NovaDataPermissao).LocalDateTime:dd/MM/yyyy HH:mm}");
+                            Log($"MÃ­dia {midia.Descricao} permitida atÃ© {DateTimeOffset.FromUnixTimeSeconds(form.NovaDataPermissao).LocalDateTime:dd/MM/yyyy HH:mm}");
                         else
-                            Log($"Data limite removida da mídia {midia.Descricao}");
+                            Log($"Data limite removida da mÃ­dia {midia.Descricao}");
                     }
                 }
 
                 // Se houve erro, mostra mensagem
                 if (!sucesso)
                 {
-                    var msg = $"Erro ao atualizar mídia:\n{mensagem}";
+                    var msg = $"Erro ao atualizar mÃ­dia:\n{mensagem}";
                     Log(msg);
                     Aviso(msg);
                 }
@@ -831,7 +831,7 @@ namespace SmartSdk
         private void Aviso(string msg) =>
             MessageBox.Show(msg, "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-        /// <summary>Exibe um InputBox simples (diálogo de texto)</summary>
+        /// <summary>Exibe um InputBox simples (diÃ¡logo de texto)</summary>
         private string? InputBox(string titulo, string prompt)
         {
             var form = new Form { Text = titulo, Width = 400, Height = 150, StartPosition = FormStartPosition.CenterParent };
@@ -845,7 +845,7 @@ namespace SmartSdk
             return form.ShowDialog() == DialogResult.OK ? txt.Text : null;
         }
 
-        /// <summary>Exibe um diálogo de seleção de opções</summary>
+        /// <summary>Exibe um diÃ¡logo de seleÃ§Ã£o de opÃ§Ãµes</summary>
         private int SelecionarOpcao(string titulo, string prompt, string[] opcoes)
         {
             var form = new Form { Text = titulo, Width = 350, Height = 200, StartPosition = FormStartPosition.CenterParent };
@@ -861,15 +861,20 @@ namespace SmartSdk
             return form.ShowDialog() == DialogResult.OK ? combo.SelectedIndex : -1;
         }
 
-        /// <summary>Pede um ID opcional (0 = automático) e valida entrada numérica.</summary>
+        /// <summary>Pede um ID opcional (0 = automÃ¡tico) e valida entrada numÃ©rica.</summary>
         private uint SolicitarIdOpcional(string titulo, string prompt)
         {
             var valor = InputBox(titulo, prompt);
             if (string.IsNullOrWhiteSpace(valor)) return 0;
             if (uint.TryParse(valor.Trim(), out uint id)) return id;
-            Aviso("ID inválido. Será usado 0 (automático).");
+            Aviso("ID invÃ¡lido. SerÃ¡ usado 0 (automÃ¡tico).");
             return 0;
         }
 
     }
 }
+
+
+
+
+

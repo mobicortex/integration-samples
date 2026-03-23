@@ -32,11 +32,11 @@ namespace MobiCortex.Sdk.Interfaces
         /// Atualiza uma entidade existente (PUT /entities?id=X).
         /// 
         /// IMPORTANTE: Este endpoint faz atualização PARCIAL. Use AtualizarEntidadeRequest
-        /// e preencha APENAS os campos que deseja modificar (name, doc, enabled, lpr_enabled).
+        /// e preencha APENAS os campos que deseja modificar (name/doc para pessoa, doc/brand/model/color/lpr_enabled para veiculo).
         /// Campos não preenchidos (null) não serão alterados no servidor.
         /// 
         /// NÃO use a classe Entidade completa aqui - ela contém campos readonly
-        /// (entity_id, cadastro_id, tipo, created_at) que causam erro 400 se enviados.
+        /// (entity_id, central_registry_id, type, created_at) que causam erro 400 se enviados.
         /// </summary>
         Task<ApiResult<ApiRetResponse>> AtualizarAsync(uint entityId, AtualizarEntidadeRequest request);
 
@@ -51,8 +51,10 @@ namespace MobiCortex.Sdk.Interfaces
         Task<ApiResult<VehicleDriverListResponse>> ObterCondutoresVeiculoAsync(uint vehicleId);
 
         /// <summary>
-        /// Substitui a lista de condutores vinculados a um veículo.
+        /// Substitui a lista de condutores vinculados a um veÃ­culo.
         /// </summary>
         Task<ApiResult<VehicleDriverUpdateResponse>> AtualizarCondutoresVeiculoAsync(uint vehicleId, IEnumerable<uint> driverIds);
     }
 }
+
+

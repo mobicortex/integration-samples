@@ -16,7 +16,7 @@ namespace SmartSdk
     ///    - Formato: placa do veículo (ex: "ABC1D23" - modelo Mercosul)
     ///    - IMPORTANTE: Ao criar via API, enviar ns32_0=0 e ns32_1=0 para evitar
     ///      que o backend tente validar a placa como formato RFID
-    ///    - A forma recomendada é usar lpr_ativo=true no cadastro do veículo
+    ///    - A forma recomendada é usar lpr_enabled=true na entidade do veiculo
     /// 
     /// 3. FACIAL (tipo 20), BIOMETRIA (tipo 5/15/18), etc:
     ///    - Geralmente requerem integração com hardware específico
@@ -42,7 +42,7 @@ namespace SmartSdk
         private readonly string? _placaPadraoLpr;
         
         /// <summary>
-        /// Construtor para criar nova mídia
+        /// Construtor para criar nova mÃ­dia
         /// </summary>
         public FormCadastroMidia()
         {
@@ -61,7 +61,7 @@ namespace SmartSdk
         }
         
         /// <summary>
-        /// Construtor com entity_id padrão pré-selecionado
+        /// Construtor com entity_id padrÃ£o prÃ©-selecionado
         /// </summary>
         public FormCadastroMidia(uint entityIdPadrao, string? placaPadraoLpr = null)
         {
@@ -124,9 +124,9 @@ namespace SmartSdk
             cmbTipoMidia.Items.Clear();
             
             // RFID Wiegand 26 bits - aceita: WIEGAND formato, HEX, CODE Smart
-            cmbTipoMidia.Items.Add(new TipoMidiaItem 
-            { 
-                Nome = "RFID Wiegand 26", 
+            cmbTipoMidia.Items.Add(new TipoMidiaItem
+            {
+                Nome = "RFID Wiegand 26",
                 Valor = TipoMidia.Wiegand26,
                 Exemplo = "123,45678",
                 DescricaoFormato = "Formatos aceitos:\n" +
@@ -136,9 +136,9 @@ namespace SmartSdk
             });
             
             // RFID Wiegand 34 bits
-            cmbTipoMidia.Items.Add(new TipoMidiaItem 
-            { 
-                Nome = "RFID Wiegand 34", 
+            cmbTipoMidia.Items.Add(new TipoMidiaItem
+            {
+                Nome = "RFID Wiegand 34",
                 Valor = TipoMidia.Wiegand34,
                 Exemplo = "1234,567890",
                 DescricaoFormato = "Formatos aceitos:\n" +
@@ -148,9 +148,9 @@ namespace SmartSdk
             });
             
             // Placa LPR
-            cmbTipoMidia.Items.Add(new TipoMidiaItem 
-            { 
-                Nome = "Placa (LPR)", 
+            cmbTipoMidia.Items.Add(new TipoMidiaItem
+            {
+                Nome = "Placa (LPR)",
                 Valor = TipoMidia.Lpr,
                 Exemplo = "ABC1234",
                 DescricaoFormato = "Formato: Placa do veículo\n" +
@@ -159,9 +159,9 @@ namespace SmartSdk
             });
             
             // Reconhecimento Facial
-            cmbTipoMidia.Items.Add(new TipoMidiaItem 
-            { 
-                Nome = "Facial", 
+            cmbTipoMidia.Items.Add(new TipoMidiaItem
+            {
+                Nome = "Facial",
                 Valor = TipoMidia.Facial,
                 Exemplo = "FACE001",
                 DescricaoFormato = "Formato: Identificador facial\n" +
@@ -169,9 +169,9 @@ namespace SmartSdk
             });
             
             // Biometria
-            cmbTipoMidia.Items.Add(new TipoMidiaItem 
-            { 
-                Nome = "Biometria", 
+            cmbTipoMidia.Items.Add(new TipoMidiaItem
+            {
+                Nome = "Biometria",
                 Valor = TipoMidia.Bio,
                 Exemplo = "BIO001",
                 DescricaoFormato = "Formato: ID da biometria\n" +
@@ -179,9 +179,9 @@ namespace SmartSdk
             });
             
             // Biometria Hikvision
-            cmbTipoMidia.Items.Add(new TipoMidiaItem 
-            { 
-                Nome = "Biometria Hikvision", 
+            cmbTipoMidia.Items.Add(new TipoMidiaItem
+            {
+                Nome = "Biometria Hikvision",
                 Valor = TipoMidia.BioHikvision,
                 Exemplo = "HIK001",
                 DescricaoFormato = "Formato: ID Hikvision\n" +
@@ -189,9 +189,9 @@ namespace SmartSdk
             });
             
             // Senha/Teclado
-            cmbTipoMidia.Items.Add(new TipoMidiaItem 
-            { 
-                Nome = "Senha/Teclado", 
+            cmbTipoMidia.Items.Add(new TipoMidiaItem
+            {
+                Nome = "Senha/Teclado",
                 Valor = TipoMidia.Teclado,
                 Exemplo = "123456",
                 DescricaoFormato = "Formato: Código numérico\n" +
@@ -199,9 +199,9 @@ namespace SmartSdk
             });
             
             // Controle Remoto
-            cmbTipoMidia.Items.Add(new TipoMidiaItem 
-            { 
-                Nome = "Controle Remoto", 
+            cmbTipoMidia.Items.Add(new TipoMidiaItem
+            {
+                Nome = "Controle Remoto",
                 Valor = TipoMidia.ControleRemoto,
                 Exemplo = "CTRL001",
                 DescricaoFormato = "Formato: ID do controle\n" +
@@ -247,7 +247,7 @@ namespace SmartSdk
             // Valida tipo selecionado
             if (cmbTipoMidia.SelectedItem == null)
             {
-                MessageBox.Show("Selecione um tipo de mídia.", "Validação", 
+                MessageBox.Show("Selecione um tipo de mídia.", "Validação",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 cmbTipoMidia.Focus();
                 DialogResult = DialogResult.None;
@@ -257,7 +257,7 @@ namespace SmartSdk
             // Valida dados da mídia
             if (string.IsNullOrWhiteSpace(txtDadosMidia.Text))
             {
-                MessageBox.Show("Informe os dados da mídia.", "Validação", 
+                MessageBox.Show("Informe os dados da mídia.", "Validação",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtDadosMidia.Focus();
                 DialogResult = DialogResult.None;
@@ -293,7 +293,7 @@ namespace SmartSdk
         }
         
         /// <summary>
-        /// Classe auxiliar para representar um tipo de mídia no ComboBox
+        /// Classe auxiliar para representar um tipo de mÃ­dia no ComboBox
         /// </summary>
         private class TipoMidiaItem
         {
@@ -306,3 +306,4 @@ namespace SmartSdk
         }
     }
 }
+

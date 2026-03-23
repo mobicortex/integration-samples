@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -9,7 +9,7 @@ using MobiCortex.Sdk.Exceptions;
 namespace MobiCortex.Sdk.Services
 {
     /// <summary>
-    /// Cliente principal para integração com controladores MobiCortex.
+    /// Cliente principal para integraÃ§Ã£o com controladores MobiCortex.
     /// </summary>
     public class MobiCortexClient : IMobiCortexClient, ICadastroService, IEntidadeService, IMidiaService, ISistemaService, IAccessService, IWebhookConfigService, IVideoSourceService
     {
@@ -52,7 +52,7 @@ namespace MobiCortex.Sdk.Services
         public IVideoSourceService VideoSources => this;
 
         /// <summary>
-        /// Cria uma nova instância do cliente MobiCortex.
+        /// Cria uma nova instÃ¢ncia do cliente MobiCortex.
         /// </summary>
         public MobiCortexClient()
         {
@@ -95,20 +95,20 @@ namespace MobiCortex.Sdk.Services
             {
                 // Verifica se a URL base foi configurada
                 if (string.IsNullOrEmpty(_baseUrl))
-                    return new ApiResult<bool> { Success = false, Message = "URL base não configurada. Chame ConfigureBaseUrl() primeiro." };
+                    return new ApiResult<bool> { Success = false, Message = "URL base nÃ£o configurada. Chame ConfigureBaseUrl() primeiro." };
 
                 // Tenta acessar o endpoint /login com POST vazio para testar conectividade
                 // O endpoint /login aceita POST e retorna 400 apenas se o body estiver incorreto
                 var url = $"{_baseUrl}/mbcortex/master/api/v1/login";
                 
-                // Faz POST com body vazio/inválido - esperamos 400 Bad Request se servidor responder
-                // Isso é suficiente para confirmar que o servidor está online
+                // Faz POST com body vazio/invÃ¡lido - esperamos 400 Bad Request se servidor responder
+                // Isso Ã© suficiente para confirmar que o servidor estÃ¡ online
                 var content = new StringContent("{}", Encoding.UTF8, "application/json");
                 var response = await _http.PostAsync(url, content);
                 
                 var responseBody = await response.Content.ReadAsStringAsync();
                 
-                // Se recebeu qualquer resposta HTTP (mesmo 400), o servidor está respondendo
+                // Se recebeu qualquer resposta HTTP (mesmo 400), o servidor estÃ¡ respondendo
                 if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || 
                     response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
                     response.StatusCode == System.Net.HttpStatusCode.Forbidden ||
@@ -121,7 +121,7 @@ namespace MobiCortex.Sdk.Services
             }
             catch (HttpRequestException ex)
             {
-                return new ApiResult<bool> { Success = false, Message = $"Falha na conexão: {ex.Message}" };
+                return new ApiResult<bool> { Success = false, Message = $"Falha na conexÃ£o: {ex.Message}" };
             }
             catch (Exception ex)
             {
@@ -147,13 +147,13 @@ namespace MobiCortex.Sdk.Services
 
         async Task<ApiResult<ApiRetResponse>> ICadastroService.CriarAsync(CadastroCentral cadastro)
         {
-            return await PostAsync<ApiRetResponse>("/central-registry", cadastro);
+            return await PostAsync<ApiRetResponse>("/central-registry", BuildCentralRegistryPayload(cadastro));
         }
 
         async Task<ApiResult<ApiRetResponse>> ICadastroService.AtualizarAsync(CadastroCentral cadastro)
         {
-            // API usa POST para criar/atualizar (não PUT)
-            return await PostAsync<ApiRetResponse>("/central-registry", cadastro);
+            // API usa POST para criar/atualizar (nÃ£o PUT)
+            return await PostAsync<ApiRetResponse>("/central-registry", BuildCentralRegistryPayload(cadastro));
         }
 
         async Task<ApiResult<ApiRetResponse>> ICadastroService.ExcluirAsync(uint id)
@@ -188,13 +188,13 @@ namespace MobiCortex.Sdk.Services
 
         async Task<ApiResult<CriarEntidadeResponse>> IEntidadeService.CriarAsync(CriarEntidadeRequest request)
         {
-            return await PostAsync<CriarEntidadeResponse>("/entities", request);
+            return await PostAsync<CriarEntidadeResponse>("/entities", BuildEntityCreatePayload(request));
         }
 
         async Task<ApiResult<ApiRetResponse>> IEntidadeService.AtualizarAsync(uint entityId, AtualizarEntidadeRequest request)
         {
             // API usa PUT /entities?id=X para atualizar entidade parcialmente
-            return await PutAsync<ApiRetResponse>($"/entities?id={entityId}", request);
+            return await PutAsync<ApiRetResponse>($"/entities?id={entityId}", BuildEntityUpdatePayload(request));
         }
 
         async Task<ApiResult<ApiRetResponse>> IEntidadeService.ExcluirAsync(uint entityId)
@@ -229,7 +229,7 @@ namespace MobiCortex.Sdk.Services
 
         async Task<ApiResult<CriarMidiaResponse>> IMidiaService.CriarAsync(CriarMidiaRequest request)
         {
-            return await PostAsync<CriarMidiaResponse>("/media", request);
+            return await PostAsync<CriarMidiaResponse>("/media", BuildMediaCreatePayload(request));
         }
 
         async Task<ApiResult<ApiRetResponse>> IMidiaService.AlterarStatusAsync(uint mediaId, bool enabled)
@@ -332,7 +332,110 @@ namespace MobiCortex.Sdk.Services
         }
         #endregion
 
-        #region Métodos HTTP Privados
+        #region MÃ©todos HTTP Privados
+        private static object BuildCentralRegistryPayload(CadastroCentral cadastro)
+        {
+            var payload = new Dictionary<string, object?>
+            {
+                ["id"] = cadastro.Id,
+                ["name"] = cadastro.Name ?? string.Empty,
+                ["enabled"] = cadastro.Enabled,
+                ["type"] = cadastro.Type,
+                ["slots1"] = cadastro.Slots1,
+                ["slots2"] = cadastro.Slots2
+            };
+
+            AddIfNotBlank(payload, "field1", cadastro.Field1);
+            AddIfNotBlank(payload, "field2", cadastro.Field2);
+            AddIfNotBlank(payload, "field3", cadastro.Field3);
+            AddIfNotBlank(payload, "field4", cadastro.Field4);
+
+            return payload;
+        }
+
+        private static object BuildEntityCreatePayload(CriarEntidadeRequest request)
+        {
+            var payload = new Dictionary<string, object?>
+            {
+                ["type"] = request.Type,
+                ["enabled"] = request.Enabled
+            };
+
+            var centralRegistryId = request.CentralRegistryId.GetValueOrDefault();
+            if (centralRegistryId > 0)
+                payload["central_registry_id"] = centralRegistryId;
+
+            if (request.Id == 0)
+                payload["createid"] = true;
+            else
+                payload["id"] = request.Id;
+
+            AddIfNotBlank(payload, "doc", request.Doc);
+
+            if (request.Type == 2)
+            {
+                AddIfNotBlank(payload, "brand", request.Brand);
+                AddIfNotBlank(payload, "model", request.Model);
+                AddIfNotBlank(payload, "color", request.Color);
+                payload["lpr_enabled"] = request.LprEnabled;
+            }
+            else
+            {
+                payload["name"] = request.Name ?? string.Empty;
+                if (request.LprEnabled)
+                    payload["lpr_enabled"] = true;
+            }
+
+            if (request.Id > 0 && request.Overwrite == true)
+                payload["overwrite"] = true;
+
+            return payload;
+        }
+
+        private static object BuildMediaCreatePayload(CriarMidiaRequest request)
+        {
+            var payload = new Dictionary<string, object?>
+            {
+                ["entity_id"] = request.EntityId,
+                ["central_registry_id"] = request.CentralRegistryId,
+                ["type"] = request.Type,
+                ["enabled"] = true
+            };
+
+            AddIfNotBlank(payload, "description", request.Description);
+
+            if (request.Ns32_0.HasValue)
+                payload["ns32_0"] = request.Ns32_0.Value;
+            if (request.Ns32_1.HasValue)
+                payload["ns32_1"] = request.Ns32_1.Value;
+
+            return payload;
+        }
+
+
+        private static object BuildEntityUpdatePayload(AtualizarEntidadeRequest request)
+        {
+            var payload = new Dictionary<string, object?>();
+
+            if (request.Enabled.HasValue)
+                payload["enabled"] = request.Enabled.Value;
+
+            AddIfNotBlank(payload, "name", request.Name);
+            AddIfNotBlank(payload, "doc", request.Doc);
+            AddIfNotBlank(payload, "brand", request.Brand);
+            AddIfNotBlank(payload, "model", request.Model);
+            AddIfNotBlank(payload, "color", request.Color);
+
+            if (request.LprEnabled.HasValue)
+                payload["lpr_enabled"] = request.LprEnabled.Value;
+
+            return payload;
+        }
+        private static void AddIfNotBlank(IDictionary<string, object?> payload, string key, string? value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+                payload[key] = value.Trim();
+        }
         private async Task<ApiResult<T>> GetAsync<T>(string endpoint)
         {
             try
@@ -456,3 +559,9 @@ namespace MobiCortex.Sdk.Services
         #endregion
     }
 }
+
+
+
+
+
+

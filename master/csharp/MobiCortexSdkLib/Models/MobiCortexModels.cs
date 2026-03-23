@@ -67,17 +67,17 @@ namespace MobiCortex.Sdk.Models
     //  Exemplo: https://192.168.0.100:4449/mbcortex/master/api/v1/login
     //
     //  HIERARQUIA DE DADOS (Modelo MobiCortex):
-    //  ┌─────────────────────────────────────────────────────────┐
-    //  │ Cadastro Central (central-registry / USER6.MCU)        │
-    //  │   └── Entidade (entities / ENTITY6.MCU)                │
-    //  │         └── Mídia de Acesso (media / MEDIA6.MCU)       │
-    //  └─────────────────────────────────────────────────────────┘
+    //  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+    //  â”‚ Cadastro Central (central-registry / USER6.MCU)        â”‚
+    //  â”‚   â””â”€â”€ Entidade (entities / ENTITY6.MCU)                â”‚
+    //  â”‚         â””â”€â”€ MÃ­dia de Acesso (media / MEDIA6.MCU)       â”‚
+    //  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
     //
-    //  Um Cadastro pode ter várias Entidades (pessoas, veículos).
-    //  Uma Entidade pode ter várias Mídias (cartão, biometria, placa, etc).
+    //  Um Cadastro pode ter vÃ¡rias Entidades (pessoas, veÃ­culos).
+    //  Uma Entidade pode ter vÃ¡rias MÃ­dias (cartÃ£o, biometria, placa, etc).
     // =============================================================================
 
-    #region Resposta Genérica
+    #region Resposta GenÃ©rica
 
     /// <summary>
     /// Resposta genérica da API com campo "ret" (0 = sucesso)
@@ -92,7 +92,7 @@ namespace MobiCortex.Sdk.Models
     }
 
     /// <summary>
-    /// Wrapper para resultado de chamadas à API
+    /// Wrapper para resultado de chamadas Ã  API
     /// </summary>
     public class ApiResult<T>
     {
@@ -104,7 +104,7 @@ namespace MobiCortex.Sdk.Models
 
     #endregion
 
-    #region Autenticação - POST/PUT/DELETE /login
+    #region AutenticaÃ§Ã£o - POST/PUT/DELETE /login
 
     /// <summary>
     /// POST /login - Login
@@ -198,7 +198,7 @@ namespace MobiCortex.Sdk.Models
     }
 
     /// <summary>
-    /// Resposta de criação de token.
+    /// Resposta de criaÃ§Ã£o de token.
     /// </summary>
     public class ApiTokenCreateResponse
     {
@@ -346,7 +346,7 @@ namespace MobiCortex.Sdk.Models
 
     /// <summary>
     /// GET /central-registry/stats
-    /// Estatísticas de uso do cadastro central
+    /// EstatÃ­sticas de uso do cadastro central
     /// </summary>
     public class CadastroStats
     {
@@ -368,7 +368,7 @@ namespace MobiCortex.Sdk.Models
     #region Entidades - GET/POST/PUT/DELETE /entities
 
     /// <summary>
-    /// Tipos de entidade disponíveis
+    /// Tipos de entidade disponÃ­veis
     /// </summary>
     public enum TipoEntidade
     {
@@ -423,11 +423,11 @@ namespace MobiCortex.Sdk.Models
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Color { get; set; }
 
-        /// <summary>Observações livres (opcional)</summary>
+        /// <summary>Campo legado. A controladora atual não expõe `obs` no contrato público de entities.</summary>
+        [Obsolete("O backend atual nao usa o campo obs em entities. Mantenha apenas para compatibilidade local.")]
         [JsonPropertyName("obs")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Obs { get; set; }
-
         /// <summary>
         /// true = LPR ativo. Quando ativado, o controlador cria automaticamente
         /// uma mídia do tipo LPR usando o campo "doc" como placa.
@@ -535,7 +535,7 @@ namespace MobiCortex.Sdk.Models
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public uint? CentralRegistryId { get; set; }
 
-        /// <summary>1=Pessoa, 2=Veículo, 3=Animal</summary>
+        /// <summary>1=Pessoa, 2=VeÃ­culo, 3=Animal</summary>
         [JsonPropertyName("type")]
         public int Type { get; set; } = 1;
 
@@ -564,12 +564,12 @@ namespace MobiCortex.Sdk.Models
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Color { get; set; }
 
-        /// <summary>Observações livres (opcional)</summary>
-        [JsonPropertyName("obs")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        /// <summary>Campo legado. O contrato público atual da controladora não usa `obs` em entities.</summary>
+        [Obsolete("O backend atual nao aceita o campo obs em entities. Mantenha apenas para compatibilidade local.")]
+        [JsonIgnore]
         public string? Obs { get; set; }
 
-        /// <summary>true = ativar reconhecimento de placa via LPR</summary>
+        /// <summary>true = ativar reconhecimento de placa via LPR para veiculo</summary>
         [JsonPropertyName("lpr_enabled")]
         public bool LprEnabled { get; set; }
 
@@ -642,8 +642,8 @@ namespace MobiCortex.Sdk.Models
     /// este modelo permite atualização parcial: preencha apenas os campos que
     /// deseja modificar. Campos null são ignorados na serialização (não enviados).
     /// 
-    /// Exemplo: para alterar só o nome, defina apenas Name = "Novo Nome",
-    /// deixando os outros campos null.
+    /// Exemplo: pessoa usa name/doc; veiculo usa doc/brand/model/color/lpr_enabled.
+    /// Campos null continuam sendo omitidos do payload.
     /// </summary>
     public class AtualizarEntidadeRequest
     {
@@ -672,10 +672,10 @@ namespace MobiCortex.Sdk.Models
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Color { get; set; }
 
-        [JsonPropertyName("obs")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        /// <summary>Campo legado. O contrato público atual da controladora não usa `obs` em entities.</summary>
+        [Obsolete("O backend atual nao aceita o campo obs em entities. Mantenha apenas para compatibilidade local.")]
+        [JsonIgnore]
         public string? Obs { get; set; }
-
         [JsonPropertyName("lpr_enabled")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonConverter(typeof(BoolIntNullableConverter))]
@@ -690,9 +690,9 @@ namespace MobiCortex.Sdk.Models
     }
 
     /// <summary>
-    /// GET /entities?central_registry_id=X  → lista entidades de um cadastro (sem paginação)
-    /// GET /entities?offset=X&amp;count=Y  → lista global paginada
-    /// GET /entities?offset=X&amp;count=Y&amp;name=filtro  → com filtro server-side
+    /// GET /entities?central_registry_id=X  â†’ lista entidades de um cadastro (sem paginaÃ§Ã£o)
+    /// GET /entities?offset=X&amp;count=Y  â†’ lista global paginada
+    /// GET /entities?offset=X&amp;count=Y&amp;name=filtro  â†’ com filtro server-side
     /// </summary>
     public class EntidadeListResponse
     {
@@ -762,7 +762,7 @@ namespace MobiCortex.Sdk.Models
 
     #endregion
 
-    #region Mídias de Acesso - GET/POST/PUT/DELETE /media
+    #region MÃ­dias de Acesso - GET/POST/PUT/DELETE /media
 
     /// <summary>
     /// Tipos de mídia de acesso suportados pelo controlador.
@@ -772,8 +772,8 @@ namespace MobiCortex.Sdk.Models
     /// - Ao criar uma mídia LPR manualmente via POST /media, é necessário enviar
     ///   os campos ns32_0 e ns32_1 para evitar que o backend tente validar a placa
     ///   como se fosse um formato RFID (Wiegand/CODE/HEX).
-    /// - A forma RECOMENDADA de criar LPR é usando lpr_ativo=true no cadastro da entidade
-    ///   (veículo), pois o backend converte automaticamente a placa em dados binários.
+    /// - A forma RECOMENDADA de criar LPR é usar lpr_enabled=true na entidade do veiculo,
+    ///   pois o backend cria/atualiza a midia LPR automaticamente.
     /// </summary>
     public static class TipoMidia
     {
@@ -788,8 +788,8 @@ namespace MobiCortex.Sdk.Models
         public const int BioHikvision = 18;    // Biometria Hikvision
         public const int BioNiceWego = 19;     // Biometria Nice Wego
         public const int Facial = 20;          // Reconhecimento facial
-        public const int Wiegand26 = 21;       // Cartão RFID Wiegand 26 bits
-        public const int Wiegand34 = 22;       // Cartão RFID Wiegand 34 bits
+        public const int Wiegand26 = 21;       // CartÃ£o RFID Wiegand 26 bits
+        public const int Wiegand34 = 22;       // CartÃ£o RFID Wiegand 34 bits
 
         /// <summary>Retorna o nome legível do tipo de mídia</summary>
         public static string GetNome(int tipo) => tipo switch
@@ -913,8 +913,8 @@ namespace MobiCortex.Sdk.Models
     ///    - Envie entity_id, central_registry_id, type=17, description="ABC1D23"
     ///    - IMPORTANTE: também envie ns32_0=0 e ns32_1=0
     ///    - Sem ns32_0/ns32_1, o backend tenta validar a placa como RFID e dá erro
-    ///    - NOTA: A forma recomendada é usar lpr_ativo=true no cadastro da entidade (veículo)
-    ///      pois o backend converte a placa automaticamente em dados binários
+    ///    - NOTA: A forma recomendada é usar lpr_enabled=true na entidade do veiculo,
+    ///      pois o backend cria/atualiza a midia LPR automaticamente
     /// 
     /// 3. Facial, Biometria, etc:
     ///    - Envie entity_id, central_registry_id, type e description
@@ -928,14 +928,14 @@ namespace MobiCortex.Sdk.Models
         [JsonPropertyName("central_registry_id")]
         public uint CentralRegistryId { get; set; }
 
-        /// <summary>Tipo da mídia (ver constantes TipoMidia.*)</summary>
+        /// <summary>Tipo da mÃ­dia (ver constantes TipoMidia.*)</summary>
         [JsonPropertyName("type")]
         public int Type { get; set; } = TipoMidia.Wiegand26;
 
         /// <summary>
-        /// Descrição/valor da mídia.
-        /// - RFID: código do cartão (ex: "123,45678" ou "HEX: FF FF FF")
-        /// - LPR: placa do veículo (ex: "ABC1D23")
+        /// DescriÃ§Ã£o/valor da mÃ­dia.
+        /// - RFID: cÃ³digo do cartÃ£o (ex: "123,45678" ou "HEX: FF FF FF")
+        /// - LPR: placa do veÃ­culo (ex: "ABC1D23")
         /// - Facial/Outros: identificador descritivo
         /// </summary>
         [JsonPropertyName("description")]
@@ -1000,7 +1000,7 @@ namespace MobiCortex.Sdk.Models
     }
 
     /// <summary>
-    /// GET /media?entity_id=X - Lista mídias de uma entidade
+    /// GET /media?entity_id=X - Lista mÃ­dias de uma entidade
     /// </summary>
     public class MidiaListResponse
     {
@@ -1022,7 +1022,7 @@ namespace MobiCortex.Sdk.Models
     #region Dashboard e Dispositivo
 
     /// <summary>
-    /// Item de cor padrão retornado por GET /vehicle-catalogs.
+    /// Item de cor padrÃ£o retornado por GET /vehicle-catalogs.
     /// </summary>
     public class VehicleColorCatalogItem
     {
@@ -1064,7 +1064,7 @@ namespace MobiCortex.Sdk.Models
     }
 
     /// <summary>
-    /// GET /dashboard - Estatísticas gerais do controlador
+    /// GET /dashboard - EstatÃ­sticas gerais do controlador
     /// </summary>
     public class DashboardStats
     {
@@ -1266,7 +1266,7 @@ namespace MobiCortex.Sdk.Models
     }
 
     /// <summary>
-    /// Resposta de listagem dos canais de vídeo.
+    /// Resposta de listagem dos canais de vÃ­deo.
     /// </summary>
     public class VideoSourceListResponse
     {
@@ -1282,3 +1282,4 @@ namespace MobiCortex.Sdk.Models
 
     #endregion
 }
+

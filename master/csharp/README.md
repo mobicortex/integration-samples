@@ -1,4 +1,4 @@
-# SmartSdk - MobiCortex Integration Sample (C# / WinForms)
+﻿# SmartSdk - MobiCortex Integration Sample (C# / WinForms)
 
 Windows Forms application that demonstrates integration with the MobiCortex controller REST API.
 This project is a reference sample for integrators who need to manage registries, entities, media, and MQTT monitoring through the MobiCortex platform.
@@ -101,7 +101,7 @@ Base route prefix: `/mbcortex/master/api/v1`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/entities?id={entity_id}` | Get entity by ID |
-| GET | `/entities?cadastro_id={id}` | List entities from a registry |
+| GET | `/entities?central_registry_id={id}` | List entities from a registry |
 | POST | `/entities` | Create an entity, including `createid=true` support |
 | PUT | `/entities?id={entity_id}` | Update an entity |
 | DELETE | `/entities?id={entity_id}` | Delete an entity and related media |
@@ -128,41 +128,43 @@ Base route prefix: `/mbcortex/master/api/v1`
 var request = new CriarEntidadeRequest
 {
     CreateId = true,
-    Tipo = (int)TipoEntidade.Pessoa,
+    Type = (int)TipoEntidade.Pessoa,
     Name = "John Doe",
     Doc = "123.456.789-00"
 };
 
-var result = await _api.CriarEntidadeAsync(request);
+var result = await client.Entidades.CriarAsync(request);
 if (result.Success && result.Data?.Ret == 0)
 {
-    Console.WriteLine($"entity_id={result.Data.EntityId}, cadastro_id={result.Data.CadastroId}");
+    Console.WriteLine($"entity_id={result.Data.EntityId}, central_registry_id={result.Data.CadastroId}");
 }
 ```
 
-### Create an entity in the complete flow (informing `cadastro_id`)
+### Create an entity in the complete flow (informing `central_registry_id`)
 
 ```csharp
 var request = new CriarEntidadeRequest
 {
-    CadastroId = 42,
-    Tipo = (int)TipoEntidade.Veiculo,
-    Name = "Black Civic",
+    CentralRegistryId = 42,
+    Type = (int)TipoEntidade.Veiculo,
+    Brand = "Honda",
+    Model = "Civic",
+    Color = "Black",
     Doc = "ABC1D23",
-    LprAtivo = 1
+    LprEnabled = true
 };
 
-var result = await _api.CriarEntidadeAsync(request);
+var result = await client.Entidades.CriarAsync(request);
 ```
 
 ### List entities with pagination
 
 ```csharp
-var cadastros = await _api.ListarCadastrosAsync(offset: 0, count: 20, filtroNome: "John");
+var cadastros = await client.Cadastros.ListarAsync(offset: 0, count: 20, nameFilter: "John");
 
 foreach (var cad in cadastros.Data.Items)
 {
-    var entidades = await _api.ListarEntidadesAsync(cad.Id);
+    var entidades = await client.Entidades.ListarPorCadastroAsync(cad.Id);
     foreach (var ent in entidades.Data.Items)
         Console.WriteLine($"  {ent.EntityId} - {ent.Name} ({ent.Doc})");
 }
@@ -174,12 +176,12 @@ foreach (var cad in cadastros.Data.Items)
 var request = new CriarMidiaRequest
 {
     EntityId = 4294000123,
-    CadastroId = 42,
-    Tipo = TipoMidia.Wiegand26,
-    Descricao = "123,45678"
+    CentralRegistryId = 42,
+    Type = TipoMidia.Wiegand26,
+    Description = "123,45678"
 };
 
-var result = await _api.CriarMidiaAsync(request);
+var result = await client.Midias.CriarAsync(request);
 ```
 
 ### Create LPR media (vehicle plate)
@@ -190,26 +192,28 @@ Important: the backend validates the media format automatically. For LPR media, 
 var request = new CriarMidiaRequest
 {
     EntityId = 4294000123,
-    CadastroId = 42,
-    Tipo = TipoMidia.Lpr,
-    Descricao = "ABC1D23",
+    CentralRegistryId = 42,
+    Type = TipoMidia.Lpr,
+    Description = "ABC1D23",
     Ns32_0 = 0,
     Ns32_1 = 0
 };
 
-var result = await _api.CriarMidiaAsync(request);
+var result = await client.Midias.CriarAsync(request);
 ```
 
-Recommended approach: use `lpr_ativo=true` on the vehicle entity record. The backend then converts the vehicle plate into the required binary data automatically.
+Recommended approach: use `lpr_enabled=true` when creating or updating the vehicle entity. The backend then creates or updates the LPR media automatically.
 
 ```csharp
 var request = new CriarEntidadeRequest
 {
-    CadastroId = 42,
-    Tipo = (int)TipoEntidade.Veiculo,
-    Name = "Black Civic",
+    CentralRegistryId = 42,
+    Type = (int)TipoEntidade.Veiculo,
+    Brand = "Honda",
+    Model = "Civic",
+    Color = "Black",
     Doc = "ABC1D23",
-    LprAtivo = true
+    LprEnabled = true
 };
 ```
 
@@ -257,3 +261,6 @@ This project is licensed under the MIT License.
 The sample code and the included SDK/library can be freely used in customer applications under the MIT License, as long as the integration targets MobiCortex devices.
 
 For the full license text, see `LICENSE`.
+
+
+

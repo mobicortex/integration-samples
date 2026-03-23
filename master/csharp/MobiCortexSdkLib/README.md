@@ -1,21 +1,21 @@
-# MobiCortex.Sdk
+﻿# MobiCortex.Sdk
 
-SDK .NET para integração com controladores de acesso MobiCortex.
+SDK .NET para integraÃ§Ã£o com controladores de acesso MobiCortex.
 
-## 📦 Instalação
+## ðŸ“¦ InstalaÃ§Ã£o
 
 ```bash
 dotnet add package MobiCortex.Sdk
 ```
 
-Ou adicione a referência de projeto:
+Ou adicione a referÃªncia de projeto:
 ```xml
 <ProjectReference Include="MobiCortexSdkLib\MobiCortex.Sdk.csproj" />
 ```
 
-## 🚀 Uso Básico
+## ðŸš€ Uso BÃ¡sico
 
-### 1. API REST (Cadastros, Entidades, Mídias)
+### 1. API REST (Cadastros, Entidades, MÃ­dias)
 
 ```csharp
 using MobiCortex.Sdk;
@@ -28,7 +28,7 @@ var client = new MobiCortexClient();
 // Configurar URL do controlador
 client.ConfigureBaseUrl("https://192.168.0.100:4449");
 
-// Testar conexão
+// Testar conexÃ£o
 var test = await client.TestConnectionAsync();
 if (!test.Success) {
     Console.WriteLine($"Erro: {test.Message}");
@@ -77,7 +77,7 @@ if (!test.Success) {
     }
 
     var cadastros = await client.Cadastros.ListarAsync(offset: 0, count: 20);
-    var entidades = await client.Entidades.ListarPorCadastroAsync(cadastroId: 1);
+    var entidades = await client.Entidades.ListarPorCadastroAsync(centralRegistryId: 1);
     var midias = await client.Midias.ListarPorEntidadeAsync(entityId: 1);
     var device = await client.Sistema.ObterDeviceInfoAsync();
     ```
@@ -227,19 +227,19 @@ if (!test.Success) {
     ```csharp
     var lista = await client.Cadastros.ListarAsync(offset: 0, count: 20);
 
-    var cadastro = new CadastroCentral { Name = "Apt 101", Enabled = 1 };
+    var cadastro = new CadastroCentral { Id = 0, Name = "Apt 101", Enabled = true };
     var result = await client.Cadastros.CriarAsync(cadastro);
     ```
 
     ### IEntidadeService
 
     ```csharp
-    var entidades = await client.Entidades.ListarPorCadastroAsync(cadastroId: 1);
+    var entidades = await client.Entidades.ListarPorCadastroAsync(centralRegistryId: 1);
 
     var pessoa = new CriarEntidadeRequest
     {
-        CadastroId = 1,
-        Tipo = (int)TipoEntidade.Pessoa,
+        CentralRegistryId = 1,
+        Type = (int)TipoEntidade.Pessoa,
         Name = "John Doe",
         Doc = "12345678900"
     };
@@ -254,9 +254,9 @@ if (!test.Success) {
     var cartao = new CriarMidiaRequest
     {
         EntityId = 1,
-        CadastroId = 1,
-        Tipo = TipoMidia.Wiegand26,
-        Descricao = "123,45678"
+        CentralRegistryId = 1,
+        Type = TipoMidia.Wiegand26,
+        Description = "123,45678"
     };
     var result = await client.Midias.CriarAsync(cartao);
     ```
@@ -282,3 +282,5 @@ if (!test.Success) {
     You may freely use the SDK in customer applications under the MIT License, provided the integration targets MobiCortex devices.
 
     For the full license text, see the repository `LICENSE` file.
+
+
