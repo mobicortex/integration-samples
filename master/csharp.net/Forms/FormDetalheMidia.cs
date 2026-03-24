@@ -1,0 +1,118 @@
+using MobiCortex.Sdk.Models;
+
+namespace SmartSdk
+{
+    /// <summary>
+    /// Formulário para exibir e editar detalhes de uma mídia de acesso.
+    /// </summary>
+    public partial class FormDetalheMidia : Form
+    {
+        private readonly MidiaAcesso _midia;
+        private uint _expirationOriginal;
+
+        /// <summary>
+        /// Retorna true se a mídia foi modificada.
+        /// </summary>
+        public bool FoiModificada { get; private set; }
+
+        /// <summary>
+        /// Retorna o novo estado de habilitação (true=habilitada, false=bloqueada).
+        /// </summary>
+        public bool NovoEstadoEnabled => !chkBloqueada.Checked;
+
+        /// <summary>
+        /// Retorna a data limite de permissão (0 = sem limite).
+        /// </summary>
+        public uint NovaDataPermissao => chkBloqueioPorData.Checked && dtpDataBloqueio.Enabled
+            ? (uint)new DateTimeOffset(dtpDataBloqueio.Value).ToUnixTimeSeconds()
+            : 0;
+
+        /// <summary>
+        /// Retorna true se a data de permissão foi alterada.
+        /// </summary>
+        public bool DataPermissaoAlterada => NovaDataPermissao != _expirationOriginal;
+
+        public FormDetalheMidia(MidiaAcesso midia)
+        {
+            InitializeComponent();
+            _midia = midia;
+            _expirationOriginal = midia.Expiration;
+            CarregarDados();
+        }
+
+        private void CarregarDados()
+        {
+            // Preenche informações
+            lblIdValor.Text = _midia.MediaId.ToString();
+            lblTipoValor.Text = _midia.TipoNome;
+            lblDescricaoValor.Text = _midia.Descricao;
+            lblDataCadastroValor.Text = _midia.CriadoEm;
+            lblDataEdicaoValor.Text = _midia.AtualizadoEm;
+
+            // Configura checkbox de bloqueio total
+            // Enabled=true significa liberada, Enabled=false significa bloqueada
+            chkBloqueada.Checked = !_midia.Enabled;
+
+            // Configura data de permissão (expiration = data em que a mídia expira)
+            if (_midia.Expiration > 0)
+            {
+                chkBloqueioPorData.Checked = true;
+                dtpDataBloqueio.Enabled = true;
+                btnLimparData.Enabled = true;
+                dtpDataBloqueio.Value = DateTimeOffset.FromUnixTimeSeconds(_midia.Expiration).LocalDateTime;
+            }
+            else
+            {
+                chkBloqueioPorData.Checked = false;
+                dtpDataBloqueio.Enabled = false;
+                btnLimparData.Enabled = false;
+                dtpDataBloqueio.Value = DateTime.Now.AddMonths(1); // Default: 1 mês
+            }
+
+            // Atualiza título
+            Text = $"Detalhes da Mídia - {_midia.Descricao}";
+        }
+
+        private void chkBloqueioPorData_CheckedChanged(object sender, EventArgs e)
+        {
+            bool habilitado = chkBloqueioPorData.Checked;
+            dtpDataBloqueio.Enabled = habilitado;
+            btnLimparData.Enabled = habilitado;
+
+            if (habilitado && dtpDataBloqueio.Value <= DateTime.Now)
+            {
+                // Se ativou e a data está no passado, ajusta para 1 mês no futuro
+                dtpDataBloqueio.Value = DateTime.Now.AddMonths(1);
+            }
+        }
+
+        private void btnLimparData_Click(object sender, EventArgs e)
+        {
+            chkBloqueioPorData.Checked = false;
+            dtpDataBloqueio.Value = DateTime.Now.AddMonths(1);
+        }
+
+        private void btnSalvar_Click(object sender, EventArgs e)
+        {
+            // Verifica se houve alteração no estado
+            bool estadoAnterior = _midia.Enabled;
+            bool estadoNovo = !chkBloqueada.Checked;
+
+            bool estadoAlterado = estadoAnterior != estadoNovo;
+            bool dataPermissaoAlterada = DataPermissaoAlterada;
+
+            FoiModificada = estadoAlterado || dataPermissaoAlterada;
+
+            // Validação: não pode ter data de permissão no passado
+            if (chkBloqueioPorData.Checked && dtpDataBloqueio.Value <= DateTime.Now)
+            {
+                MessageBox.Show("A data de permissão deve ser futura.", "Validação",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                DialogResult = DialogResult.None;
+                return;
+            }
+
+            DialogResult = DialogResult.OK;
+        }
+    }
+}

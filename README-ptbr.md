@@ -26,6 +26,16 @@ Principais subpastas:
   - [`CHANGELOG-ptbr.md`](./master/csharp/CHANGELOG-ptbr.md): historico de alteracoes em portugues do Brasil.
   - [`/master/csharp/MobiCortexSdkLib/README.md`](./master/csharp/MobiCortexSdkLib/README.md): detalhes da biblioteca SDK.
 
+- [`/master/csharp.net`](./master/csharp.net)
+  Exemplo de integracao em **C# / .NET** com aplicacao WinForms e biblioteca SDK reutilizavel.
+
+  Arquivos importantes:
+  - [`README.md`](./master/csharp.net/README.md): documentacao em ingles.
+  - [`README-ptbr.md`](./master/csharp.net/README-ptbr.md): documentacao em portugues do Brasil.
+  - [`CHANGELOG.md`](./master/csharp.net/CHANGELOG.md): historico de alteracoes em ingles.
+  - [`CHANGELOG-ptbr.md`](./master/csharp.net/CHANGELOG-ptbr.md): historico de alteracoes em portugues do Brasil.
+  - [`MobiCortexIntegration.sln`](./master/csharp.net/MobiCortexIntegration.sln): solucao do Visual Studio.
+
 - [`/master/nodejs`](./master/nodejs)
   Exemplo de integracao em **Node.js**, com client, exemplos de uso e arquivos auxiliares.
 
@@ -135,7 +145,68 @@ Resumo da tecnologia:
 - UI: Windows Forms
 - Integracoes: REST API, MQTT, webhook/helpers de servidor presentes na estrutura da amostra
 
-### 3. Exemplo em Node.js
+### 3. Exemplo em C# / .NET (csharp.net)
+
+Pasta base:
+
+- [`/master/csharp.net`](./master/csharp.net)
+
+Arquivos principais:
+
+- [`/master/csharp.net/README.md`](./master/csharp.net/README.md)
+  Documentacao em ingles do exemplo C#.
+
+- [`/master/csharp.net/README-ptbr.md`](./master/csharp.net/README-ptbr.md)
+  Documentacao em portugues do Brasil do exemplo C#.
+
+- [`/master/csharp.net/CHANGELOG.md`](./master/csharp.net/CHANGELOG.md)
+  Historico de alteracoes em ingles do exemplo C#.
+
+- [`/master/csharp.net/CHANGELOG-ptbr.md`](./master/csharp.net/CHANGELOG-ptbr.md)
+  Historico de alteracoes em portugues do Brasil do exemplo C#.
+
+- [`/master/csharp.net/SmartSdk.csproj`](./master/csharp.net/SmartSdk.csproj)
+  Arquivo principal do projeto.
+
+- [`/master/csharp.net/MobiCortexIntegration.sln`](./master/csharp.net/MobiCortexIntegration.sln)
+  Solucao Visual Studio da aplicacao de exemplo e do SDK.
+
+- [`/master/csharp.net/Program.cs`](./master/csharp.net/Program.cs)
+  Ponto de entrada da aplicacao.
+
+- [`/master/csharp.net/MainForm.cs`](./master/csharp.net/MainForm.cs)
+  Formulario principal e launcher das demos.
+
+Subpastas importantes:
+
+- [`/master/csharp.net/Forms`](./master/csharp.net/Forms)
+  Telas WinForms para fluxos de cadastro, entidade, midia, dashboard, MQTT, webhook e monitoramento.
+
+- [`/master/csharp.net/MobiCortexSdkLib`](./master/csharp.net/MobiCortexSdkLib)
+  Biblioteca SDK .NET reutilizavel usada pela aplicacao de exemplo.
+
+Arquivos importantes do SDK:
+
+- [`/master/csharp.net/MobiCortexSdkLib/README.md`](./master/csharp.net/MobiCortexSdkLib/README.md)
+  Documentacao especifica do SDK.
+
+- [`/master/csharp.net/MobiCortexSdkLib/MobiCortex.Sdk.csproj`](./master/csharp.net/MobiCortexSdkLib/MobiCortex.Sdk.csproj)
+  Arquivo do projeto da biblioteca SDK.
+
+- [`/master/csharp.net/MobiCortexSdkLib/Services/MobiCortexClient.cs`](./master/csharp.net/MobiCortexSdkLib/Services/MobiCortexClient.cs)
+  Implementacao principal do client HTTP/API.
+
+- [`/master/csharp.net/MobiCortexSdkLib/Models/MobiCortexModels.cs`](./master/csharp.net/MobiCortexSdkLib/Models/MobiCortexModels.cs)
+  DTOs e modelos usados pelo SDK.
+
+Resumo da tecnologia:
+
+- Linguagem: C#
+- Runtime: .NET 8
+- UI: Windows Forms
+- Integracoes: REST API, MQTT, webhook/helpers de servidor
+
+### 4. Exemplo em Node.js
 
 Pasta base:
 
@@ -194,7 +265,7 @@ Resumo da tecnologia:
 - Runtime: Node.js
 - Integracoes: REST API, fluxo de testes via CLI
 
-### 4. Exemplo em Python
+### 5. Exemplo em Python
 
 Pasta base:
 
@@ -246,6 +317,11 @@ Resumo da tecnologia:
   [`/master/csharp/README-ptbr.md`](./master/csharp/README-ptbr.md)
   [`/master/csharp/MobiCortexSdkLib/README.md`](./master/csharp/MobiCortexSdkLib/README.md)
 
+- Documentacao C# / .NET (csharp.net):
+  [`/master/csharp.net/README.md`](./master/csharp.net/README.md)
+  [`/master/csharp.net/README-ptbr.md`](./master/csharp.net/README-ptbr.md)
+  [`/master/csharp.net/MobiCortexSdkLib/README.md`](./master/csharp.net/MobiCortexSdkLib/README.md)
+
 - Documentacao Node.js:
   [`/master/nodejs/README.md`](./master/nodejs/README.md)
 
@@ -258,7 +334,7 @@ Se voce estiver comecando do zero, a sequencia mais simples e:
 
 1. Ler [`/master/docs/MobiCortex-Master-Endpoints.md`](./master/docs/MobiCortex-Master-Endpoints.md)
 2. Importar [`/master/docs/MobiCortex-Master-Endpoints-Postman.json`](./master/docs/MobiCortex-Master-Endpoints-Postman.json) no Postman
-3. Escolher a linguagem desejada em [`/master/csharp`](./master/csharp), [`/master/nodejs`](./master/nodejs) ou [`/master/python`](./master/python)
+3. Escolher a linguagem desejada em [`/master/csharp`](./master/csharp), [`/master/csharp.net`](./master/csharp.net), [`/master/nodejs`](./master/nodejs) ou [`/master/python`](./master/python)
 4. Abrir o `README.md` da linguagem escolhida
 
 ## Versoes do Documento

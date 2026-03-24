@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    
+    <!-- Informações do Pacote NuGet -->
+    <PackageId>MobiCortex.Sdk</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>MobiCortex</Authors>
+    <Company>MobiCortex</Company>
+    <Description>SDK .NET para integração com controladores de acesso MobiCortex</Description>
+    <PackageTags>mobicortex;access-control;api;sdk;iot</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    
+    <!-- Documentação -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="System.Net.Http.Json" Version="8.0.1" />
+    <PackageReference Include="MQTTnet" Version="4.3.7.1207" />
+  </ItemGroup>
+
+</Project>
