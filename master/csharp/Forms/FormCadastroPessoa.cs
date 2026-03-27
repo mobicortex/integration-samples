@@ -3,118 +3,118 @@ using MobiCortex.Sdk.Models;
 namespace SmartSdk
 {
     /// <summary>
-    /// Formulário de cadastro/edição de Pessoa (Entidade tipo 1).
+    /// Form for creating/editing a Person (Entity type 1).
     /// </summary>
     public partial class FormCadastroPessoa : Form
     {
-        // Dados da pessoa (preenchidos ao salvar)
+        // Person data (filled on save)
         public uint Id { get; private set; }
         public string Nome { get; private set; } = string.Empty;
         public string Documento { get; private set; } = string.Empty;
         public bool LprAtivo { get; private set; }
         public bool EntidadeEnabled { get; private set; } = true;
-        
-        // Modo edição
+
+        // Edit mode
         public bool ModoEdicao { get; private set; }
-        
-        // Dados para edição
-        private readonly Entidade? _entidadeExistente;
-        private readonly uint _cadastroIdPadrao;
-        
+
+        // Data for editing
+        private readonly Entity? _existingEntity;
+        private readonly uint _defaultRegistryId;
+
         /// <summary>
-        /// Construtor para criar nova pessoa
+        /// Constructor for creating a new person
         /// </summary>
         public FormCadastroPessoa(uint cadastroId)
         {
-            _cadastroIdPadrao = cadastroId;
+            _defaultRegistryId = cadastroId;
             InitializeComponent();
             ModoEdicao = false;
         }
-        
+
         /// <summary>
-        /// Construtor para editar pessoa existente
+        /// Constructor for editing an existing person
         /// </summary>
-        public FormCadastroPessoa(Entidade entidade)
+        public FormCadastroPessoa(Entity entidade)
         {
-            _entidadeExistente = entidade;
-            _cadastroIdPadrao = entidade.CadastroId;
+            _existingEntity = entidade;
+            _defaultRegistryId = entidade.RegistryId;
             InitializeComponent();
             ModoEdicao = true;
         }
-        
+
         private void FormCadastroPessoa_Load(object? sender, EventArgs e)
         {
-            if (ModoEdicao && _entidadeExistente != null)
+            if (ModoEdicao && _existingEntity != null)
             {
-                ConfigurarModoEdicao();
+                ConfigureEditMode();
             }
             else
             {
-                // Modo criação - valores padrão
+                // Creation mode - default values
                 numId.Value = 0;
                 chkHabilitado.Checked = true;
                 chkLprAtivo.Checked = false;
                 chkLprAtivo.Enabled = false;
-                chkLprAtivo.Text = "LPR não se aplica para pessoa";
-                lblIdInfo.Text = "0 = geração automática pelo servidor";
+                chkLprAtivo.Text = "LPR does not apply to person";
+                lblIdInfo.Text = "The server will generate the ID automatically";
             }
         }
-        
+
         /// <summary>
-        /// Configura o formulário para modo de edição
+        /// Configures the form for edit mode
         /// </summary>
-        private void ConfigurarModoEdicao()
+        private void ConfigureEditMode()
         {
-            if (_entidadeExistente == null) return;
-            
-            lblTitulo.Text = "Editar Pessoa";
-            Text = "Editar Pessoa";
-            
-            // Preenche campos
-            numId.Value = _entidadeExistente.EntityId;
-            numId.Enabled = false; // ID não pode ser alterado
-            lblIdInfo.Text = "ID da entidade não pode ser alterado em modo de edição.";
-            
-            txtNome.Text = _entidadeExistente.Name;
-            txtDocumento.Text = _entidadeExistente.Doc;
+            if (_existingEntity == null) return;
+
+            lblTitulo.Text = "Edit Person";
+            Text = "Edit Person";
+
+            // Fill fields
+            numId.Value = _existingEntity.EntityId;
+            numId.Enabled = false; // ID cannot be changed
+            lblIdInfo.Text = "Entity ID cannot be changed in edit mode.";
+
+            txtNome.Text = _existingEntity.Name;
+            txtDocumento.Text = _existingEntity.Doc;
             chkLprAtivo.Checked = false;
             chkLprAtivo.Enabled = false;
-            chkLprAtivo.Text = "LPR nao se aplica para pessoa";
-            chkHabilitado.Checked = _entidadeExistente.Enabled;
+            chkLprAtivo.Text = "LPR does not apply to person";
+            chkHabilitado.Checked = _existingEntity.Enabled;
         }
-        
+
         /// <summary>
-        /// Valida e salva os dados da pessoa
+        /// Validates and saves the person data
         /// </summary>
         private void btnSalvar_Click(object? sender, EventArgs e)
         {
-            // Valida nome
+            // Validate name
             if (string.IsNullOrWhiteSpace(txtNome.Text))
             {
-                MessageBox.Show("Informe o nome da pessoa.", "Validação",
+                MessageBox.Show("Enter the name of the person.", "Validation",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtNome.Focus();
                 DialogResult = DialogResult.None;
                 return;
             }
-            
-            // Armazena os dados
+
+            // Store the data
             Id = (uint)numId.Value;
             Nome = txtNome.Text.Trim();
             Documento = txtDocumento.Text.Trim();
             LprAtivo = false;
             EntidadeEnabled = chkHabilitado.Checked;
-            
-            // Em modo criação com ID 0, confirma geração automática
+
+            // In creation mode with ID 0, confirm automatic generation
             if (!ModoEdicao && Id == 0)
             {
-                lblIdInfo.Text = "Será gerado automaticamente pelo servidor";
+                lblIdInfo.Text = "The server will generate the ID automatically";
             }
-            
+
             DialogResult = DialogResult.OK;
             Close();
         }
-        
+
         private void btnCancelar_Click(object? sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
@@ -122,4 +122,3 @@ namespace SmartSdk
         }
     }
 }
-

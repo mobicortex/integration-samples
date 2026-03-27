@@ -46,7 +46,7 @@ namespace SmartSdk
             this.lblTitulo.Name = "lblTitulo";
             this.lblTitulo.Size = new Size(136, 25);
             this.lblTitulo.TabIndex = 0;
-            this.lblTitulo.Text = "Editar Pessoa";
+            this.lblTitulo.Text = "Edit Person";
             // 
             // lblSubtitulo
             // 
@@ -56,7 +56,7 @@ namespace SmartSdk
             this.lblSubtitulo.Name = "lblSubtitulo";
             this.lblSubtitulo.Size = new Size(220, 15);
             this.lblSubtitulo.TabIndex = 1;
-            this.lblSubtitulo.Text = "Entidade do tipo Pessoa (tipo = 1)";
+            this.lblSubtitulo.Text = "Person entity (type = 1)";
             // 
             // grpIdentificacao
             // 
@@ -69,7 +69,7 @@ namespace SmartSdk
             this.grpIdentificacao.Size = new Size(360, 100);
             this.grpIdentificacao.TabIndex = 2;
             this.grpIdentificacao.TabStop = false;
-            this.grpIdentificacao.Text = "Identificação";
+            this.grpIdentificacao.Text = "Identification";
             // 
             // lblUpdatedAt
             // 
@@ -80,7 +80,7 @@ namespace SmartSdk
             this.lblUpdatedAt.Name = "lblUpdatedAt";
             this.lblUpdatedAt.Size = new Size(77, 13);
             this.lblUpdatedAt.TabIndex = 3;
-            this.lblUpdatedAt.Text = "Atualizado: -";
+            this.lblUpdatedAt.Text = "Updated: -";
             // 
             // lblCreatedAt
             // 
@@ -91,7 +91,7 @@ namespace SmartSdk
             this.lblCreatedAt.Name = "lblCreatedAt";
             this.lblCreatedAt.Size = new Size(59, 13);
             this.lblCreatedAt.TabIndex = 2;
-            this.lblCreatedAt.Text = "Criado: -";
+            this.lblCreatedAt.Text = "Created: -";
             // 
             // lblEntityId
             // 
@@ -121,7 +121,7 @@ namespace SmartSdk
             this.grpNome.Size = new Size(360, 80);
             this.grpNome.TabIndex = 3;
             this.grpNome.TabStop = false;
-            this.grpNome.Text = "Nome";
+            this.grpNome.Text = "Name";
             // 
             // txtNome
             // 
@@ -137,7 +137,7 @@ namespace SmartSdk
             this.lblNome.Name = "lblNome";
             this.lblNome.Size = new Size(95, 15);
             this.lblNome.TabIndex = 0;
-            this.lblNome.Text = "Nome completo:";
+            this.lblNome.Text = "Full name:";
             // 
             // grpDocumento
             // 
@@ -148,13 +148,13 @@ namespace SmartSdk
             this.grpDocumento.Size = new Size(360, 80);
             this.grpDocumento.TabIndex = 4;
             this.grpDocumento.TabStop = false;
-            this.grpDocumento.Text = "Documento";
+            this.grpDocumento.Text = "Document";
             // 
             // txtDocumento
             // 
             this.txtDocumento.Location = new Point(15, 45);
             this.txtDocumento.Name = "txtDocumento";
-            this.txtDocumento.PlaceholderText = "CPF (opcional)";
+            this.txtDocumento.PlaceholderText = "CPF (optional)";
             this.txtDocumento.Size = new Size(200, 23);
             this.txtDocumento.TabIndex = 1;
             // 
@@ -186,7 +186,7 @@ namespace SmartSdk
             this.chkHabilitado.Name = "chkHabilitado";
             this.chkHabilitado.Size = new Size(113, 19);
             this.chkHabilitado.TabIndex = 0;
-            this.chkHabilitado.Text = "Entidade ativa";
+            this.chkHabilitado.Text = "Active entity";
             this.chkHabilitado.UseVisualStyleBackColor = true;
             // 
             // btnSalvar
@@ -199,7 +199,7 @@ namespace SmartSdk
             this.btnSalvar.Name = "btnSalvar";
             this.btnSalvar.Size = new Size(80, 35);
             this.btnSalvar.TabIndex = 6;
-            this.btnSalvar.Text = "Salvar";
+            this.btnSalvar.Text = "Save";
             this.btnSalvar.UseVisualStyleBackColor = false;
             this.btnSalvar.Click += this.btnSalvar_Click;
             // 
@@ -213,7 +213,7 @@ namespace SmartSdk
             this.btnCancelar.Name = "btnCancelar";
             this.btnCancelar.Size = new Size(80, 35);
             this.btnCancelar.TabIndex = 7;
-            this.btnCancelar.Text = "Cancelar";
+            this.btnCancelar.Text = "Cancel";
             this.btnCancelar.UseVisualStyleBackColor = false;
             this.btnCancelar.Click += this.btnCancelar_Click;
             // 
@@ -235,7 +235,7 @@ namespace SmartSdk
             this.MinimizeBox = false;
             this.Name = "FormCadastroPessoaEdit";
             this.StartPosition = FormStartPosition.CenterParent;
-            this.Text = "Editar Pessoa";
+            this.Text = "Edit Person";
             this.Load += this.FormCadastroPessoaEdit_Load;
             this.grpIdentificacao.ResumeLayout(false);
             this.grpIdentificacao.PerformLayout();

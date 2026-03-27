@@ -48,7 +48,7 @@ namespace SmartSdk
             lblSubtitulo.Name = "lblSubtitulo";
             lblSubtitulo.Size = new Size(440, 15);
             lblSubtitulo.TabIndex = 1;
-            lblSubtitulo.Text = "Selecione uma opcao para continuar o cadastro.";
+            lblSubtitulo.Text = "Select an option to continue the registration.";
             // 
             // lblTitulo
             // 
@@ -58,7 +58,7 @@ namespace SmartSdk
             lblTitulo.Name = "lblTitulo";
             lblTitulo.Size = new Size(420, 20);
             lblTitulo.TabIndex = 0;
-            lblTitulo.Text = "Escolha o tipo da entidade";
+            lblTitulo.Text = "Choose the entity type";
             // 
             // _cardPessoa
             // 
@@ -79,7 +79,7 @@ namespace SmartSdk
             lblPessoaDesc.Name = "lblPessoaDesc";
             lblPessoaDesc.Size = new Size(390, 15);
             lblPessoaDesc.TabIndex = 1;
-            lblPessoaDesc.Text = "Morador, colaborador, visitante";
+            lblPessoaDesc.Text = "Resident, employee, visitor";
             // 
             // _rbPessoa
             // 
@@ -90,7 +90,7 @@ namespace SmartSdk
             _rbPessoa.Size = new Size(65, 19);
             _rbPessoa.TabIndex = 0;
             _rbPessoa.TabStop = true;
-            _rbPessoa.Text = "Pessoa";
+            _rbPessoa.Text = "Person";
             _rbPessoa.UseVisualStyleBackColor = true;
             // 
             // _cardVeiculo
@@ -112,7 +112,7 @@ namespace SmartSdk
             lblVeiculoDesc.Name = "lblVeiculoDesc";
             lblVeiculoDesc.Size = new Size(390, 15);
             lblVeiculoDesc.TabIndex = 1;
-            lblVeiculoDesc.Text = "Carro, moto, caminhonete";
+            lblVeiculoDesc.Text = "Car, motorcycle, truck";
             // 
             // _rbVeiculo
             // 
@@ -121,7 +121,7 @@ namespace SmartSdk
             _rbVeiculo.Name = "_rbVeiculo";
             _rbVeiculo.Size = new Size(66, 19);
             _rbVeiculo.TabIndex = 0;
-            _rbVeiculo.Text = "Veiculo";
+            _rbVeiculo.Text = "Vehicle";
             _rbVeiculo.UseVisualStyleBackColor = true;
             // 
             // _btnOk
@@ -135,7 +135,7 @@ namespace SmartSdk
             _btnOk.Name = "_btnOk";
             _btnOk.Size = new Size(96, 30);
             _btnOk.TabIndex = 3;
-            _btnOk.Text = "Continuar";
+            _btnOk.Text = "Continue";
             _btnOk.UseVisualStyleBackColor = false;
             // 
             // _btnCancelar
@@ -145,7 +145,7 @@ namespace SmartSdk
             _btnCancelar.Name = "_btnCancelar";
             _btnCancelar.Size = new Size(86, 30);
             _btnCancelar.TabIndex = 4;
-            _btnCancelar.Text = "Cancelar";
+            _btnCancelar.Text = "Cancel";
             _btnCancelar.UseVisualStyleBackColor = true;
             // 
             // FormSelecionarTipoEntidade

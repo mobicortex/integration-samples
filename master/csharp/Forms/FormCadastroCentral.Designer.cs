@@ -67,7 +67,7 @@ namespace SmartSdk
             lblSubtitulo.Name = "lblSubtitulo";
             lblSubtitulo.Size = new Size(440, 15);
             lblSubtitulo.TabIndex = 1;
-            lblSubtitulo.Text = "Cadastro Central (Unidade/Apartamento/Empresa)";
+            lblSubtitulo.Text = "Central Registry (Unit/Apartment/Company)";
             // 
             // lblTitulo
             // 
@@ -77,7 +77,7 @@ namespace SmartSdk
             lblTitulo.Name = "lblTitulo";
             lblTitulo.Size = new Size(420, 20);
             lblTitulo.TabIndex = 0;
-            lblTitulo.Text = "Cadastro Central";
+            lblTitulo.Text = "Central Registry";
             // 
             // grpId
             // 
@@ -91,7 +91,7 @@ namespace SmartSdk
             grpId.Size = new Size(444, 90);
             grpId.TabIndex = 1;
             grpId.TabStop = false;
-            grpId.Text = "Identificacao";
+            grpId.Text = "Identification";
             // 
             // lblIdInfo
             // 
@@ -101,12 +101,12 @@ namespace SmartSdk
             lblIdInfo.Name = "lblIdInfo";
             lblIdInfo.Size = new Size(400, 15);
             lblIdInfo.TabIndex = 2;
-            lblIdInfo.Text = "0 = geracao automatica pelo servidor";
+            lblIdInfo.Text = "0 = automatic generation by the server";
             // 
             // numId
             // 
             numId.Location = new Point(80, 30);
-            numId.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
+            numId.Maximum = new decimal(new int[] { -1, 0, 0, 0 }); // uint.MaxValue = 4294967295
             numId.Name = "numId";
             numId.Size = new Size(140, 23);
             numId.TabIndex = 1;
@@ -133,7 +133,7 @@ namespace SmartSdk
             grpNome.Size = new Size(444, 70);
             grpNome.TabIndex = 2;
             grpNome.TabStop = false;
-            grpNome.Text = "Nome";
+            grpNome.Text = "Name";
             // 
             // txtNome
             // 
@@ -152,7 +152,7 @@ namespace SmartSdk
             lblNome.Name = "lblNome";
             lblNome.Size = new Size(43, 15);
             lblNome.TabIndex = 0;
-            lblNome.Text = "Nome:";
+            lblNome.Text = "Name:";
             // 
             // grpCamposOpcionais
             // 
@@ -171,7 +171,7 @@ namespace SmartSdk
             grpCamposOpcionais.Size = new Size(444, 140);
             grpCamposOpcionais.TabIndex = 3;
             grpCamposOpcionais.TabStop = false;
-            grpCamposOpcionais.Text = "Campos Opcionais";
+            grpCamposOpcionais.Text = "Optional Fields";
             // 
             // txtField4
             // 
@@ -190,7 +190,7 @@ namespace SmartSdk
             lblField4.Name = "lblField4";
             lblField4.Size = new Size(44, 15);
             lblField4.TabIndex = 6;
-            lblField4.Text = "Campo";
+            lblField4.Text = "Field";
             // 
             // txtField3
             // 
@@ -209,7 +209,7 @@ namespace SmartSdk
             lblField3.Name = "lblField3";
             lblField3.Size = new Size(44, 15);
             lblField3.TabIndex = 4;
-            lblField3.Text = "Campo";
+            lblField3.Text = "Field";
             // 
             // txtField2
             // 
@@ -228,7 +228,7 @@ namespace SmartSdk
             lblField2.Name = "lblField2";
             lblField2.Size = new Size(44, 15);
             lblField2.TabIndex = 2;
-            lblField2.Text = "Campo";
+            lblField2.Text = "Field";
             // 
             // txtField1
             // 
@@ -247,7 +247,7 @@ namespace SmartSdk
             lblField1.Name = "lblField1";
             lblField1.Size = new Size(44, 15);
             lblField1.TabIndex = 0;
-            lblField1.Text = "Campo";
+            lblField1.Text = "Field";
             // 
             // grpStatus
             // 
@@ -270,7 +270,7 @@ namespace SmartSdk
             chkBloqueado.Name = "chkBloqueado";
             chkBloqueado.Size = new Size(190, 19);
             chkBloqueado.TabIndex = 0;
-            chkBloqueado.Text = "Ativar cadastro";
+            chkBloqueado.Text = "Enable registry";
             chkBloqueado.UseVisualStyleBackColor = true;
             // 
             // panelBotoes
@@ -291,7 +291,7 @@ namespace SmartSdk
             btnCancelar.Name = "btnCancelar";
             btnCancelar.Size = new Size(84, 30);
             btnCancelar.TabIndex = 1;
-            btnCancelar.Text = "Cancelar";
+            btnCancelar.Text = "Cancel";
             btnCancelar.UseVisualStyleBackColor = true;
             // 
             // btnSalvar
@@ -306,7 +306,7 @@ namespace SmartSdk
             btnSalvar.Name = "btnSalvar";
             btnSalvar.Size = new Size(90, 30);
             btnSalvar.TabIndex = 0;
-            btnSalvar.Text = "Salvar";
+            btnSalvar.Text = "Save";
             btnSalvar.UseVisualStyleBackColor = false;
             btnSalvar.Click += btnSalvar_Click;
             // 

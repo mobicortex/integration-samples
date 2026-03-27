@@ -15,165 +15,165 @@ namespace SmartSdk
 
         private void InitializeComponent()
         {
-            panelHeader = new Panel();
-            lblSubtitulo = new Label();
-            lblTitulo = new Label();
-            _cardPessoa = new Panel();
-            lblPessoaDesc = new Label();
-            _rbPessoa = new RadioButton();
-            _cardVeiculo = new Panel();
-            lblVeiculoDesc = new Label();
-            _rbVeiculo = new RadioButton();
-            _btnOk = new Button();
-            _btnCancelar = new Button();
-            panelHeader.SuspendLayout();
-            _cardPessoa.SuspendLayout();
-            _cardVeiculo.SuspendLayout();
-            SuspendLayout();
-            // 
+            this.panelHeader = new Panel();
+            this.lblSubtitulo = new Label();
+            this.lblTitulo = new Label();
+            this._cardPessoa = new Panel();
+            this.lblPessoaDesc = new Label();
+            this._rbPessoa = new RadioButton();
+            this._cardVeiculo = new Panel();
+            this.lblVeiculoDesc = new Label();
+            this._rbVeiculo = new RadioButton();
+            this._btnOk = new Button();
+            this._btnCancelar = new Button();
+            this.panelHeader.SuspendLayout();
+            this._cardPessoa.SuspendLayout();
+            this._cardVeiculo.SuspendLayout();
+            this.SuspendLayout();
+            //
             // panelHeader
-            // 
-            panelHeader.BackColor = Color.FromArgb(244, 246, 248);
-            panelHeader.Controls.Add(lblSubtitulo);
-            panelHeader.Controls.Add(lblTitulo);
-            panelHeader.Location = new Point(0, 0);
-            panelHeader.Name = "panelHeader";
-            panelHeader.Size = new Size(504, 62);
-            panelHeader.TabIndex = 0;
-            // 
+            //
+            this.panelHeader.BackColor = Color.FromArgb(244, 246, 248);
+            this.panelHeader.Controls.Add(this.lblSubtitulo);
+            this.panelHeader.Controls.Add(this.lblTitulo);
+            this.panelHeader.Location = new Point(0, 0);
+            this.panelHeader.Name = "panelHeader";
+            this.panelHeader.Size = new Size(504, 62);
+            this.panelHeader.TabIndex = 0;
+            //
             // lblSubtitulo
-            // 
-            lblSubtitulo.ForeColor = Color.FromArgb(95, 102, 109);
-            lblSubtitulo.Location = new Point(20, 33);
-            lblSubtitulo.Name = "lblSubtitulo";
-            lblSubtitulo.Size = new Size(440, 15);
-            lblSubtitulo.TabIndex = 1;
-            lblSubtitulo.Text = "Selecione uma opcao para continuar o cadastro.";
-            // 
+            //
+            this.lblSubtitulo.ForeColor = Color.FromArgb(95, 102, 109);
+            this.lblSubtitulo.Location = new Point(20, 33);
+            this.lblSubtitulo.Name = "lblSubtitulo";
+            this.lblSubtitulo.Size = new Size(440, 15);
+            this.lblSubtitulo.TabIndex = 1;
+            this.lblSubtitulo.Text = "Select an option to continue the registration.";
+            //
             // lblTitulo
-            // 
-            lblTitulo.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            lblTitulo.ForeColor = Color.FromArgb(32, 36, 40);
-            lblTitulo.Location = new Point(20, 12);
-            lblTitulo.Name = "lblTitulo";
-            lblTitulo.Size = new Size(420, 20);
-            lblTitulo.TabIndex = 0;
-            lblTitulo.Text = "Escolha o tipo da entidade";
-            // 
+            //
+            this.lblTitulo.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            this.lblTitulo.ForeColor = Color.FromArgb(32, 36, 40);
+            this.lblTitulo.Location = new Point(20, 12);
+            this.lblTitulo.Name = "lblTitulo";
+            this.lblTitulo.Size = new Size(420, 20);
+            this.lblTitulo.TabIndex = 0;
+            this.lblTitulo.Text = "Choose the entity type";
+            //
             // _cardPessoa
-            // 
-            _cardPessoa.BackColor = Color.FromArgb(240, 248, 255);
-            _cardPessoa.BorderStyle = BorderStyle.FixedSingle;
-            _cardPessoa.Controls.Add(lblPessoaDesc);
-            _cardPessoa.Controls.Add(_rbPessoa);
-            _cardPessoa.Cursor = Cursors.Hand;
-            _cardPessoa.Location = new Point(20, 76);
-            _cardPessoa.Name = "_cardPessoa";
-            _cardPessoa.Size = new Size(470, 74);
-            _cardPessoa.TabIndex = 1;
-            // 
+            //
+            this._cardPessoa.BackColor = Color.FromArgb(240, 248, 255);
+            this._cardPessoa.BorderStyle = BorderStyle.FixedSingle;
+            this._cardPessoa.Controls.Add(this.lblPessoaDesc);
+            this._cardPessoa.Controls.Add(this._rbPessoa);
+            this._cardPessoa.Cursor = Cursors.Hand;
+            this._cardPessoa.Location = new Point(20, 76);
+            this._cardPessoa.Name = "_cardPessoa";
+            this._cardPessoa.Size = new Size(470, 74);
+            this._cardPessoa.TabIndex = 1;
+            //
             // lblPessoaDesc
-            // 
-            lblPessoaDesc.ForeColor = Color.FromArgb(95, 102, 109);
-            lblPessoaDesc.Location = new Point(34, 36);
-            lblPessoaDesc.Name = "lblPessoaDesc";
-            lblPessoaDesc.Size = new Size(390, 15);
-            lblPessoaDesc.TabIndex = 1;
-            lblPessoaDesc.Text = "Morador, colaborador, visitante";
-            // 
+            //
+            this.lblPessoaDesc.ForeColor = Color.FromArgb(95, 102, 109);
+            this.lblPessoaDesc.Location = new Point(34, 36);
+            this.lblPessoaDesc.Name = "lblPessoaDesc";
+            this.lblPessoaDesc.Size = new Size(390, 15);
+            this.lblPessoaDesc.TabIndex = 1;
+            this.lblPessoaDesc.Text = "Resident, employee, visitor";
+            //
             // _rbPessoa
-            // 
-            _rbPessoa.AutoSize = true;
-            _rbPessoa.Checked = true;
-            _rbPessoa.Location = new Point(14, 12);
-            _rbPessoa.Name = "_rbPessoa";
-            _rbPessoa.Size = new Size(65, 19);
-            _rbPessoa.TabIndex = 0;
-            _rbPessoa.TabStop = true;
-            _rbPessoa.Text = "Pessoa";
-            _rbPessoa.UseVisualStyleBackColor = true;
-            // 
+            //
+            this._rbPessoa.AutoSize = true;
+            this._rbPessoa.Checked = true;
+            this._rbPessoa.Location = new Point(14, 12);
+            this._rbPessoa.Name = "_rbPessoa";
+            this._rbPessoa.Size = new Size(65, 19);
+            this._rbPessoa.TabIndex = 0;
+            this._rbPessoa.TabStop = true;
+            this._rbPessoa.Text = "Person";
+            this._rbPessoa.UseVisualStyleBackColor = true;
+            //
             // _cardVeiculo
-            // 
-            _cardVeiculo.BackColor = Color.White;
-            _cardVeiculo.BorderStyle = BorderStyle.FixedSingle;
-            _cardVeiculo.Controls.Add(lblVeiculoDesc);
-            _cardVeiculo.Controls.Add(_rbVeiculo);
-            _cardVeiculo.Cursor = Cursors.Hand;
-            _cardVeiculo.Location = new Point(20, 160);
-            _cardVeiculo.Name = "_cardVeiculo";
-            _cardVeiculo.Size = new Size(470, 74);
-            _cardVeiculo.TabIndex = 2;
-            // 
+            //
+            this._cardVeiculo.BackColor = Color.White;
+            this._cardVeiculo.BorderStyle = BorderStyle.FixedSingle;
+            this._cardVeiculo.Controls.Add(this.lblVeiculoDesc);
+            this._cardVeiculo.Controls.Add(this._rbVeiculo);
+            this._cardVeiculo.Cursor = Cursors.Hand;
+            this._cardVeiculo.Location = new Point(20, 160);
+            this._cardVeiculo.Name = "_cardVeiculo";
+            this._cardVeiculo.Size = new Size(470, 74);
+            this._cardVeiculo.TabIndex = 2;
+            //
             // lblVeiculoDesc
-            // 
-            lblVeiculoDesc.ForeColor = Color.FromArgb(95, 102, 109);
-            lblVeiculoDesc.Location = new Point(34, 36);
-            lblVeiculoDesc.Name = "lblVeiculoDesc";
-            lblVeiculoDesc.Size = new Size(390, 15);
-            lblVeiculoDesc.TabIndex = 1;
-            lblVeiculoDesc.Text = "Carro, moto, caminhonete";
-            // 
+            //
+            this.lblVeiculoDesc.ForeColor = Color.FromArgb(95, 102, 109);
+            this.lblVeiculoDesc.Location = new Point(34, 36);
+            this.lblVeiculoDesc.Name = "lblVeiculoDesc";
+            this.lblVeiculoDesc.Size = new Size(390, 15);
+            this.lblVeiculoDesc.TabIndex = 1;
+            this.lblVeiculoDesc.Text = "Car, motorcycle, truck";
+            //
             // _rbVeiculo
-            // 
-            _rbVeiculo.AutoSize = true;
-            _rbVeiculo.Location = new Point(14, 12);
-            _rbVeiculo.Name = "_rbVeiculo";
-            _rbVeiculo.Size = new Size(66, 19);
-            _rbVeiculo.TabIndex = 0;
-            _rbVeiculo.Text = "Veiculo";
-            _rbVeiculo.UseVisualStyleBackColor = true;
-            // 
+            //
+            this._rbVeiculo.AutoSize = true;
+            this._rbVeiculo.Location = new Point(14, 12);
+            this._rbVeiculo.Name = "_rbVeiculo";
+            this._rbVeiculo.Size = new Size(66, 19);
+            this._rbVeiculo.TabIndex = 0;
+            this._rbVeiculo.Text = "Vehicle";
+            this._rbVeiculo.UseVisualStyleBackColor = true;
+            //
             // _btnOk
-            // 
-            _btnOk.BackColor = Color.FromArgb(25, 135, 84);
-            _btnOk.DialogResult = DialogResult.OK;
-            _btnOk.FlatAppearance.BorderSize = 0;
-            _btnOk.FlatStyle = FlatStyle.Flat;
-            _btnOk.ForeColor = Color.White;
-            _btnOk.Location = new Point(304, 248);
-            _btnOk.Name = "_btnOk";
-            _btnOk.Size = new Size(96, 30);
-            _btnOk.TabIndex = 3;
-            _btnOk.Text = "Continuar";
-            _btnOk.UseVisualStyleBackColor = false;
-            // 
+            //
+            this._btnOk.BackColor = Color.FromArgb(25, 135, 84);
+            this._btnOk.DialogResult = DialogResult.OK;
+            this._btnOk.FlatAppearance.BorderSize = 0;
+            this._btnOk.FlatStyle = FlatStyle.Flat;
+            this._btnOk.ForeColor = Color.White;
+            this._btnOk.Location = new Point(304, 248);
+            this._btnOk.Name = "_btnOk";
+            this._btnOk.Size = new Size(96, 30);
+            this._btnOk.TabIndex = 3;
+            this._btnOk.Text = "Continue";
+            this._btnOk.UseVisualStyleBackColor = false;
+            //
             // _btnCancelar
-            // 
-            _btnCancelar.DialogResult = DialogResult.Cancel;
-            _btnCancelar.Location = new Point(406, 248);
-            _btnCancelar.Name = "_btnCancelar";
-            _btnCancelar.Size = new Size(86, 30);
-            _btnCancelar.TabIndex = 4;
-            _btnCancelar.Text = "Cancelar";
-            _btnCancelar.UseVisualStyleBackColor = true;
-            // 
+            //
+            this._btnCancelar.DialogResult = DialogResult.Cancel;
+            this._btnCancelar.Location = new Point(406, 248);
+            this._btnCancelar.Name = "_btnCancelar";
+            this._btnCancelar.Size = new Size(86, 30);
+            this._btnCancelar.TabIndex = 4;
+            this._btnCancelar.Text = "Cancel";
+            this._btnCancelar.UseVisualStyleBackColor = true;
+            //
             // FormSelecionarTipoEntidade
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.White;
-            CancelButton = _btnCancelar;
-            ClientSize = new Size(504, 291);
-            Controls.Add(_btnCancelar);
-            Controls.Add(_btnOk);
-            Controls.Add(_cardVeiculo);
-            Controls.Add(_cardPessoa);
-            Controls.Add(panelHeader);
-            Font = new Font("Segoe UI", 9F);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            Name = "FormSelecionarTipoEntidade";
-            ShowInTaskbar = false;
-            StartPosition = FormStartPosition.CenterParent;
-            Text = "Tipo de Entidade";
-            panelHeader.ResumeLayout(false);
-            _cardPessoa.ResumeLayout(false);
-            _cardPessoa.PerformLayout();
-            _cardVeiculo.ResumeLayout(false);
-            _cardVeiculo.PerformLayout();
-            ResumeLayout(false);
+            //
+            this.AutoScaleDimensions = new SizeF(7F, 15F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.BackColor = Color.White;
+            this.CancelButton = this._btnCancelar;
+            this.ClientSize = new Size(504, 291);
+            this.Controls.Add(this._btnCancelar);
+            this.Controls.Add(this._btnOk);
+            this.Controls.Add(this._cardVeiculo);
+            this.Controls.Add(this._cardPessoa);
+            this.Controls.Add(this.panelHeader);
+            this.Font = new Font("Segoe UI", 9F);
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "FormSelecionarTipoEntidade";
+            this.ShowInTaskbar = false;
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.Text = "Entity Type";
+            this.panelHeader.ResumeLayout(false);
+            this._cardPessoa.ResumeLayout(false);
+            this._cardPessoa.PerformLayout();
+            this._cardVeiculo.ResumeLayout(false);
+            this._cardVeiculo.PerformLayout();
+            this.ResumeLayout(false);
         }
 
         #endregion

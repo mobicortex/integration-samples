@@ -4,8 +4,8 @@ using MobiCortex.Sdk.Models;
 namespace SmartSdk
 {
     /// <summary>
-    /// Formulario simplificado para cadastro de veiculo.
-    /// Campos: ID, marca, modelo, cor, placa e LPR.
+    /// Simplified form for vehicle registration.
+    /// Fields: ID, brand, model, color, plate and LPR.
     /// </summary>
     public partial class FormCadastroVeiculo : Form
     {
@@ -18,16 +18,16 @@ namespace SmartSdk
         public bool LprAtivo { get; private set; }
         public bool EntidadeEnabled { get; private set; } = true;
 
-        // Modo edição
-        private readonly bool _modoEdicao = false;
-        private readonly Entidade? _entidadeExistente;
+        // Edit mode
+        private readonly bool _editMode = false;
+        private readonly Entity? _existingEntity;
         private readonly IMobiCortexClient? _api;
 
         private static readonly string[] FallbackVehicleColors =
         {
-            "Amarela", "Azul", "Bege", "Branca", "Cinza", "Dourada", "Grena",
-            "Laranja", "Marrom", "Prata", "Preta", "Rosa", "Roxa", "Verde",
-            "Vermelha", "Fantasia"
+            "Yellow", "Blue", "Beige", "White", "Gray", "Gold", "Maroon",
+            "Orange", "Brown", "Silver", "Black", "Pink", "Purple", "Green",
+            "Red", "Custom"
         };
 
         private static readonly string[] FallbackVehicleBrands =
@@ -38,13 +38,13 @@ namespace SmartSdk
         };
 
         /// <summary>
-        /// Construtor padrão para o Designer do Visual Studio.
+        /// Default constructor for Visual Studio Designer.
         /// </summary>
         public FormCadastroVeiculo()
         {
             InitializeComponent();
             CadastroId = 0;
-            ConfigurarFallbackCatalogos();
+            ConfigureFallbackCatalogs();
         }
 
         public FormCadastroVeiculo(uint cadastroId, IMobiCortexClient? api = null)
@@ -52,26 +52,26 @@ namespace SmartSdk
             CadastroId = cadastroId;
             _api = api;
             InitializeComponent();
-            ConfigurarFallbackCatalogos();
-            lblCadastro.Text = $"Cadastro selecionado: {CadastroId}";
+            ConfigureFallbackCatalogs();
+            lblCadastro.Text = $"Selected registry: {CadastroId}";
         }
 
         /// <summary>
-        /// Construtor para edição de veículo existente
+        /// Constructor for editing an existing vehicle
         /// </summary>
-        public FormCadastroVeiculo(Entidade entidade, IMobiCortexClient? api = null) : this(entidade.CadastroId, api)
+        public FormCadastroVeiculo(Entity entidade, IMobiCortexClient? api = null) : this(entidade.RegistryId, api)
         {
-            _modoEdicao = true;
-            _entidadeExistente = entidade;
+            _editMode = true;
+            _existingEntity = entidade;
         }
 
         private async void FormCadastroVeiculo_Load(object? sender, EventArgs e)
         {
-            await CarregarCatalogosVeiculoAsync();
+            await LoadVehicleCatalogsAsync();
 
-            if (_modoEdicao && _entidadeExistente != null)
+            if (_editMode && _existingEntity != null)
             {
-                ConfigurarModoEdicao();
+                ConfigureEditMode();
                 return;
             }
 
@@ -79,17 +79,17 @@ namespace SmartSdk
             EntidadeEnabled = true;
         }
 
-        private void ConfigurarFallbackCatalogos()
+        private void ConfigureFallbackCatalogs()
         {
-            PreencherCores(FallbackVehicleColors);
-            PreencherMarcas(FallbackVehicleBrands);
+            FillColors(FallbackVehicleColors);
+            FillBrands(FallbackVehicleBrands);
         }
 
-        private async Task CarregarCatalogosVeiculoAsync()
+        private async Task LoadVehicleCatalogsAsync()
         {
             if (_api == null) return;
 
-            var result = await _api.Sistema.ObterCatalogosVeiculoAsync();
+            var result = await _api.SystemInfo.GetVehicleCatalogsAsync();
             if (!result.Success || result.Data == null || result.Data.Ret != 0)
             {
                 return;
@@ -109,21 +109,21 @@ namespace SmartSdk
 
             if (colors.Length > 0)
             {
-                PreencherCores(colors);
+                FillColors(colors);
             }
 
             if (brands.Length > 0)
             {
-                PreencherMarcas(brands);
+                FillBrands(brands);
             }
         }
 
-        private void PreencherCores(IEnumerable<string> colors)
+        private void FillColors(IEnumerable<string> colors)
         {
             var selected = _cmbCor.SelectedItem?.ToString() ?? _cmbCor.Text;
             _cmbCor.BeginUpdate();
             _cmbCor.Items.Clear();
-            _cmbCor.Items.Add("Selecionar...");
+            _cmbCor.Items.Add("Select...");
 
             foreach (var color in colors.Distinct(StringComparer.OrdinalIgnoreCase))
             {
@@ -137,7 +137,7 @@ namespace SmartSdk
                 {
                     _cmbCor.SelectedIndex = index;
                 }
-                else if (!string.Equals(selected, "Selecionar...", StringComparison.OrdinalIgnoreCase))
+                else if (!string.Equals(selected, "Select...", StringComparison.OrdinalIgnoreCase))
                 {
                     _cmbCor.Items.Add(selected);
                     _cmbCor.SelectedIndex = _cmbCor.Items.Count - 1;
@@ -155,7 +155,7 @@ namespace SmartSdk
             _cmbCor.EndUpdate();
         }
 
-        private void PreencherMarcas(IEnumerable<string> brands)
+        private void FillBrands(IEnumerable<string> brands)
         {
             var selected = _txtMarca.Text;
             var orderedBrands = brands
@@ -189,67 +189,67 @@ namespace SmartSdk
             _txtMarca.EndUpdate();
         }
 
-        private void ConfigurarModoEdicao()
+        private void ConfigureEditMode()
         {
-            if (_entidadeExistente == null) return;
+            if (_existingEntity == null) return;
 
-            Text = "Editar Veículo";
-            lblTitulo.Text = "Editar Veículo";
-            lblCadastro.Text = $"Cadastro ID: {CadastroId}";
+            Text = "Edit Vehicle";
+            lblTitulo.Text = "Edit Vehicle";
+            lblCadastro.Text = $"Registry ID: {CadastroId}";
 
-            // Preenche os campos com os dados existentes
-            // Aumenta o máximo para aceitar IDs altos (faixa web >= 4294000000)
+            // Fill fields with existing data
+            // Increase maximum to accept high IDs (web range >= 4294000000)
             _numId.Maximum = uint.MaxValue;
-            _numId.Value = _entidadeExistente.EntityId;
-            _numId.Enabled = false; // ID não pode ser alterado
+            _numId.Value = _existingEntity.EntityId;
+            _numId.Enabled = false; // ID cannot be changed
 
-            // Preenche placa
-            _txtPlaca.Text = _entidadeExistente.Doc;
+            // Fill plate
+            _txtPlaca.Text = _existingEntity.Doc;
 
-            // Preenche marca/modelo/cor se disponíveis
-            if (!string.IsNullOrEmpty(_entidadeExistente.Brand))
-                _txtMarca.Text = _entidadeExistente.Brand;
-            if (!string.IsNullOrEmpty(_entidadeExistente.Model))
-                _txtModelo.Text = _entidadeExistente.Model;
-            if (!string.IsNullOrEmpty(_entidadeExistente.Color))
+            // Fill brand/model/color if available
+            if (!string.IsNullOrEmpty(_existingEntity.Brand))
+                _txtMarca.Text = _existingEntity.Brand;
+            if (!string.IsNullOrEmpty(_existingEntity.Model))
+                _txtModelo.Text = _existingEntity.Model;
+            if (!string.IsNullOrEmpty(_existingEntity.Color))
             {
-                var colorIndex = _cmbCor.FindStringExact(_entidadeExistente.Color);
+                var colorIndex = _cmbCor.FindStringExact(_existingEntity.Color);
                 if (colorIndex >= 0)
                     _cmbCor.SelectedIndex = colorIndex;
                 else
                 {
-                    _cmbCor.Items.Add(_entidadeExistente.Color);
+                    _cmbCor.Items.Add(_existingEntity.Color);
                     _cmbCor.SelectedIndex = _cmbCor.Items.Count - 1;
                 }
             }
 
             // LPR
-            _chkLpr.Checked = _entidadeExistente.LprAtivo;
+            _chkLpr.Checked = _existingEntity.LprActive;
 
             // Enabled
-            EntidadeEnabled = _entidadeExistente.Enabled;
-            _chkHabilitado.Checked = _entidadeExistente.Enabled;
+            EntidadeEnabled = _existingEntity.Enabled;
+            _chkHabilitado.Checked = _existingEntity.Enabled;
         }
 
         private void BtnSalvar_Click(object? sender, EventArgs e)
         {
-            var placaNormalizada = _txtPlaca.Text.Trim().ToUpper().Replace("-", "").Replace(" ", "");
-            if (string.IsNullOrWhiteSpace(placaNormalizada))
+            var normalizedPlate = _txtPlaca.Text.Trim().ToUpper().Replace("-", "").Replace(" ", "");
+            if (string.IsNullOrWhiteSpace(normalizedPlate))
             {
-                MessageBox.Show("Placa e obrigatoria.", "Validacao",
+                MessageBox.Show("License plate is mandatory.", "Validation",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 DialogResult = DialogResult.None;
                 _txtPlaca.Focus();
                 return;
             }
 
-            var placaValida =
-                System.Text.RegularExpressions.Regex.IsMatch(placaNormalizada, @"^[A-Z]{3}[0-9]{4}$") ||
-                System.Text.RegularExpressions.Regex.IsMatch(placaNormalizada, @"^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$");
+            var validPlate =
+                System.Text.RegularExpressions.Regex.IsMatch(normalizedPlate, @"^[A-Z]{3}[0-9]{4}$") ||
+                System.Text.RegularExpressions.Regex.IsMatch(normalizedPlate, @"^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$");
 
-            if (!placaValida)
+            if (!validPlate)
             {
-                MessageBox.Show("Placa invalida. Use ABC1234 ou ABC1D23.", "Validacao",
+                MessageBox.Show("Invalid plate. Use ABC1234 or ABC1D23.", "Validation",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 DialogResult = DialogResult.None;
                 _txtPlaca.Focus();
@@ -260,15 +260,15 @@ namespace SmartSdk
             Marca = _txtMarca.Text.Trim();
             Modelo = _txtModelo.Text.Trim();
             Cor = _cmbCor.SelectedIndex <= 0 ? string.Empty : _cmbCor.SelectedItem?.ToString() ?? string.Empty;
-            Placa = placaNormalizada;
+            Placa = normalizedPlate;
             LprAtivo = _chkLpr.Checked;
             EntidadeEnabled = _chkHabilitado.Checked;
 
             if (IdVeiculo == 0)
             {
                 var result = MessageBox.Show(
-                    "ID nao informado. O codigo sera gerado automaticamente pela controladora.\n\nDeseja continuar?",
-                    "Confirmacao - ID Automatico",
+                    "ID not provided. The server will generate the ID automatically.\n\nDo you want to continue?",
+                    "Confirmation - Automatic ID",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Information);
 

@@ -38,9 +38,9 @@ namespace SmartSdk
             lblExplicacao.Padding = new Padding(8, 4, 8, 4);
             lblExplicacao.Size = new Size(800, 55);
             lblExplicacao.TabIndex = 0;
-            lblExplicacao.Text = "MQTT sobre WebSocket: Receba eventos em tempo real do controlador.\r\n" +
-                "URL: wss://<host>/mbcortex/master/api/v1/mqtt  |  Senha MQTT = session_key do login HTTP\r\n" +
-                "Tópicos: mbcortex/master/events/#  |  mbcortex/master/logs/#  |  #  (todos)";
+            lblExplicacao.Text = "MQTT over WebSocket: Receive real-time events from the controller.\r\n" +
+                "URL: wss://<host>/mbcortex/master/api/v1/mqtt  |  MQTT Password = session_key from HTTP login\r\n" +
+                "Topics: mbcortex/master/events/#  |  mbcortex/master/logs/#  |  #  (all)";
             // 
             // panelTopo - Controles de conexão
             // 
@@ -67,7 +67,7 @@ namespace SmartSdk
             btnConectar.Name = "btnConectar";
             btnConectar.Size = new Size(120, 28);
             btnConectar.TabIndex = 0;
-            btnConectar.Text = "Conectar MQTT";
+            btnConectar.Text = "Connect MQTT";
             btnConectar.UseVisualStyleBackColor = false;
             btnConectar.Click += btnConectar_Click;
             // 
@@ -80,7 +80,7 @@ namespace SmartSdk
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(85, 15);
             lblStatus.TabIndex = 1;
-            lblStatus.Text = "Desconectado";
+            lblStatus.Text = "Disconnected";
             // 
             // lblContador
             // 
@@ -90,7 +90,7 @@ namespace SmartSdk
             lblContador.Name = "lblContador";
             lblContador.Size = new Size(82, 15);
             lblContador.TabIndex = 2;
-            lblContador.Text = "Mensagens: 0";
+            lblContador.Text = "Messages: 0";
             // 
             // lblTopico
             // 
@@ -99,7 +99,7 @@ namespace SmartSdk
             lblTopico.Name = "lblTopico";
             lblTopico.Size = new Size(46, 15);
             lblTopico.TabIndex = 3;
-            lblTopico.Text = "Tópico:";
+            lblTopico.Text = "Topic:";
             // 
             // txtTopico
             // 
@@ -115,7 +115,7 @@ namespace SmartSdk
             btnSubscrever.Name = "btnSubscrever";
             btnSubscrever.Size = new Size(80, 28);
             btnSubscrever.TabIndex = 5;
-            btnSubscrever.Text = "Subscrever";
+            btnSubscrever.Text = "Subscribe";
             btnSubscrever.Click += btnSubscrever_Click;
             // 
             // btnLimpar
@@ -124,7 +124,7 @@ namespace SmartSdk
             btnLimpar.Name = "btnLimpar";
             btnLimpar.Size = new Size(60, 28);
             btnLimpar.TabIndex = 6;
-            btnLimpar.Text = "Limpar";
+            btnLimpar.Text = "Clear";
             btnLimpar.Click += btnLimpar_Click;
             // 
             // txtLog - Log de mensagens recebidas

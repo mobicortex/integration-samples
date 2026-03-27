@@ -71,7 +71,7 @@ namespace SmartSdk
             lblSubtitulo.Name = "lblSubtitulo";
             lblSubtitulo.Size = new Size(520, 15);
             lblSubtitulo.TabIndex = 1;
-            lblSubtitulo.Text = "Preencha os dados abaixo para cadastrar o veiculo no cadastro selecionado.";
+            lblSubtitulo.Text = "Fill in the data below to register the vehicle in the selected registry.";
             // 
             // lblTitulo
             // 
@@ -81,7 +81,7 @@ namespace SmartSdk
             lblTitulo.Name = "lblTitulo";
             lblTitulo.Size = new Size(420, 20);
             lblTitulo.TabIndex = 0;
-            lblTitulo.Text = "Novo Veiculo";
+            lblTitulo.Text = "New Vehicle";
             // 
             // lblIdentificacao
             // 
@@ -91,7 +91,7 @@ namespace SmartSdk
             lblIdentificacao.Name = "lblIdentificacao";
             lblIdentificacao.Size = new Size(180, 18);
             lblIdentificacao.TabIndex = 1;
-            lblIdentificacao.Text = "Identificacao";
+            lblIdentificacao.Text = "Identification";
             // 
             // panelIdentificacao
             // 
@@ -113,12 +113,12 @@ namespace SmartSdk
             lblIdInfo.Name = "lblIdInfo";
             lblIdInfo.Size = new Size(360, 15);
             lblIdInfo.TabIndex = 3;
-            lblIdInfo.Text = "0 = geracao automatica pela controladora";
+            lblIdInfo.Text = "0 = automatic generation by the controller";
             // 
             // _numId
             // 
             _numId.Location = new Point(52, 53);
-            _numId.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
+            _numId.Maximum = new decimal(new int[] { -1, 0, 0, 0 }); // uint.MaxValue = 4294967295
             _numId.Name = "_numId";
             _numId.Size = new Size(140, 23);
             _numId.TabIndex = 2;
@@ -138,7 +138,7 @@ namespace SmartSdk
             lblCadastro.Name = "lblCadastro";
             lblCadastro.Size = new Size(250, 15);
             lblCadastro.TabIndex = 0;
-            lblCadastro.Text = "Cadastro selecionado: 0";
+            lblCadastro.Text = "Selected registry: 0";
             // 
             // lblDados
             // 
@@ -148,7 +148,7 @@ namespace SmartSdk
             lblDados.Name = "lblDados";
             lblDados.Size = new Size(180, 18);
             lblDados.TabIndex = 3;
-            lblDados.Text = "Dados do Veiculo";
+            lblDados.Text = "Vehicle Data";
             // 
             // panelDados
             // 
@@ -181,13 +181,13 @@ namespace SmartSdk
             lblPlaca.Name = "lblPlaca";
             lblPlaca.Size = new Size(140, 15);
             lblPlaca.TabIndex = 8;
-            lblPlaca.Text = "Placa";
+            lblPlaca.Text = "License Plate";
             // 
             // _cmbCor
             // 
             _cmbCor.DropDownStyle = ComboBoxStyle.DropDownList;
             _cmbCor.FormattingEnabled = true;
-            _cmbCor.Items.AddRange(new object[] { "Selecionar...", "Branco", "Preto", "Prata", "Cinza", "Azul", "Vermelho", "Verde", "Amarelo", "Marrom", "Outro" });
+            _cmbCor.Items.AddRange(new object[] { "Select...", "White", "Black", "Silver", "Gray", "Blue", "Red", "Green", "Yellow", "Brown", "Other" });
             _cmbCor.Location = new Point(302, 49);
             _cmbCor.Name = "_cmbCor";
             _cmbCor.Size = new Size(270, 23);
@@ -199,7 +199,7 @@ namespace SmartSdk
             lblCor.Name = "lblCor";
             lblCor.Size = new Size(140, 15);
             lblCor.TabIndex = 2;
-            lblCor.Text = "Cor";
+            lblCor.Text = "Color";
             // 
             // _txtModelo
             // 
@@ -215,7 +215,7 @@ namespace SmartSdk
             lblModelo.Name = "lblModelo";
             lblModelo.Size = new Size(140, 15);
             lblModelo.TabIndex = 4;
-            lblModelo.Text = "Modelo";
+            lblModelo.Text = "Model";
             // 
             // _txtMarca
             // 
@@ -234,7 +234,7 @@ namespace SmartSdk
             lblMarca.Name = "lblMarca";
             lblMarca.Size = new Size(140, 15);
             lblMarca.TabIndex = 0;
-            lblMarca.Text = "Marca";
+            lblMarca.Text = "Brand";
             // 
             // panelLpr
             // 
@@ -254,7 +254,7 @@ namespace SmartSdk
             lblLprInfo.Name = "lblLprInfo";
             lblLprInfo.Size = new Size(330, 15);
             lblLprInfo.TabIndex = 1;
-            lblLprInfo.Text = "Identificar veiculo automaticamente";
+            lblLprInfo.Text = "Identify vehicle automatically";
             // 
             // _chkLpr
             // 
@@ -265,7 +265,7 @@ namespace SmartSdk
             _chkLpr.Name = "_chkLpr";
             _chkLpr.Size = new Size(162, 19);
             _chkLpr.TabIndex = 0;
-            _chkLpr.Text = "Leitura de Placa (LPR)";
+            _chkLpr.Text = "License Plate Reading (LPR)";
             _chkLpr.UseVisualStyleBackColor = true;
             // 
             // panelStatus
@@ -286,7 +286,7 @@ namespace SmartSdk
             lblStatusInfo.Name = "lblStatusInfo";
             lblStatusInfo.Size = new Size(330, 15);
             lblStatusInfo.TabIndex = 1;
-            lblStatusInfo.Text = "Desmarque para desativar o acesso deste veiculo";
+            lblStatusInfo.Text = "Uncheck to disable access for this vehicle";
             // 
             // _chkHabilitado
             // 
@@ -297,7 +297,7 @@ namespace SmartSdk
             _chkHabilitado.Name = "_chkHabilitado";
             _chkHabilitado.Size = new Size(91, 19);
             _chkHabilitado.TabIndex = 0;
-            _chkHabilitado.Text = "Veiculo ativo";
+            _chkHabilitado.Text = "Active vehicle";
             _chkHabilitado.UseVisualStyleBackColor = true;
             // 
             // panelBotoes
@@ -318,7 +318,7 @@ namespace SmartSdk
             btnCancelar.Name = "btnCancelar";
             btnCancelar.Size = new Size(82, 26);
             btnCancelar.TabIndex = 1;
-            btnCancelar.Text = "Cancelar";
+            btnCancelar.Text = "Cancel";
             btnCancelar.UseVisualStyleBackColor = true;
             // 
             // btnSalvar
@@ -332,7 +332,7 @@ namespace SmartSdk
             btnSalvar.Name = "btnSalvar";
             btnSalvar.Size = new Size(78, 26);
             btnSalvar.TabIndex = 0;
-            btnSalvar.Text = "Salvar";
+            btnSalvar.Text = "Save";
             btnSalvar.UseVisualStyleBackColor = false;
             btnSalvar.Click += BtnSalvar_Click;
             // 

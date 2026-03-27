@@ -6,8 +6,8 @@ using MQTTnet.Protocol;
 namespace SmartSdk
 {
     /// <summary>
-    /// Formulário de teste do Cliente MQTT.
-    /// Conecta ao broker MQTT da controladora MobiCortex.
+    /// MQTT Client test form.
+    /// Connects to the MobiCortex controller MQTT broker.
     /// </summary>
     public partial class FormMqttCliente : Form
     {
@@ -29,7 +29,7 @@ namespace SmartSdk
 
         private void FormMqttCliente_Load(object? sender, EventArgs e)
         {
-            // Tópicos padrão pré-selecionados
+            // Default pre-selected topics
             chkEvents.Checked = true;
             chkLogs.Checked = false;
             chkSensors.Checked = false;
@@ -39,14 +39,14 @@ namespace SmartSdk
         {
             if (_mqttClient?.IsConnected == true)
             {
-                await Desconectar();
+                await Disconnect();
                 return;
             }
 
-            await Conectar();
+            await Connect();
         }
 
-        private async Task Conectar()
+        private async Task Connect()
         {
             try
             {
@@ -55,14 +55,14 @@ namespace SmartSdk
 
                 if (string.IsNullOrEmpty(wsUrl) || string.IsNullOrEmpty(sessionKey))
                 {
-                    MessageBox.Show("Informe a URL WebSocket e a Session Key", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Enter the WebSocket URL and Session Key", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 btnConectar.Enabled = false;
-                btnConectar.Text = "Conectando...";
+                btnConectar.Text = "Connecting...";
 
-                // Coletar tópicos
+                // Collect topics
                 var topics = new List<string>();
                 if (chkEvents.Checked) topics.Add("mbcortex/master/events/#");
                 if (chkLogs.Checked) topics.Add("mbcortex/master/logs/#");
@@ -73,9 +73,9 @@ namespace SmartSdk
 
                 if (!topics.Any())
                 {
-                    MessageBox.Show("Selecione pelo menos um tópico", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Select at least one topic", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     btnConectar.Enabled = true;
-                    btnConectar.Text = "Conectar";
+                    btnConectar.Text = "Connect";
                     return;
                 }
 
@@ -87,25 +87,25 @@ namespace SmartSdk
 
                 if (connected)
                 {
-                    btnConectar.Text = "Desconectar";
+                    btnConectar.Text = "Disconnect";
                     btnConectar.BackColor = Color.FromArgb(220, 53, 69);
-                    lblStatus.Text = "Conectado";
+                    lblStatus.Text = "Connected";
                     lblStatus.ForeColor = Color.DarkGreen;
-                    Log("Conectado ao broker MQTT");
-                    Log($"Subscrito em: {string.Join(", ", topics)}");
+                    Log("Connected to MQTT broker");
+                    Log($"Subscribed to: {string.Join(", ", topics)}");
                 }
                 else
                 {
-                    lblStatus.Text = "Falha na conexão";
+                    lblStatus.Text = "Connection failed";
                     lblStatus.ForeColor = Color.DarkRed;
-                    Log("Falha ao conectar ao broker MQTT");
+                    Log("Failed to connect to MQTT broker");
                     _mqttClient = null;
                 }
             }
             catch (Exception ex)
             {
-                Log($"Erro: {ex.Message}");
-                lblStatus.Text = "Erro";
+                Log($"Error: {ex.Message}");
+                lblStatus.Text = "Error";
                 lblStatus.ForeColor = Color.DarkRed;
             }
             finally
@@ -114,7 +114,7 @@ namespace SmartSdk
             }
         }
 
-        private async Task Desconectar()
+        private async Task Disconnect()
         {
             if (_mqttClient != null)
             {
@@ -123,11 +123,11 @@ namespace SmartSdk
                 _mqttClient = null;
             }
 
-            btnConectar.Text = "Conectar";
+            btnConectar.Text = "Connect";
             btnConectar.BackColor = SystemColors.Control;
-            lblStatus.Text = "Desconectado";
+            lblStatus.Text = "Disconnected";
             lblStatus.ForeColor = Color.Gray;
-            Log("Desconectado do broker MQTT");
+            Log("Disconnected from MQTT broker");
         }
 
         private void OnMqttMessageReceived(object? sender, MqttMessageReceivedEventArgs e)
@@ -140,10 +140,10 @@ namespace SmartSdk
 
             _messages.Add(e);
 
-            // Formatar para exibição
+            // Format for display
             var timestamp = e.ReceivedAt.ToString("HH:mm:ss.fff");
-            var shortPayload = e.Payload.Length > 100 
-                ? e.Payload.Substring(0, 100) + "..." 
+            var shortPayload = e.Payload.Length > 100
+                ? e.Payload.Substring(0, 100) + "..."
                 : e.Payload;
 
             Log($"[{timestamp}] {e.Topic}");
@@ -151,8 +151,8 @@ namespace SmartSdk
             Log($"  Payload: {shortPayload}");
             Log("");
 
-            // Atualizar contador
-            lblMensagens.Text = $"Mensagens: {_messages.Count}";
+            // Update counter
+            lblMensagens.Text = $"Messages: {_messages.Count}";
         }
 
         private void OnMqttDisconnected(object? sender, EventArgs e)
@@ -163,10 +163,10 @@ namespace SmartSdk
                 return;
             }
 
-            Log("Conexão MQTT perdida!");
-            lblStatus.Text = "Desconectado";
+            Log("MQTT connection lost!");
+            lblStatus.Text = "Disconnected";
             lblStatus.ForeColor = Color.DarkRed;
-            btnConectar.Text = "Conectar";
+            btnConectar.Text = "Connect";
             btnConectar.BackColor = SystemColors.Control;
         }
 
@@ -174,7 +174,7 @@ namespace SmartSdk
         {
             if (_mqttClient?.IsConnected != true)
             {
-                MessageBox.Show("Conecte primeiro ao broker", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Connect to the broker first", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -184,26 +184,26 @@ namespace SmartSdk
 
             if (string.IsNullOrEmpty(topic) || string.IsNullOrEmpty(payload))
             {
-                MessageBox.Show("Informe tópico e payload", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Enter topic and payload", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             var result = await _mqttClient.PublishAsync(topic, payload, qos);
-            Log(result ? $"Publicado em {topic}" : "Falha ao publicar");
+            Log(result ? $"Published to {topic}" : "Failed to publish");
         }
 
         private void btnLimpar_Click(object? sender, EventArgs e)
         {
             txtLog.Clear();
             _messages.Clear();
-            lblMensagens.Text = "Mensagens: 0";
+            lblMensagens.Text = "Messages: 0";
         }
 
         private void btnSalvar_Click(object? sender, EventArgs e)
         {
             if (_messages.Count == 0)
             {
-                MessageBox.Show("Nenhuma mensagem para salvar", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("No messages to save", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -220,7 +220,7 @@ namespace SmartSdk
                     WriteIndented = true
                 });
                 File.WriteAllText(dlg.FileName, json);
-                Log($"Mensagens salvas em: {dlg.FileName}");
+                Log($"Messages saved to: {dlg.FileName}");
             }
         }
 

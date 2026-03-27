@@ -15,418 +15,418 @@ namespace SmartSdk
 
         private void InitializeComponent()
         {
-            lblExplicacao = new Label();
-            splitMain = new SplitContainer();
-            panelEntidades = new Panel();
-            listEntidades = new ListView();
-            colEntId = new ColumnHeader();
-            colEntTipo = new ColumnHeader();
-            colEntNome = new ColumnHeader();
-            colEntDoc = new ColumnHeader();
-            colEntAtivo = new ColumnHeader();
-            colEntCadId = new ColumnHeader();
-            panelPaginacao = new FlowLayoutPanel();
-            btnAnterior = new Button();
-            lblPagina = new Label();
-            btnProxima = new Button();
-            panelEntBotoes = new FlowLayoutPanel();
-            btnNovaEntidade = new Button();
-            btnExcluirEntidade = new Button();
-            txtFiltroEntidade = new TextBox();
-            btnBuscarEntidade = new Button();
-            lblStatusEntidades = new Label();
-            lblEntidadesTitulo = new Label();
-            panelMidias = new Panel();
-            listMidias = new ListView();
-            colMidId = new ColumnHeader();
-            colMidTipo = new ColumnHeader();
-            colMidDesc = new ColumnHeader();
-            colMidHab = new ColumnHeader();
-            panelMidBotoes = new FlowLayoutPanel();
-            btnNovaMidia = new Button();
-            btnExcluirMidia = new Button();
-            lblStatusMidias = new Label();
-            lblMidiasTitulo = new Label();
-            txtLog = new TextBox();
-            ((System.ComponentModel.ISupportInitialize)splitMain).BeginInit();
-            splitMain.Panel1.SuspendLayout();
-            splitMain.Panel2.SuspendLayout();
-            splitMain.SuspendLayout();
-            panelEntidades.SuspendLayout();
-            panelPaginacao.SuspendLayout();
-            panelEntBotoes.SuspendLayout();
-            panelMidias.SuspendLayout();
-            panelMidBotoes.SuspendLayout();
-            SuspendLayout();
-            // 
+            this.lblExplicacao = new Label();
+            this.splitMain = new SplitContainer();
+            this.panelEntidades = new Panel();
+            this.listEntidades = new ListView();
+            this.colEntId = new ColumnHeader();
+            this.colEntTipo = new ColumnHeader();
+            this.colEntNome = new ColumnHeader();
+            this.colEntDoc = new ColumnHeader();
+            this.colEntAtivo = new ColumnHeader();
+            this.colEntCadId = new ColumnHeader();
+            this.panelPaginacao = new FlowLayoutPanel();
+            this.btnAnterior = new Button();
+            this.lblPagina = new Label();
+            this.btnProxima = new Button();
+            this.panelEntBotoes = new FlowLayoutPanel();
+            this.btnNovaEntidade = new Button();
+            this.btnExcluirEntidade = new Button();
+            this.txtFiltroEntidade = new TextBox();
+            this.btnBuscarEntidade = new Button();
+            this.lblStatusEntidades = new Label();
+            this.lblEntidadesTitulo = new Label();
+            this.panelMidias = new Panel();
+            this.listMidias = new ListView();
+            this.colMidId = new ColumnHeader();
+            this.colMidTipo = new ColumnHeader();
+            this.colMidDesc = new ColumnHeader();
+            this.colMidHab = new ColumnHeader();
+            this.panelMidBotoes = new FlowLayoutPanel();
+            this.btnNovaMidia = new Button();
+            this.btnExcluirMidia = new Button();
+            this.lblStatusMidias = new Label();
+            this.lblMidiasTitulo = new Label();
+            this.txtLog = new TextBox();
+            ((System.ComponentModel.ISupportInitialize)(this.splitMain)).BeginInit();
+            this.splitMain.Panel1.SuspendLayout();
+            this.splitMain.Panel2.SuspendLayout();
+            this.splitMain.SuspendLayout();
+            this.panelEntidades.SuspendLayout();
+            this.panelPaginacao.SuspendLayout();
+            this.panelEntBotoes.SuspendLayout();
+            this.panelMidias.SuspendLayout();
+            this.panelMidBotoes.SuspendLayout();
+            this.SuspendLayout();
+            //
             // lblExplicacao
-            // 
-            lblExplicacao.BackColor = Color.FromArgb(0, 120, 60);
-            lblExplicacao.Dock = DockStyle.Top;
-            lblExplicacao.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            lblExplicacao.ForeColor = Color.White;
-            lblExplicacao.Location = new Point(0, 0);
-            lblExplicacao.Name = "lblExplicacao";
-            lblExplicacao.Padding = new Padding(10, 5, 10, 5);
-            lblExplicacao.Size = new Size(1050, 40);
-            lblExplicacao.TabIndex = 2;
-            lblExplicacao.Text = "CADASTRO SIMPLIFICADO (2 níveis): Crie entidades com createid=true — o controlador gera os IDs automaticamente. Não é necessário criar cadastro central antes.";
-            lblExplicacao.TextAlign = ContentAlignment.MiddleLeft;
-            // 
+            //
+            this.lblExplicacao.BackColor = Color.FromArgb(0, 120, 60);
+            this.lblExplicacao.Dock = DockStyle.Top;
+            this.lblExplicacao.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            this.lblExplicacao.ForeColor = Color.White;
+            this.lblExplicacao.Location = new Point(0, 0);
+            this.lblExplicacao.Name = "lblExplicacao";
+            this.lblExplicacao.Padding = new Padding(10, 5, 10, 5);
+            this.lblExplicacao.Size = new Size(1050, 40);
+            this.lblExplicacao.TabIndex = 2;
+            this.lblExplicacao.Text = "SIMPLIFIED REGISTRY (2 levels): Create entities with createid=true — the controller generates IDs automatically. No need to create a central registry first.";
+            this.lblExplicacao.TextAlign = ContentAlignment.MiddleLeft;
+            //
             // splitMain
-            // 
-            splitMain.Dock = DockStyle.Fill;
-            splitMain.Location = new Point(0, 40);
-            splitMain.Name = "splitMain";
-            // 
+            //
+            this.splitMain.Dock = DockStyle.Fill;
+            this.splitMain.Location = new Point(0, 40);
+            this.splitMain.Name = "splitMain";
+            //
             // splitMain.Panel1
-            // 
-            splitMain.Panel1.Controls.Add(panelEntidades);
-            // 
+            //
+            this.splitMain.Panel1.Controls.Add(this.panelEntidades);
+            //
             // splitMain.Panel2
-            // 
-            splitMain.Panel2.Controls.Add(panelMidias);
-            splitMain.Size = new Size(1050, 480);
-            splitMain.SplitterDistance = 648;
-            splitMain.TabIndex = 0;
-            // 
+            //
+            this.splitMain.Panel2.Controls.Add(this.panelMidias);
+            this.splitMain.Size = new Size(1050, 480);
+            this.splitMain.SplitterDistance = 648;
+            this.splitMain.TabIndex = 0;
+            //
             // panelEntidades
-            // 
-            panelEntidades.Controls.Add(listEntidades);
-            panelEntidades.Controls.Add(panelPaginacao);
-            panelEntidades.Controls.Add(panelEntBotoes);
-            panelEntidades.Controls.Add(lblStatusEntidades);
-            panelEntidades.Controls.Add(lblEntidadesTitulo);
-            panelEntidades.Dock = DockStyle.Fill;
-            panelEntidades.Location = new Point(0, 0);
-            panelEntidades.Name = "panelEntidades";
-            panelEntidades.Size = new Size(648, 480);
-            panelEntidades.TabIndex = 0;
-            // 
+            //
+            this.panelEntidades.Controls.Add(this.listEntidades);
+            this.panelEntidades.Controls.Add(this.panelPaginacao);
+            this.panelEntidades.Controls.Add(this.panelEntBotoes);
+            this.panelEntidades.Controls.Add(this.lblStatusEntidades);
+            this.panelEntidades.Controls.Add(this.lblEntidadesTitulo);
+            this.panelEntidades.Dock = DockStyle.Fill;
+            this.panelEntidades.Location = new Point(0, 0);
+            this.panelEntidades.Name = "panelEntidades";
+            this.panelEntidades.Size = new Size(648, 480);
+            this.panelEntidades.TabIndex = 0;
+            //
             // listEntidades
-            // 
-            listEntidades.Columns.AddRange(new ColumnHeader[] { colEntId, colEntTipo, colEntNome, colEntDoc, colEntAtivo, colEntCadId });
-            listEntidades.Dock = DockStyle.Fill;
-            listEntidades.FullRowSelect = true;
-            listEntidades.GridLines = true;
-            listEntidades.Location = new Point(0, 112);
-            listEntidades.MultiSelect = false;
-            listEntidades.Name = "listEntidades";
-            listEntidades.Size = new Size(648, 368);
-            listEntidades.TabIndex = 0;
-            listEntidades.UseCompatibleStateImageBehavior = false;
-            listEntidades.View = View.Details;
-            listEntidades.SelectedIndexChanged += listEntidades_SelectedIndexChanged;
-            // 
+            //
+            this.listEntidades.Columns.AddRange(new ColumnHeader[] { this.colEntId, this.colEntTipo, this.colEntNome, this.colEntDoc, this.colEntAtivo, this.colEntCadId });
+            this.listEntidades.Dock = DockStyle.Fill;
+            this.listEntidades.FullRowSelect = true;
+            this.listEntidades.GridLines = true;
+            this.listEntidades.Location = new Point(0, 112);
+            this.listEntidades.MultiSelect = false;
+            this.listEntidades.Name = "listEntidades";
+            this.listEntidades.Size = new Size(648, 368);
+            this.listEntidades.TabIndex = 0;
+            this.listEntidades.UseCompatibleStateImageBehavior = false;
+            this.listEntidades.View = View.Details;
+            this.listEntidades.SelectedIndexChanged += new System.EventHandler(this.listEntidades_SelectedIndexChanged);
+            //
             // colEntId
-            // 
-            colEntId.Text = "ID";
-            colEntId.Width = 90;
-            // 
+            //
+            this.colEntId.Text = "ID";
+            this.colEntId.Width = 90;
+            //
             // colEntTipo
-            // 
-            colEntTipo.Text = "Tipo";
-            // 
+            //
+            this.colEntTipo.Text = "Type";
+            //
             // colEntNome
-            // 
-            colEntNome.Text = "Descrição";
-            colEntNome.Width = 150;
-            // 
+            //
+            this.colEntNome.Text = "Description";
+            this.colEntNome.Width = 150;
+            //
             // colEntDoc
-            // 
-            colEntDoc.Text = "Doc/Placa";
-            colEntDoc.Width = 90;
-            // 
+            //
+            this.colEntDoc.Text = "Doc/Plate";
+            this.colEntDoc.Width = 90;
+            //
             // colEntAtivo
-            // 
-            colEntAtivo.Text = "Ativo";
-            colEntAtivo.Width = 50;
-            // 
+            //
+            this.colEntAtivo.Text = "Active";
+            this.colEntAtivo.Width = 50;
+            //
             // colEntCadId
-            // 
-            colEntCadId.Text = "CadID";
-            colEntCadId.Width = 70;
-            // 
+            //
+            this.colEntCadId.Text = "CadID";
+            this.colEntCadId.Width = 70;
+            //
             // panelPaginacao
-            // 
-            panelPaginacao.Controls.Add(btnAnterior);
-            panelPaginacao.Controls.Add(lblPagina);
-            panelPaginacao.Controls.Add(btnProxima);
-            panelPaginacao.Dock = DockStyle.Top;
-            panelPaginacao.Location = new Point(0, 82);
-            panelPaginacao.Name = "panelPaginacao";
-            panelPaginacao.Size = new Size(648, 30);
-            panelPaginacao.TabIndex = 1;
-            panelPaginacao.WrapContents = false;
-            // 
+            //
+            this.panelPaginacao.Controls.Add(this.btnAnterior);
+            this.panelPaginacao.Controls.Add(this.lblPagina);
+            this.panelPaginacao.Controls.Add(this.btnProxima);
+            this.panelPaginacao.Dock = DockStyle.Top;
+            this.panelPaginacao.Location = new Point(0, 82);
+            this.panelPaginacao.Name = "panelPaginacao";
+            this.panelPaginacao.Size = new Size(648, 30);
+            this.panelPaginacao.TabIndex = 1;
+            this.panelPaginacao.WrapContents = false;
+            //
             // btnAnterior
-            // 
-            btnAnterior.AutoSize = true;
-            btnAnterior.Enabled = false;
-            btnAnterior.FlatStyle = FlatStyle.Flat;
-            btnAnterior.Location = new Point(3, 3);
-            btnAnterior.Name = "btnAnterior";
-            btnAnterior.Size = new Size(75, 27);
-            btnAnterior.TabIndex = 0;
-            btnAnterior.Text = "<< Ant.";
-            btnAnterior.Click += btnAnterior_Click;
-            // 
+            //
+            this.btnAnterior.AutoSize = true;
+            this.btnAnterior.Enabled = false;
+            this.btnAnterior.FlatStyle = FlatStyle.Flat;
+            this.btnAnterior.Location = new Point(3, 3);
+            this.btnAnterior.Name = "btnAnterior";
+            this.btnAnterior.Size = new Size(75, 27);
+            this.btnAnterior.TabIndex = 0;
+            this.btnAnterior.Text = "<< Prev";
+            this.btnAnterior.Click += new System.EventHandler(this.btnAnterior_Click);
+            //
             // lblPagina
-            // 
-            lblPagina.AutoSize = true;
-            lblPagina.Location = new Point(87, 6);
-            lblPagina.Margin = new Padding(6, 6, 6, 0);
-            lblPagina.Name = "lblPagina";
-            lblPagina.Size = new Size(24, 15);
-            lblPagina.TabIndex = 1;
-            lblPagina.Text = "0/0";
-            lblPagina.TextAlign = ContentAlignment.MiddleCenter;
-            // 
+            //
+            this.lblPagina.AutoSize = true;
+            this.lblPagina.Location = new Point(87, 6);
+            this.lblPagina.Margin = new Padding(6, 6, 6, 0);
+            this.lblPagina.Name = "lblPagina";
+            this.lblPagina.Size = new Size(24, 15);
+            this.lblPagina.TabIndex = 1;
+            this.lblPagina.Text = "0/0";
+            this.lblPagina.TextAlign = ContentAlignment.MiddleCenter;
+            //
             // btnProxima
-            // 
-            btnProxima.AutoSize = true;
-            btnProxima.Enabled = false;
-            btnProxima.FlatStyle = FlatStyle.Flat;
-            btnProxima.Location = new Point(120, 3);
-            btnProxima.Name = "btnProxima";
-            btnProxima.Size = new Size(75, 27);
-            btnProxima.TabIndex = 2;
-            btnProxima.Text = "Próx. >>";
-            btnProxima.Click += btnProxima_Click;
-            // 
+            //
+            this.btnProxima.AutoSize = true;
+            this.btnProxima.Enabled = false;
+            this.btnProxima.FlatStyle = FlatStyle.Flat;
+            this.btnProxima.Location = new Point(120, 3);
+            this.btnProxima.Name = "btnProxima";
+            this.btnProxima.Size = new Size(75, 27);
+            this.btnProxima.TabIndex = 2;
+            this.btnProxima.Text = "Next >>";
+            this.btnProxima.Click += new System.EventHandler(this.btnProxima_Click);
+            //
             // panelEntBotoes
-            // 
-            panelEntBotoes.Controls.Add(btnNovaEntidade);
-            panelEntBotoes.Controls.Add(btnExcluirEntidade);
-            panelEntBotoes.Controls.Add(txtFiltroEntidade);
-            panelEntBotoes.Controls.Add(btnBuscarEntidade);
-            panelEntBotoes.Dock = DockStyle.Top;
-            panelEntBotoes.Location = new Point(0, 48);
-            panelEntBotoes.Name = "panelEntBotoes";
-            panelEntBotoes.Size = new Size(648, 34);
-            panelEntBotoes.TabIndex = 2;
-            panelEntBotoes.WrapContents = false;
-            // 
+            //
+            this.panelEntBotoes.Controls.Add(this.btnNovaEntidade);
+            this.panelEntBotoes.Controls.Add(this.btnExcluirEntidade);
+            this.panelEntBotoes.Controls.Add(this.txtFiltroEntidade);
+            this.panelEntBotoes.Controls.Add(this.btnBuscarEntidade);
+            this.panelEntBotoes.Dock = DockStyle.Top;
+            this.panelEntBotoes.Location = new Point(0, 48);
+            this.panelEntBotoes.Name = "panelEntBotoes";
+            this.panelEntBotoes.Size = new Size(648, 34);
+            this.panelEntBotoes.TabIndex = 2;
+            this.panelEntBotoes.WrapContents = false;
+            //
             // btnNovaEntidade
-            // 
-            btnNovaEntidade.AutoSize = true;
-            btnNovaEntidade.BackColor = Color.FromArgb(0, 120, 60);
-            btnNovaEntidade.Cursor = Cursors.Hand;
-            btnNovaEntidade.FlatStyle = FlatStyle.Flat;
-            btnNovaEntidade.ForeColor = Color.White;
-            btnNovaEntidade.Location = new Point(3, 3);
-            btnNovaEntidade.Name = "btnNovaEntidade";
-            btnNovaEntidade.Size = new Size(76, 27);
-            btnNovaEntidade.TabIndex = 0;
-            btnNovaEntidade.Text = "+ Entidade";
-            btnNovaEntidade.UseVisualStyleBackColor = false;
-            btnNovaEntidade.Click += btnNovaEntidade_Click;
-            // 
+            //
+            this.btnNovaEntidade.AutoSize = true;
+            this.btnNovaEntidade.BackColor = Color.FromArgb(0, 120, 60);
+            this.btnNovaEntidade.Cursor = Cursors.Hand;
+            this.btnNovaEntidade.FlatStyle = FlatStyle.Flat;
+            this.btnNovaEntidade.ForeColor = Color.White;
+            this.btnNovaEntidade.Location = new Point(3, 3);
+            this.btnNovaEntidade.Name = "btnNovaEntidade";
+            this.btnNovaEntidade.Size = new Size(76, 27);
+            this.btnNovaEntidade.TabIndex = 0;
+            this.btnNovaEntidade.Text = "+ Entity";
+            this.btnNovaEntidade.UseVisualStyleBackColor = false;
+            this.btnNovaEntidade.Click += new System.EventHandler(this.btnNovaEntidade_Click);
+            //
             // btnExcluirEntidade
-            // 
-            btnExcluirEntidade.AutoSize = true;
-            btnExcluirEntidade.Cursor = Cursors.Hand;
-            btnExcluirEntidade.FlatStyle = FlatStyle.Flat;
-            btnExcluirEntidade.ForeColor = Color.Firebrick;
-            btnExcluirEntidade.Location = new Point(85, 3);
-            btnExcluirEntidade.Name = "btnExcluirEntidade";
-            btnExcluirEntidade.Size = new Size(75, 27);
-            btnExcluirEntidade.TabIndex = 1;
-            btnExcluirEntidade.Text = "Excluir";
-            btnExcluirEntidade.Click += btnExcluirEntidade_Click;
-            // 
+            //
+            this.btnExcluirEntidade.AutoSize = true;
+            this.btnExcluirEntidade.Cursor = Cursors.Hand;
+            this.btnExcluirEntidade.FlatStyle = FlatStyle.Flat;
+            this.btnExcluirEntidade.ForeColor = Color.Firebrick;
+            this.btnExcluirEntidade.Location = new Point(85, 3);
+            this.btnExcluirEntidade.Name = "btnExcluirEntidade";
+            this.btnExcluirEntidade.Size = new Size(75, 27);
+            this.btnExcluirEntidade.TabIndex = 1;
+            this.btnExcluirEntidade.Text = "Delete";
+            this.btnExcluirEntidade.Click += new System.EventHandler(this.btnExcluirEntidade_Click);
+            //
             // txtFiltroEntidade
-            // 
-            txtFiltroEntidade.Location = new Point(175, 4);
-            txtFiltroEntidade.Margin = new Padding(12, 4, 0, 0);
-            txtFiltroEntidade.Name = "txtFiltroEntidade";
-            txtFiltroEntidade.Size = new Size(140, 23);
-            txtFiltroEntidade.TabIndex = 2;
-            txtFiltroEntidade.KeyDown += txtFiltroEntidade_KeyDown;
-            // 
+            //
+            this.txtFiltroEntidade.Location = new Point(175, 4);
+            this.txtFiltroEntidade.Margin = new Padding(12, 4, 0, 0);
+            this.txtFiltroEntidade.Name = "txtFiltroEntidade";
+            this.txtFiltroEntidade.Size = new Size(140, 23);
+            this.txtFiltroEntidade.TabIndex = 2;
+            this.txtFiltroEntidade.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtFiltroEntidade_KeyDown);
+            //
             // btnBuscarEntidade
-            // 
-            btnBuscarEntidade.AutoSize = true;
-            btnBuscarEntidade.Cursor = Cursors.Hand;
-            btnBuscarEntidade.FlatStyle = FlatStyle.Flat;
-            btnBuscarEntidade.Location = new Point(318, 3);
-            btnBuscarEntidade.Name = "btnBuscarEntidade";
-            btnBuscarEntidade.Size = new Size(75, 27);
-            btnBuscarEntidade.TabIndex = 3;
-            btnBuscarEntidade.Text = "Buscar";
-            btnBuscarEntidade.Click += btnBuscarEntidade_Click;
-            // 
+            //
+            this.btnBuscarEntidade.AutoSize = true;
+            this.btnBuscarEntidade.Cursor = Cursors.Hand;
+            this.btnBuscarEntidade.FlatStyle = FlatStyle.Flat;
+            this.btnBuscarEntidade.Location = new Point(318, 3);
+            this.btnBuscarEntidade.Name = "btnBuscarEntidade";
+            this.btnBuscarEntidade.Size = new Size(75, 27);
+            this.btnBuscarEntidade.TabIndex = 3;
+            this.btnBuscarEntidade.Text = "Search";
+            this.btnBuscarEntidade.Click += new System.EventHandler(this.btnBuscarEntidade_Click);
+            //
             // lblStatusEntidades
-            // 
-            lblStatusEntidades.Dock = DockStyle.Top;
-            lblStatusEntidades.Font = new Font("Segoe UI", 8F);
-            lblStatusEntidades.ForeColor = Color.Gray;
-            lblStatusEntidades.Location = new Point(0, 28);
-            lblStatusEntidades.Name = "lblStatusEntidades";
-            lblStatusEntidades.Size = new Size(648, 20);
-            lblStatusEntidades.TabIndex = 3;
-            lblStatusEntidades.Text = "Carregando...";
-            // 
+            //
+            this.lblStatusEntidades.Dock = DockStyle.Top;
+            this.lblStatusEntidades.Font = new Font("Segoe UI", 8F);
+            this.lblStatusEntidades.ForeColor = Color.Gray;
+            this.lblStatusEntidades.Location = new Point(0, 28);
+            this.lblStatusEntidades.Name = "lblStatusEntidades";
+            this.lblStatusEntidades.Size = new Size(648, 20);
+            this.lblStatusEntidades.TabIndex = 3;
+            this.lblStatusEntidades.Text = "Loading...";
+            //
             // lblEntidadesTitulo
-            // 
-            lblEntidadesTitulo.Dock = DockStyle.Top;
-            lblEntidadesTitulo.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            lblEntidadesTitulo.ForeColor = Color.FromArgb(0, 120, 60);
-            lblEntidadesTitulo.Location = new Point(0, 0);
-            lblEntidadesTitulo.Name = "lblEntidadesTitulo";
-            lblEntidadesTitulo.Size = new Size(648, 28);
-            lblEntidadesTitulo.TabIndex = 4;
-            lblEntidadesTitulo.Text = "Entidades";
-            lblEntidadesTitulo.TextAlign = ContentAlignment.MiddleLeft;
-            // 
+            //
+            this.lblEntidadesTitulo.Dock = DockStyle.Top;
+            this.lblEntidadesTitulo.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            this.lblEntidadesTitulo.ForeColor = Color.FromArgb(0, 120, 60);
+            this.lblEntidadesTitulo.Location = new Point(0, 0);
+            this.lblEntidadesTitulo.Name = "lblEntidadesTitulo";
+            this.lblEntidadesTitulo.Size = new Size(648, 28);
+            this.lblEntidadesTitulo.TabIndex = 4;
+            this.lblEntidadesTitulo.Text = "Entities";
+            this.lblEntidadesTitulo.TextAlign = ContentAlignment.MiddleLeft;
+            //
             // panelMidias
-            // 
-            panelMidias.Controls.Add(listMidias);
-            panelMidias.Controls.Add(panelMidBotoes);
-            panelMidias.Controls.Add(lblStatusMidias);
-            panelMidias.Controls.Add(lblMidiasTitulo);
-            panelMidias.Dock = DockStyle.Fill;
-            panelMidias.Location = new Point(0, 0);
-            panelMidias.Name = "panelMidias";
-            panelMidias.Size = new Size(398, 480);
-            panelMidias.TabIndex = 0;
-            // 
+            //
+            this.panelMidias.Controls.Add(this.listMidias);
+            this.panelMidias.Controls.Add(this.panelMidBotoes);
+            this.panelMidias.Controls.Add(this.lblStatusMidias);
+            this.panelMidias.Controls.Add(this.lblMidiasTitulo);
+            this.panelMidias.Dock = DockStyle.Fill;
+            this.panelMidias.Location = new Point(0, 0);
+            this.panelMidias.Name = "panelMidias";
+            this.panelMidias.Size = new Size(398, 480);
+            this.panelMidias.TabIndex = 0;
+            //
             // listMidias
-            // 
-            listMidias.Columns.AddRange(new ColumnHeader[] { colMidId, colMidTipo, colMidDesc, colMidHab });
-            listMidias.Dock = DockStyle.Fill;
-            listMidias.FullRowSelect = true;
-            listMidias.GridLines = true;
-            listMidias.Location = new Point(0, 82);
-            listMidias.MultiSelect = false;
-            listMidias.Name = "listMidias";
-            listMidias.Size = new Size(398, 398);
-            listMidias.TabIndex = 0;
-            listMidias.UseCompatibleStateImageBehavior = false;
-            listMidias.View = View.Details;
-            listMidias.DoubleClick += listMidias_DoubleClick;
-            // 
+            //
+            this.listMidias.Columns.AddRange(new ColumnHeader[] { this.colMidId, this.colMidTipo, this.colMidDesc, this.colMidHab });
+            this.listMidias.Dock = DockStyle.Fill;
+            this.listMidias.FullRowSelect = true;
+            this.listMidias.GridLines = true;
+            this.listMidias.Location = new Point(0, 82);
+            this.listMidias.MultiSelect = false;
+            this.listMidias.Name = "listMidias";
+            this.listMidias.Size = new Size(398, 398);
+            this.listMidias.TabIndex = 0;
+            this.listMidias.UseCompatibleStateImageBehavior = false;
+            this.listMidias.View = View.Details;
+            this.listMidias.DoubleClick += new System.EventHandler(this.listMidias_DoubleClick);
+            //
             // colMidId
-            // 
-            colMidId.Text = "ID";
-            colMidId.Width = 90;
-            // 
+            //
+            this.colMidId.Text = "ID";
+            this.colMidId.Width = 90;
+            //
             // colMidTipo
-            // 
-            colMidTipo.Text = "Tipo";
-            colMidTipo.Width = 80;
-            // 
+            //
+            this.colMidTipo.Text = "Type";
+            this.colMidTipo.Width = 80;
+            //
             // colMidDesc
-            // 
-            colMidDesc.Text = "Descrição";
-            colMidDesc.Width = 150;
-            // 
+            //
+            this.colMidDesc.Text = "Description";
+            this.colMidDesc.Width = 150;
+            //
             // colMidHab
-            // 
-            colMidHab.Text = "Hab";
-            colMidHab.Width = 40;
-            // 
+            //
+            this.colMidHab.Text = "Ena";
+            this.colMidHab.Width = 40;
+            //
             // panelMidBotoes
-            // 
-            panelMidBotoes.Controls.Add(btnNovaMidia);
-            panelMidBotoes.Controls.Add(btnExcluirMidia);
-            panelMidBotoes.Dock = DockStyle.Top;
-            panelMidBotoes.Location = new Point(0, 48);
-            panelMidBotoes.Name = "panelMidBotoes";
-            panelMidBotoes.Size = new Size(398, 34);
-            panelMidBotoes.TabIndex = 1;
-            panelMidBotoes.WrapContents = false;
-            // 
+            //
+            this.panelMidBotoes.Controls.Add(this.btnNovaMidia);
+            this.panelMidBotoes.Controls.Add(this.btnExcluirMidia);
+            this.panelMidBotoes.Dock = DockStyle.Top;
+            this.panelMidBotoes.Location = new Point(0, 48);
+            this.panelMidBotoes.Name = "panelMidBotoes";
+            this.panelMidBotoes.Size = new Size(398, 34);
+            this.panelMidBotoes.TabIndex = 1;
+            this.panelMidBotoes.WrapContents = false;
+            //
             // btnNovaMidia
-            // 
-            btnNovaMidia.AutoSize = true;
-            btnNovaMidia.BackColor = Color.FromArgb(0, 120, 60);
-            btnNovaMidia.Cursor = Cursors.Hand;
-            btnNovaMidia.FlatStyle = FlatStyle.Flat;
-            btnNovaMidia.ForeColor = Color.White;
-            btnNovaMidia.Location = new Point(3, 3);
-            btnNovaMidia.Name = "btnNovaMidia";
-            btnNovaMidia.Size = new Size(75, 27);
-            btnNovaMidia.TabIndex = 0;
-            btnNovaMidia.Text = "+ Mídia";
-            btnNovaMidia.UseVisualStyleBackColor = false;
-            btnNovaMidia.Click += btnNovaMidia_Click;
-            // 
+            //
+            this.btnNovaMidia.AutoSize = true;
+            this.btnNovaMidia.BackColor = Color.FromArgb(0, 120, 60);
+            this.btnNovaMidia.Cursor = Cursors.Hand;
+            this.btnNovaMidia.FlatStyle = FlatStyle.Flat;
+            this.btnNovaMidia.ForeColor = Color.White;
+            this.btnNovaMidia.Location = new Point(3, 3);
+            this.btnNovaMidia.Name = "btnNovaMidia";
+            this.btnNovaMidia.Size = new Size(75, 27);
+            this.btnNovaMidia.TabIndex = 0;
+            this.btnNovaMidia.Text = "+ Media";
+            this.btnNovaMidia.UseVisualStyleBackColor = false;
+            this.btnNovaMidia.Click += new System.EventHandler(this.btnNovaMidia_Click);
+            //
             // btnExcluirMidia
-            // 
-            btnExcluirMidia.AutoSize = true;
-            btnExcluirMidia.Cursor = Cursors.Hand;
-            btnExcluirMidia.FlatStyle = FlatStyle.Flat;
-            btnExcluirMidia.ForeColor = Color.Firebrick;
-            btnExcluirMidia.Location = new Point(84, 3);
-            btnExcluirMidia.Name = "btnExcluirMidia";
-            btnExcluirMidia.Size = new Size(75, 27);
-            btnExcluirMidia.TabIndex = 1;
-            btnExcluirMidia.Text = "Excluir";
-            btnExcluirMidia.Click += btnExcluirMidia_Click;
-            // 
+            //
+            this.btnExcluirMidia.AutoSize = true;
+            this.btnExcluirMidia.Cursor = Cursors.Hand;
+            this.btnExcluirMidia.FlatStyle = FlatStyle.Flat;
+            this.btnExcluirMidia.ForeColor = Color.Firebrick;
+            this.btnExcluirMidia.Location = new Point(84, 3);
+            this.btnExcluirMidia.Name = "btnExcluirMidia";
+            this.btnExcluirMidia.Size = new Size(75, 27);
+            this.btnExcluirMidia.TabIndex = 1;
+            this.btnExcluirMidia.Text = "Delete";
+            this.btnExcluirMidia.Click += new System.EventHandler(this.btnExcluirMidia_Click);
+            //
             // lblStatusMidias
-            // 
-            lblStatusMidias.Dock = DockStyle.Top;
-            lblStatusMidias.Font = new Font("Segoe UI", 8F);
-            lblStatusMidias.ForeColor = Color.Gray;
-            lblStatusMidias.Location = new Point(0, 28);
-            lblStatusMidias.Name = "lblStatusMidias";
-            lblStatusMidias.Size = new Size(398, 20);
-            lblStatusMidias.TabIndex = 2;
-            lblStatusMidias.Text = "Selecione uma entidade";
-            // 
+            //
+            this.lblStatusMidias.Dock = DockStyle.Top;
+            this.lblStatusMidias.Font = new Font("Segoe UI", 8F);
+            this.lblStatusMidias.ForeColor = Color.Gray;
+            this.lblStatusMidias.Location = new Point(0, 28);
+            this.lblStatusMidias.Name = "lblStatusMidias";
+            this.lblStatusMidias.Size = new Size(398, 20);
+            this.lblStatusMidias.TabIndex = 2;
+            this.lblStatusMidias.Text = "Select an entity";
+            //
             // lblMidiasTitulo
-            // 
-            lblMidiasTitulo.Dock = DockStyle.Top;
-            lblMidiasTitulo.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            lblMidiasTitulo.ForeColor = Color.FromArgb(0, 120, 60);
-            lblMidiasTitulo.Location = new Point(0, 0);
-            lblMidiasTitulo.Name = "lblMidiasTitulo";
-            lblMidiasTitulo.Size = new Size(398, 28);
-            lblMidiasTitulo.TabIndex = 3;
-            lblMidiasTitulo.Text = "Mídias";
-            lblMidiasTitulo.TextAlign = ContentAlignment.MiddleLeft;
-            // 
+            //
+            this.lblMidiasTitulo.Dock = DockStyle.Top;
+            this.lblMidiasTitulo.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            this.lblMidiasTitulo.ForeColor = Color.FromArgb(0, 120, 60);
+            this.lblMidiasTitulo.Location = new Point(0, 0);
+            this.lblMidiasTitulo.Name = "lblMidiasTitulo";
+            this.lblMidiasTitulo.Size = new Size(398, 28);
+            this.lblMidiasTitulo.TabIndex = 3;
+            this.lblMidiasTitulo.Text = "Media";
+            this.lblMidiasTitulo.TextAlign = ContentAlignment.MiddleLeft;
+            //
             // txtLog
-            // 
-            txtLog.BackColor = Color.FromArgb(30, 30, 30);
-            txtLog.Dock = DockStyle.Bottom;
-            txtLog.Font = new Font("Consolas", 8.5F);
-            txtLog.ForeColor = Color.LightGreen;
-            txtLog.Location = new Point(0, 520);
-            txtLog.Multiline = true;
-            txtLog.Name = "txtLog";
-            txtLog.ReadOnly = true;
-            txtLog.ScrollBars = ScrollBars.Vertical;
-            txtLog.Size = new Size(1050, 100);
-            txtLog.TabIndex = 1;
-            // 
+            //
+            this.txtLog.BackColor = Color.FromArgb(30, 30, 30);
+            this.txtLog.Dock = DockStyle.Bottom;
+            this.txtLog.Font = new Font("Consolas", 8.5F);
+            this.txtLog.ForeColor = Color.LightGreen;
+            this.txtLog.Location = new Point(0, 520);
+            this.txtLog.Multiline = true;
+            this.txtLog.Name = "txtLog";
+            this.txtLog.ReadOnly = true;
+            this.txtLog.ScrollBars = ScrollBars.Vertical;
+            this.txtLog.Size = new Size(1050, 100);
+            this.txtLog.TabIndex = 1;
+            //
             // FormCadastroSimples
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1050, 620);
-            Controls.Add(splitMain);
-            Controls.Add(txtLog);
-            Controls.Add(lblExplicacao);
-            Name = "FormCadastroSimples";
-            Text = "Cadastro Simplificado (Entidade → Mídia) — createid=true";
-            Load += FormCadastroSimples_Load;
-            splitMain.Panel1.ResumeLayout(false);
-            splitMain.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)splitMain).EndInit();
-            splitMain.ResumeLayout(false);
-            panelEntidades.ResumeLayout(false);
-            panelPaginacao.ResumeLayout(false);
-            panelPaginacao.PerformLayout();
-            panelEntBotoes.ResumeLayout(false);
-            panelEntBotoes.PerformLayout();
-            panelMidias.ResumeLayout(false);
-            panelMidBotoes.ResumeLayout(false);
-            panelMidBotoes.PerformLayout();
-            ResumeLayout(false);
-            PerformLayout();
+            //
+            this.AutoScaleDimensions = new SizeF(7F, 15F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.ClientSize = new Size(1050, 620);
+            this.Controls.Add(this.splitMain);
+            this.Controls.Add(this.txtLog);
+            this.Controls.Add(this.lblExplicacao);
+            this.Name = "FormCadastroSimples";
+            this.Text = "Simplified Registry (Entity → Media) — createid=true";
+            this.Load += new System.EventHandler(this.FormCadastroSimples_Load);
+            this.splitMain.Panel1.ResumeLayout(false);
+            this.splitMain.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitMain)).EndInit();
+            this.splitMain.ResumeLayout(false);
+            this.panelEntidades.ResumeLayout(false);
+            this.panelPaginacao.ResumeLayout(false);
+            this.panelPaginacao.PerformLayout();
+            this.panelEntBotoes.ResumeLayout(false);
+            this.panelEntBotoes.PerformLayout();
+            this.panelMidias.ResumeLayout(false);
+            this.panelMidBotoes.ResumeLayout(false);
+            this.panelMidBotoes.PerformLayout();
+            this.ResumeLayout(false);
+            this.PerformLayout();
         }
 
         #endregion

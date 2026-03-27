@@ -3,65 +3,65 @@ using MobiCortex.Sdk.Models;
 namespace SmartSdk
 {
     /// <summary>
-    /// Formulário de cadastro/edição de mídias de acesso.
-    /// 
-    /// TIPOS DE MÍDIA E COMO USAR:
-    /// 
+    /// Form for creating/editing access media.
+    ///
+    /// MEDIA TYPES AND HOW TO USE:
+    ///
     /// 1. RFID (Wiegand 26/34 bits):
-    ///    - Formatos aceitos: "123,45678" (facility,code) ou "HEX: FF FF FF"
-    ///    - O backend detecta automaticamente e converte para dados binários
-    ///    - Não requer campos adicionais além de tipo e descricao
-    /// 
-    /// 2. PLACA LPR (tipo 17):
-    ///    - Formato: placa do veículo (ex: "ABC1D23" - modelo Mercosul)
-    ///    - IMPORTANTE: Ao criar via API, enviar ns32_0=0 e ns32_1=0 para evitar
-    ///      que o backend tente validar a placa como formato RFID
-    ///    - A forma recomendada é usar lpr_enabled=true na entidade do veiculo
-    /// 
-    /// 3. FACIAL (tipo 20), BIOMETRIA (tipo 5/15/18), etc:
-    ///    - Geralmente requerem integração com hardware específico
-    ///    - Envie o identificador no campo descricao
-    ///    - Para evitar validação RFID, envie ns32_0=0 e ns32_1=0
-    /// 
-    /// Referência backend: ws_media6.cpp (validação em media_try_apply_rfid_from_text)
+    ///    - Accepted formats: "123,45678" (facility,code) or "HEX: FF FF FF"
+    ///    - The backend automatically detects and converts to binary data
+    ///    - Does not require additional fields beyond type and description
+    ///
+    /// 2. LPR PLATE (type 17):
+    ///    - Format: vehicle plate (e.g.: "ABC1D23" - Mercosul format)
+    ///    - IMPORTANT: When creating via API, send ns32_0=0 and ns32_1=0 to prevent
+    ///      the backend from trying to validate the plate as RFID format
+    ///    - The recommended way is to use lpr_enabled=true on the vehicle entity
+    ///
+    /// 3. FACIAL (type 20), BIOMETRY (type 5/15/18), etc:
+    ///    - Generally require integration with specific hardware
+    ///    - Send the identifier in the description field
+    ///    - To avoid RFID validation, send ns32_0=0 and ns32_1=0
+    ///
+    /// Backend reference: ws_media6.cpp (validation in media_try_apply_rfid_from_text)
     /// </summary>
     public partial class FormCadastroMidia : Form
     {
-        // Dados da mídia (preenchidos ao salvar)
+        // Media data (filled when saving)
         public int TipoMidiaSelecionado { get; private set; }
         public uint IdMidia { get; private set; }
         public string DadosMidia { get; private set; } = string.Empty;
         public string TipoMidiaNome { get; private set; } = string.Empty;
-        
-        // Modo edição
+
+        // Edit mode
         public bool ModoEdicao { get; private set; }
-        
-        // Dados para edição (opcional)
-        private readonly MidiaAcesso? _midiaExistente;
+
+        // Data for editing (optional)
+        private readonly AccessMedia? _midiaExistente;
         private readonly uint? _entityIdPadrao;
         private readonly string? _placaPadraoLpr;
-        
+
         /// <summary>
-        /// Construtor para criar nova mÃ­dia
+        /// Constructor for creating new media
         /// </summary>
         public FormCadastroMidia()
         {
             InitializeComponent();
             ModoEdicao = false;
         }
-        
+
         /// <summary>
-        /// Construtor para editar mídia existente
+        /// Constructor for editing existing media
         /// </summary>
-        public FormCadastroMidia(MidiaAcesso midia)
+        public FormCadastroMidia(AccessMedia midia)
         {
             InitializeComponent();
             _midiaExistente = midia;
             ModoEdicao = true;
         }
-        
+
         /// <summary>
-        /// Construtor com entity_id padrÃ£o prÃ©-selecionado
+        /// Constructor with pre-selected default entity_id
         /// </summary>
         public FormCadastroMidia(uint entityIdPadrao, string? placaPadraoLpr = null)
         {
@@ -70,215 +70,215 @@ namespace SmartSdk
             _placaPadraoLpr = placaPadraoLpr;
             ModoEdicao = false;
         }
-        
-        private void FormCadastroMidia_Load(object? sender, EventArgs e)
+
+        private void FormCadastroMidia_Load(object sender, EventArgs e)
         {
-            CarregarTiposMidia();
-            
+            LoadMediaTypes();
+
             if (ModoEdicao && _midiaExistente != null)
             {
-                ConfigurarModoEdicao();
+                ConfigureEditMode();
             }
             else
             {
-                // Modo criação - ID 0 por padrão (servidor gera automaticamente)
+                // Creation mode - ID 0 by default (server generates automatically)
                 numIdMidia.Value = 0;
                 cmbTipoMidia.SelectedIndex = 0;
             }
         }
-        
+
         /// <summary>
-        /// Configura o formulário para modo de edição
+        /// Configures the form for edit mode
         /// </summary>
-        private void ConfigurarModoEdicao()
+        private void ConfigureEditMode()
         {
             if (_midiaExistente == null) return;
-            
-            lblTitulo.Text = "Editar Mídia";
-            Text = "Editar Mídia";
-            
-            // Seleciona o tipo atual
+
+            lblTitulo.Text = "Edit Media";
+            Text = "Edit Media";
+
+            // Select the current type
             for (int i = 0; i < cmbTipoMidia.Items.Count; i++)
             {
-                if (cmbTipoMidia.Items[i] is TipoMidiaItem item && item.Valor == _midiaExistente.Tipo)
+                if (cmbTipoMidia.Items[i] is TipoMidiaItem item && item.Valor == _midiaExistente.TypeAlias)
                 {
                     cmbTipoMidia.SelectedIndex = i;
                     break;
                 }
             }
-            
-            // Preenche ID (não pode ser alterado em edição)
+
+            // Fill ID (cannot be changed in edit mode)
             numIdMidia.Value = _midiaExistente.MediaId;
             numIdMidia.Enabled = false;
-            lblIdInfo.Text = "💡 ID da mídia não pode ser alterado em modo de edição.";
-            
-            // Preenche dados
-            txtDadosMidia.Text = _midiaExistente.Descricao;
+            lblIdInfo.Text = "Media ID cannot be changed in edit mode.";
+
+            // Fill data
+            txtDadosMidia.Text = _midiaExistente.DescriptionAlias;
         }
-        
+
         /// <summary>
-        /// Carrega os tipos de mídia disponíveis no ComboBox
+        /// Loads the available media types into the ComboBox
         /// </summary>
-        private void CarregarTiposMidia()
+        private void LoadMediaTypes()
         {
             cmbTipoMidia.Items.Clear();
-            
-            // RFID Wiegand 26 bits - aceita: WIEGAND formato, HEX, CODE Smart
+
+            // RFID Wiegand 26 bits - accepts: WIEGAND format, HEX, CODE Smart
             cmbTipoMidia.Items.Add(new TipoMidiaItem
             {
                 Nome = "RFID Wiegand 26",
-                Valor = TipoMidia.Wiegand26,
+                Valor = MediaType.Wiegand26,
                 Exemplo = "123,45678",
-                DescricaoFormato = "Formatos aceitos:\n" +
-                                   "• Wiegand: 123,45678 (facility,code)\n" +
-                                   "• HEX: FF FF FF ou FFFFFF\n" +
-                                   "• CODE Smart: 12345,123,12345"
+                DescricaoFormato = "Accepted formats:\n" +
+                                   "- Wiegand: 123,45678 (facility,code)\n" +
+                                   "- HEX: FF FF FF or FFFFFF\n" +
+                                   "- CODE Smart: 12345,123,12345"
             });
-            
+
             // RFID Wiegand 34 bits
             cmbTipoMidia.Items.Add(new TipoMidiaItem
             {
                 Nome = "RFID Wiegand 34",
-                Valor = TipoMidia.Wiegand34,
+                Valor = MediaType.Wiegand34,
                 Exemplo = "1234,567890",
-                DescricaoFormato = "Formatos aceitos:\n" +
-                                   "• Wiegand: 1234,567890 (facility,code)\n" +
-                                   "• HEX: FF FF FF FF\n" +
-                                   "• CODE Smart: 12345,123,12345"
+                DescricaoFormato = "Accepted formats:\n" +
+                                   "- Wiegand: 1234,567890 (facility,code)\n" +
+                                   "- HEX: FF FF FF FF\n" +
+                                   "- CODE Smart: 12345,123,12345"
             });
-            
-            // Placa LPR
+
+            // LPR Plate
             cmbTipoMidia.Items.Add(new TipoMidiaItem
             {
-                Nome = "Placa (LPR)",
-                Valor = TipoMidia.Lpr,
+                Nome = "Plate (LPR)",
+                Valor = MediaType.Lpr,
                 Exemplo = "ABC1234",
-                DescricaoFormato = "Formato: Placa do veículo\n" +
-                                   "• Modelo antigo: ABC1234\n" +
-                                   "• Mercosul: ABC1D23"
+                DescricaoFormato = "Format: Vehicle plate\n" +
+                                   "- Old format: ABC1234\n" +
+                                   "- Mercosul: ABC1D23"
             });
-            
-            // Reconhecimento Facial
+
+            // Facial Recognition
             cmbTipoMidia.Items.Add(new TipoMidiaItem
             {
                 Nome = "Facial",
-                Valor = TipoMidia.Facial,
+                Valor = MediaType.Facial,
                 Exemplo = "FACE001",
-                DescricaoFormato = "Formato: Identificador facial\n" +
-                                   "• Exemplo: FACE001, ID12345"
+                DescricaoFormato = "Format: Facial identifier\n" +
+                                   "- Example: FACE001, ID12345"
             });
-            
-            // Biometria
+
+            // Biometry
             cmbTipoMidia.Items.Add(new TipoMidiaItem
             {
-                Nome = "Biometria",
-                Valor = TipoMidia.Bio,
+                Nome = "Biometry",
+                Valor = MediaType.Bio,
                 Exemplo = "BIO001",
-                DescricaoFormato = "Formato: ID da biometria\n" +
-                                   "• Exemplo: BIO001, FP12345"
+                DescricaoFormato = "Format: Biometry ID\n" +
+                                   "- Example: BIO001, FP12345"
             });
-            
-            // Biometria Hikvision
+
+            // Biometry Hikvision
             cmbTipoMidia.Items.Add(new TipoMidiaItem
             {
-                Nome = "Biometria Hikvision",
-                Valor = TipoMidia.BioHikvision,
+                Nome = "Biometry Hikvision",
+                Valor = MediaType.BioHikvision,
                 Exemplo = "HIK001",
-                DescricaoFormato = "Formato: ID Hikvision\n" +
-                                   "• Exemplo: HIK001, HK12345"
+                DescricaoFormato = "Format: Hikvision ID\n" +
+                                   "- Example: HIK001, HK12345"
             });
-            
-            // Senha/Teclado
+
+            // Password/Keypad
             cmbTipoMidia.Items.Add(new TipoMidiaItem
             {
-                Nome = "Senha/Teclado",
-                Valor = TipoMidia.Teclado,
+                Nome = "Password/Keypad",
+                Valor = MediaType.Keyboard,
                 Exemplo = "123456",
-                DescricaoFormato = "Formato: Código numérico\n" +
-                                   "• 4 a 10 dígitos numéricos"
+                DescricaoFormato = "Format: Numeric code\n" +
+                                   "- 4 to 10 numeric digits"
             });
-            
-            // Controle Remoto
+
+            // Remote Control
             cmbTipoMidia.Items.Add(new TipoMidiaItem
             {
-                Nome = "Controle Remoto",
-                Valor = TipoMidia.ControleRemoto,
+                Nome = "Remote Control",
+                Valor = MediaType.RemoteControl,
                 Exemplo = "CTRL001",
-                DescricaoFormato = "Formato: ID do controle\n" +
-                                   "• Exemplo: CTRL001, HT001"
+                DescricaoFormato = "Format: Control ID\n" +
+                                   "- Example: CTRL001, HT001"
             });
-            
+
             cmbTipoMidia.DisplayMember = "Nome";
             cmbTipoMidia.ValueMember = "Valor";
         }
-        
+
         /// <summary>
-        /// Atualiza a descrição do formato quando o tipo é alterado
+        /// Updates the format description when the type is changed
         /// </summary>
-        private void cmbTipoMidia_SelectedIndexChanged(object? sender, EventArgs e)
+        private void cmbTipoMidia_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cmbTipoMidia.SelectedItem is TipoMidiaItem tipo)
             {
                 lblFormatoAtual.Text = tipo.DescricaoFormato;
                 toolTip.SetToolTip(txtDadosMidia, tipo.DescricaoFormato);
 
-                // Em LPR, se ja temos a placa da entidade, reaproveita sem pedir de novo.
-                if (tipo.Valor == TipoMidia.Lpr && !string.IsNullOrWhiteSpace(_placaPadraoLpr))
+                // For LPR, if we already have the entity plate, reuse it without asking again.
+                if (tipo.Valor == MediaType.Lpr && !string.IsNullOrWhiteSpace(_placaPadraoLpr))
                 {
-                    txtDadosMidia.Text = _placaPadraoLpr.Trim().ToUpper().Replace("-", "");
+                    txtDadosMidia.Text = _placaPadraoLpr!.Trim().ToUpper().Replace("-", "");
                     txtDadosMidia.ReadOnly = true;
-                    lblExemploFormato.Text = "Placa preenchida automaticamente a partir do veiculo.";
+                    lblExemploFormato.Text = "Plate automatically filled from the vehicle.";
                 }
                 else
                 {
                     txtDadosMidia.ReadOnly = false;
-                    lblExemploFormato.Text = "Exemplo de formato:";
+                    lblExemploFormato.Text = "Format example:";
                 }
             }
         }
-        
+
         /// <summary>
-        /// Valida e salva os dados da mídia
+        /// Validates and saves the media data
         /// </summary>
-        private void btnSalvar_Click(object? sender, EventArgs e)
+        private void btnSalvar_Click(object sender, EventArgs e)
         {
-            // Valida tipo selecionado
+            // Validate selected type
             if (cmbTipoMidia.SelectedItem == null)
             {
-                MessageBox.Show("Selecione um tipo de mídia.", "Validação",
+                MessageBox.Show("Select a media type.", "Validation",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 cmbTipoMidia.Focus();
                 DialogResult = DialogResult.None;
                 return;
             }
-            
-            // Valida dados da mídia
+
+            // Validate media data
             if (string.IsNullOrWhiteSpace(txtDadosMidia.Text))
             {
-                MessageBox.Show("Informe os dados da mídia.", "Validação",
+                MessageBox.Show("Enter the media data.", "Validation",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtDadosMidia.Focus();
                 DialogResult = DialogResult.None;
                 return;
             }
-            
+
             var tipo = (TipoMidiaItem)cmbTipoMidia.SelectedItem;
             TipoMidiaSelecionado = tipo.Valor;
             TipoMidiaNome = tipo.Nome;
-            
-            // Armazena os dados (maiúsculo para RFID/Placas)
+
+            // Store the data (uppercase for RFID/Plates)
             IdMidia = (uint)numIdMidia.Value;
             DadosMidia = txtDadosMidia.Text.Trim().ToUpper();
-            
-            // Em modo criação com ID 0, confirma geração automática
+
+            // In creation mode with ID 0, confirm automatic generation
             if (!ModoEdicao && IdMidia == 0)
             {
                 var result = MessageBox.Show(
-                    "O ID está configurado como 0 (zero).\n\n" +
-                    "O servidor gerará o ID automaticamente.\n\n" +
-                    "Deseja continuar?",
-                    "Confirmação", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                
+                    "The ID is set to 0 (zero).\n\n" +
+                    "The server will generate the ID automatically.\n\n" +
+                    "Do you want to continue?",
+                    "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
                 if (result != DialogResult.Yes)
                 {
                     DialogResult = DialogResult.None;
@@ -286,12 +286,12 @@ namespace SmartSdk
                     return;
                 }
             }
-            
+
             DialogResult = DialogResult.OK;
         }
-        
+
         /// <summary>
-        /// Classe auxiliar para representar um tipo de mÃ­dia no ComboBox
+        /// Helper class to represent a media type in the ComboBox
         /// </summary>
         private class TipoMidiaItem
         {
@@ -299,9 +299,11 @@ namespace SmartSdk
             public int Valor { get; set; }
             public string Exemplo { get; set; } = string.Empty;
             public string DescricaoFormato { get; set; } = string.Empty;
-            
-            public override string ToString() => Nome;
+
+            public override string ToString()
+            {
+                return Nome;
+            }
         }
     }
 }
-

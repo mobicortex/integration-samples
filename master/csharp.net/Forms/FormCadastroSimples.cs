@@ -6,53 +6,53 @@ using MobiCortex.Sdk.Interfaces;
 namespace SmartSdk
 {
     // =============================================================================
-    //  CADASTRO SIMPLIFICADO (2 Níveis)
+    //  SIMPLIFIED REGISTRATION (2 Levels)
     //
-    //  Este formulário demonstra o modelo simplificado de cadastro.
+    //  This form demonstrates the simplified registration model.
     //
-    //  Neste modelo, o integrador NÃO precisa gerenciar Cadastros Centrais.
-    //  Basta criar a entidade com createid=true e o controlador gera
-    //  automaticamente o cadastro_id e entity_id internamente.
+    //  In this model, the integrator DOES NOT need to manage Central Registries.
+    //  Just create the entity with createid=true and the controller automatically
+    //  generates the registry_id and entity_id internally.
     //
-    //  FLUXO:
-    //  1. Criar Entidade com createid=true (o controlador cria tudo)
-    //  2. Adicionar MÃ­dias Ã  entidade
+    //  FLOW:
+    //  1. Create Entity with createid=true (the controller creates everything)
+    //  2. Add Media to the entity
     //
-    //  DIFERENÇA DO MODELO COMPLETO:
-    //  - Completo: Cadastro → Entidade → Mídia (3 níveis, o integrador gerencia tudo)
-    //  - Simplificado: Entidade → Mídia (2 níveis, o controlador gera IDs)
+    //  DIFFERENCE FROM THE COMPLETE MODEL:
+    //  - Complete: Registry -> Entity -> Media (3 levels, the integrator manages everything)
+    //  - Simplified: Entity -> Media (2 levels, the controller generates IDs)
     //
-    //  ENDPOINTS USADOS:
-    //  - POST /entities  (com createid=true)
-    //  - GET  /entities?offset=X&count=Y[&name=filtro]  (lista paginada global)
-    //  - GET  /entities?id=X                            (busca por ID)
+    //  ENDPOINTS USED:
+    //  - POST /entities  (with createid=true)
+    //  - GET  /entities?offset=X&count=Y[&name=filter]  (paginated global list)
+    //  - GET  /entities?id=X                             (search by ID)
     //  - GET/POST/DELETE /media
     // =============================================================================
 
     public partial class FormCadastroSimples : Form
     {
-        private IMobiCortexClient _api = null!;
-        private Entidade? _entidadeSelecionada;
+        private IMobiCortexClient _api = new MobiCortexClient();
+        private Entity? _entidadeSelecionada;
 
-        // Estado de paginaÃ§Ã£o server-side
+        // Server-side pagination state
         private int _currentOffset = 0;
         private uint _totalEntidades = 0;
         private const int PageSize = 10;
 
-        // Filtro de texto atual (enviado ao servidor)
+        // Current text filter (sent to the server)
         private string _filtroNome = "";
 
         /// <summary>
-        /// Serviço da API. Pode ser definido via propriedade para uso no designer.
+        /// API service. Can be set via property for designer usage.
         /// </summary>
         public IMobiCortexClient ApiService
         {
-            get => _api;
-            set => _api = value;
+            get { return _api; }
+            set { _api = value; }
         }
 
         /// <summary>
-        /// Construtor padrÃ£o para o Designer do Visual Studio.
+        /// Default constructor for the Visual Studio Designer.
         /// </summary>
         public FormCadastroSimples()
         {
@@ -65,37 +65,37 @@ namespace SmartSdk
         }
 
         // =====================================================================
-        //  ENTIDADES (NÃ­vel 1 no modelo simplificado)
-        //  Diferença: usamos createid=true para criar
+        //  ENTITIES (Level 1 in the simplified model)
+        //  Difference: we use createid=true to create
         // =====================================================================
 
-        private async void FormCadastroSimples_Load(object? sender, EventArgs e)
+        private async void FormCadastroSimples_Load(object sender, EventArgs e)
         {
-            // No modo design do VS, _api pode ser null - não carregar dados
+            // In VS design mode, _api may be null - don't load data
             if (_api == null) return;
-            await CarregarEntidades();
+            await LoadEntities();
         }
 
         /// <summary>
-        /// Carrega a página atual de entidades do servidor.
-        /// GET /entities?offset=X&amp;count=Y[&amp;name=filtro]
-        /// Uma única chamada HTTP — paginação e filtro são feitos no servidor.
+        /// Loads the current page of entities from the server.
+        /// GET /entities?offset=X&amp;count=Y[&amp;name=filter]
+        /// A single HTTP call - pagination and filtering are done on the server.
         /// </summary>
-        private async Task CarregarEntidades()
+        private async Task LoadEntities()
         {
-            lblStatusEntidades.Text = "Carregando...";
+            lblStatusEntidades.Text = "Loading...";
             listEntidades.Items.Clear();
             listMidias.Items.Clear();
             _entidadeSelecionada = null;
 
-            var result = await _api.Entidades.ListarTodosAsync(
+            var result = await _api.Entities.ListAllAsync(
                 _currentOffset, PageSize,
-                nome: string.IsNullOrEmpty(_filtroNome) ? null : _filtroNome);
+                name: string.IsNullOrEmpty(_filtroNome) ? null : _filtroNome);
 
             if (!result.Success || result.Data == null)
             {
-                lblStatusEntidades.Text = $"Erro: {result.Message}";
-                AtualizarPaginacao();
+                lblStatusEntidades.Text = $"Error: {result.Message}";
+                UpdatePagination();
                 return;
             }
 
@@ -104,58 +104,58 @@ namespace SmartSdk
             foreach (var ent in result.Data.Items)
             {
                 var item = new ListViewItem(ent.EntityId.ToString());
-                item.SubItems.Add(ent.TipoNome);
-                item.SubItems.Add(ent.NomeExibicao);
+                item.SubItems.Add(ent.TypeName);
+                item.SubItems.Add(ent.DisplayName);
                 item.SubItems.Add(ent.Doc);
-                item.SubItems.Add(ent.Enabled ? "S" : "N");
-                item.SubItems.Add(ent.CadastroId.ToString());
+                item.SubItems.Add(ent.Enabled ? "Y" : "N");
+                item.SubItems.Add(ent.RegistryId.ToString());
                 item.Tag = ent;
                 listEntidades.Items.Add(item);
             }
 
-            AtualizarPaginacao();
+            UpdatePagination();
         }
 
         /// <summary>
-        /// Busca uma entidade específica pelo entity_id.
+        /// Searches for a specific entity by entity_id.
         /// GET /entities?id=X
         /// </summary>
-        private async Task BuscarEntidadePorId(uint entityId)
+        private async Task SearchEntityById(uint entityId)
         {
             listEntidades.Items.Clear();
             listMidias.Items.Clear();
             _entidadeSelecionada = null;
 
-            var result = await _api.Entidades.ObterAsync(entityId);
+            var result = await _api.Entities.GetAsync(entityId);
 
             if (result.Success && result.Data != null && result.Data.Ret == 0)
             {
                 var ent = result.Data;
                 var item = new ListViewItem(ent.EntityId.ToString());
-                item.SubItems.Add(ent.TipoNome);
-                item.SubItems.Add(ent.NomeExibicao);
+                item.SubItems.Add(ent.TypeName);
+                item.SubItems.Add(ent.DisplayName);
                 item.SubItems.Add(ent.Doc);
-                item.SubItems.Add(ent.Enabled ? "S" : "N");
-                item.SubItems.Add(ent.CadastroId.ToString());
+                item.SubItems.Add(ent.Enabled ? "Y" : "N");
+                item.SubItems.Add(ent.RegistryId.ToString());
                 item.Tag = ent;
                 listEntidades.Items.Add(item);
 
-                lblStatusEntidades.Text = $"Busca por ID {entityId} — 1 resultado";
+                lblStatusEntidades.Text = $"Search by ID {entityId} - 1 result";
                 btnAnterior.Enabled = false;
                 btnProxima.Enabled = false;
                 lblPagina.Text = "ID";
             }
             else
             {
-                lblStatusEntidades.Text = $"ID {entityId} não encontrado";
+                lblStatusEntidades.Text = $"ID {entityId} not found";
                 btnAnterior.Enabled = false;
                 btnProxima.Enabled = false;
                 lblPagina.Text = "0/0";
             }
         }
 
-        /// <summary>Atualiza label de status e botões de paginação</summary>
-        private void AtualizarPaginacao()
+        /// <summary>Updates the status label and pagination buttons</summary>
+        private void UpdatePagination()
         {
             int totalPages = (int)((_totalEntidades + PageSize - 1) / PageSize);
             int currentPage = totalPages > 0 ? (_currentOffset / PageSize) + 1 : 0;
@@ -163,35 +163,35 @@ namespace SmartSdk
             lblPagina.Text = $"{currentPage}/{totalPages}";
             btnAnterior.Enabled = _currentOffset > 0;
             btnProxima.Enabled = (_currentOffset + PageSize) < _totalEntidades;
-            lblStatusEntidades.Text = $"{_totalEntidades} entidade(s) encontrada(s)";
+            lblStatusEntidades.Text = $"{_totalEntidades} entity(ies) found";
         }
 
-        /// <summary>Ao selecionar uma entidade, carrega suas mídias.</summary>
-        private async void listEntidades_SelectedIndexChanged(object? sender, EventArgs e)
+        /// <summary>When selecting an entity, loads its media.</summary>
+        private async void listEntidades_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listEntidades.SelectedItems.Count == 0) return;
 
-            _entidadeSelecionada = listEntidades.SelectedItems[0].Tag as Entidade;
+            _entidadeSelecionada = listEntidades.SelectedItems[0].Tag as Entity;
             if (_entidadeSelecionada == null) return;
 
-            lblMidiasTitulo.Text = $"Mídias de: {_entidadeSelecionada.NomeExibicao}";
-            await CarregarMidias(_entidadeSelecionada.EntityId);
+            lblMidiasTitulo.Text = $"Media of: {_entidadeSelecionada.DisplayName}";
+            await LoadMedia(_entidadeSelecionada.EntityId);
         }
 
         /// <summary>
-        /// Cria uma entidade usando o modelo simplificado (createid=true).
+        /// Creates an entity using the simplified model (createid=true).
         ///
-        /// IMPORTANTE: A diferença principal deste modelo é o campo createid.
-        /// Quando createid=true, o controlador:
-        /// 1. Gera um entity_id automaticamente
-        /// 2. Cria um cadastro central automaticamente (ou reutiliza um existente)
-        /// 3. Retorna entity_id e central_registry_id na resposta
+        /// IMPORTANT: The main difference of this model is the createid field.
+        /// When createid=true, the controller:
+        /// 1. Generates an entity_id automatically
+        /// 2. Creates a central registry automatically (or reuses an existing one)
+        /// 3. Returns entity_id and central_registry_id in the response
         ///
-        /// O integrador não precisa criar o cadastro central antes.
+        /// The integrator does not need to create the central registry beforehand.
         /// </summary>
-        private async void btnNovaEntidade_Click(object? sender, EventArgs e)
+        private async void btnNovaEntidade_Click(object sender, EventArgs e)
         {
-            // Seleciona o tipo em um formulário dedicado (mais claro do que Yes/No).
+            // Select the type in a dedicated form (clearer than Yes/No).
             using var formTipo = new FormSelecionarTipoEntidade();
             if (formTipo.ShowDialog(this) != DialogResult.OK) return;
             int tipo = formTipo.TipoEntidadeSelecionado;
@@ -204,7 +204,7 @@ namespace SmartSdk
             bool lprAtivo;
             bool enabled;
 
-            if (tipo == (int)TipoEntidade.Pessoa)
+            if (tipo == (int)EntityType.Person)
             {
                 using var formPessoa = new FormCadastroPessoa(0);
                 if (formPessoa.ShowDialog(this) != DialogResult.OK) return;
@@ -214,7 +214,7 @@ namespace SmartSdk
                 lprAtivo = formPessoa.LprAtivo;
                 enabled = formPessoa.EntidadeEnabled;
             }
-            else if (tipo == (int)TipoEntidade.Veiculo)
+            else if (tipo == (int)EntityType.Vehicle)
             {
                 using var formVeiculo = new FormCadastroVeiculo(0, _api);
                 if (formVeiculo.ShowDialog(this) != DialogResult.OK) return;
@@ -229,310 +229,342 @@ namespace SmartSdk
             }
             else
             {
-                Aviso("Tipo de entidade não suportado no cadastro simplificado.");
+                ShowWarning("Entity type not supported in simplified registration.");
                 return;
             }
 
-            // *** CREATEID = TRUE ***  <- Esta e a diferenca principal!
-            var request = new CriarEntidadeRequest
+            // *** CREATEID = TRUE ***  <- This is the main difference!
+            var request = new CreateEntityRequest
             {
-                // Não informamos central_registry_id.
-                // A controladora gera entity_id e central_registry_id automaticamente.
+                // We don't provide central_registry_id.
+                // The controller generates entity_id and central_registry_id automatically.
                 Id = 0,
                 CreateId = true,
-                Tipo = tipo,
+                TypeAlias = tipo,
                 Enabled = enabled,
                 Name = nome,
                 Doc = doc,
                 Brand = brand,
                 Model = model,
                 Color = color,
-                LprAtivo = lprAtivo
+                LprActive = lprAtivo
             };
 
-            var result = await _api.Entidades.CriarAsync(request);
+            var result = await _api.Entities.CreateAsync(request);
             if (result.Success && result.Data?.Ret == 0)
             {
                 var nomeLog = !string.IsNullOrWhiteSpace(nome) ? nome : doc;
-                Log($"Entidade criada: {nomeLog}");
-                Log($"  -> entity_id={result.Data.EntityId}, central_registry_id={result.Data.CadastroId}");
+                Log($"Entity created: {nomeLog}");
+                Log($"  -> entity_id={result.Data.EntityId}, central_registry_id={result.Data.RegistryId}");
                 if (result.Data.CreatedCentral == 1)
-                    Log($"  -> Cadastro central criado automaticamente");
+                    Log($"  -> Central registry created automatically");
                 _currentOffset = 0;
-                await CarregarEntidades();
+                await LoadEntities();
+            }
+            else if (result.IsConflict)
+            {
+                // HTTP 409 = entity already exists on the controller.
+                // Options: overwrite (Overwrite=true) or use PUT to update.
+                var nomeLog = !string.IsNullOrWhiteSpace(nome) ? nome : doc;
+                Log($"Entity already exists: {nomeLog} (HTTP 409 Conflict)");
+
+                var resposta = MessageBox.Show(
+                    $"The entity '{nomeLog}' already exists on the controller.\n\nDo you want to overwrite the existing data?",
+                    "Entity already registered",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (resposta == DialogResult.Yes)
+                {
+                    request.Overwrite = true;
+                    var retryResult = await _api.Entities.CreateAsync(request);
+                    if (retryResult.Success && retryResult.Data?.Ret == 0)
+                    {
+                        Log($"Entity overwritten: {nomeLog} (entity_id={retryResult.Data.EntityId})");
+                        _currentOffset = 0;
+                        await LoadEntities();
+                    }
+                    else
+                    {
+                        var msg = $"Error overwriting entity (HTTP {retryResult.StatusCode}):\n{retryResult.Message}";
+                        Log(msg);
+                        ShowWarning(msg);
+                    }
+                }
             }
             else
             {
-                var msg = $"Erro ao criar entidade:\n{result.Message}";
+                var msg = $"Error creating entity (HTTP {result.StatusCode}):\n{result.Message}";
+                if (!string.IsNullOrEmpty(result.RawResponse))
+                    msg += $"\nResponse: {result.RawResponse}";
                 Log(msg);
-                Aviso(msg);
+                ShowWarning(msg);
             }
         }
 
         /// <summary>
-        /// Exclui a entidade selecionada.
+        /// Deletes the selected entity.
         /// DELETE /entities?id=X
         /// </summary>
-        private async void btnExcluirEntidade_Click(object? sender, EventArgs e)
+        private async void btnExcluirEntidade_Click(object sender, EventArgs e)
         {
-            if (_entidadeSelecionada == null) { Aviso("Selecione uma entidade"); return; }
+            if (_entidadeSelecionada == null) { ShowWarning("Select an entity"); return; }
 
             var confirm = MessageBox.Show(
-                $"Excluir '{_entidadeSelecionada.NomeExibicao}' e todas suas mídias?",
-                "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                $"Delete '{_entidadeSelecionada.DisplayName}' and all its media?",
+                "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
 
-            var result = await _api.Entidades.ExcluirAsync(_entidadeSelecionada.EntityId);
+            var result = await _api.Entities.DeleteAsync(_entidadeSelecionada.EntityId);
             if (result.Success)
             {
-                Log($"Entidade excluída: {_entidadeSelecionada.NomeExibicao}");
+                Log($"Entity deleted: {_entidadeSelecionada.DisplayName}");
                 _currentOffset = 0;
-                await CarregarEntidades();
+                await LoadEntities();
             }
             else
             {
-                var msg = $"Erro ao excluir entidade:\n{result.Message}";
+                var msg = $"Error deleting entity (HTTP {result.StatusCode}):\n{result.Message}";
                 Log(msg);
-                Aviso(msg);
+                ShowWarning(msg);
             }
         }
 
-        private async void btnBuscarEntidade_Click(object? sender, EventArgs e)
+        private async void btnBuscarEntidade_Click(object sender, EventArgs e)
         {
-            var filtro = txtFiltroEntidade.Text.Trim();
+            var filter = txtFiltroEntidade.Text.Trim();
             _currentOffset = 0;
 
-            // Se digitou um número, busca direto pela entity_id (API)
-            if (uint.TryParse(filtro, out uint idBusca))
+            // If a number was entered, search directly by entity_id (API)
+            if (uint.TryParse(filter, out uint searchId))
             {
-                await BuscarEntidadePorId(idBusca);
+                await SearchEntityById(searchId);
                 return;
             }
 
-            // Filtro por texto — enviado ao servidor
-            _filtroNome = filtro;
-            await CarregarEntidades();
+            // Text filter - sent to the server
+            _filtroNome = filter;
+            await LoadEntities();
         }
 
-        private async void btnAnterior_Click(object? sender, EventArgs e)
+        private async void btnAnterior_Click(object sender, EventArgs e)
         {
             _currentOffset = Math.Max(0, _currentOffset - PageSize);
-            await CarregarEntidades();
+            await LoadEntities();
         }
 
-        private async void btnProxima_Click(object? sender, EventArgs e)
+        private async void btnProxima_Click(object sender, EventArgs e)
         {
             _currentOffset += PageSize;
-            await CarregarEntidades();
+            await LoadEntities();
         }
 
-        /// <summary>Enter no campo de busca dispara a pesquisa</summary>
-        private async void txtFiltroEntidade_KeyDown(object? sender, KeyEventArgs e)
+        /// <summary>Enter key in the search field triggers the search</summary>
+        private async void txtFiltroEntidade_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
                 e.SuppressKeyPress = true;
                 _currentOffset = 0;
 
-                var filtro = txtFiltroEntidade.Text.Trim();
-                if (uint.TryParse(filtro, out uint idBusca))
+                var filter = txtFiltroEntidade.Text.Trim();
+                if (uint.TryParse(filter, out uint searchId))
                 {
-                    await BuscarEntidadePorId(idBusca);
+                    await SearchEntityById(searchId);
                     return;
                 }
 
-                _filtroNome = filtro;
-                await CarregarEntidades();
+                _filtroNome = filter;
+                await LoadEntities();
             }
         }
 
         // =====================================================================
-        //  MÍDIAS (Nível 2 no modelo simplificado)
-        //  Funciona exatamente igual ao modelo completo
+        //  MEDIA (Level 2 in the simplified model)
+        //  Works exactly like the complete model
         // =====================================================================
 
-        private async Task CarregarMidias(uint entityId)
+        private async Task LoadMedia(uint entityId)
         {
             listMidias.Items.Clear();
 
-            var result = await _api.Midias.ListarPorEntidadeAsync(entityId);
+            var result = await _api.Media.ListByEntityAsync(entityId);
             if (result.Success && result.Data != null)
             {
-                lblStatusMidias.Text = $"{result.Data.Count} mídia(s)";
+                lblStatusMidias.Text = $"{result.Data.Count} media item(s)";
                 foreach (var m in result.Data.Items)
                 {
                     var item = new ListViewItem(m.MediaId.ToString());
-                    item.SubItems.Add(m.TipoNome);
-                    item.SubItems.Add(m.Descricao);
-                    item.SubItems.Add(m.Enabled ? "Sim" : "Não");
+                    item.SubItems.Add(m.TypeName);
+                    item.SubItems.Add(m.DescriptionAlias);
+                    item.SubItems.Add(m.Enabled ? "Yes" : "No");
                     item.Tag = m;
                     listMidias.Items.Add(item);
                 }
             }
             else
             {
-                lblStatusMidias.Text = $"Erro: {result.Message}";
+                lblStatusMidias.Text = $"Error: {result.Message}";
             }
         }
 
         /// <summary>
-        /// Abre o formulÃ¡rio de cadastro de mÃ­dia para criar uma nova mÃ­dia
-        /// vinculada Ã  entidade selecionada.
+        /// Opens the media registration form to create a new media
+        /// linked to the selected entity.
         /// </summary>
-        private async void btnNovaMidia_Click(object? sender, EventArgs e)
+        private async void btnNovaMidia_Click(object sender, EventArgs e)
         {
-            if (_entidadeSelecionada == null) { Aviso("Selecione uma entidade"); return; }
+            if (_entidadeSelecionada == null) { ShowWarning("Select an entity"); return; }
 
             using var form = new FormCadastroMidia(_entidadeSelecionada.EntityId, _entidadeSelecionada.Doc);
-            
+
             if (form.ShowDialog(this) == DialogResult.OK)
             {
-                // LPR só deve ser cadastrado para entidades do tipo veículo.
-                if (form.TipoMidiaSelecionado == TipoMidia.Lpr &&
-                    _entidadeSelecionada.Tipo != (int)TipoEntidade.Veiculo)
+                // LPR should only be registered for vehicle-type entities.
+                if (form.TipoMidiaSelecionado == MediaType.Lpr &&
+                    _entidadeSelecionada.TypeAlias != (int)EntityType.Vehicle)
                 {
-                    Aviso("A mídia LPR (placa) só pode ser cadastrada para entidades do tipo Veículo.");
+                    ShowWarning("LPR (plate) media can only be registered for Vehicle-type entities.");
                     return;
                 }
 
-                var request = new CriarMidiaRequest
+                var request = new CreateMediaRequest
                 {
                     EntityId = _entidadeSelecionada.EntityId,
-                    CadastroId = _entidadeSelecionada.CadastroId,
-                    Tipo = form.TipoMidiaSelecionado,
-                    Descricao = form.TipoMidiaSelecionado == TipoMidia.Lpr &&
+                    RegistryId = _entidadeSelecionada.RegistryId,
+                    TypeAlias = form.TipoMidiaSelecionado,
+                    DescriptionAlias = form.TipoMidiaSelecionado == MediaType.Lpr &&
                                 !string.IsNullOrWhiteSpace(_entidadeSelecionada.Doc)
                         ? _entidadeSelecionada.Doc
                         : form.DadosMidia
                 };
 
-                // EXPLICAÇÃO: O backend valida o formato da mídia baseado no conteúdo
-                // do campo "descricao". Para RFID, ele aceita formatos Wiegand/CODE/HEX.
-                // Para LPR (placa), se enviarmos apenas a descricao, o backend tenta
-                // validar como RFID e retorna erro "formato RFID invalido".
-                // 
-                // SOLUÇÃO: Enviar ns32_0 e ns32_1 indica ao backend que os dados binários
-                // já foram processados, então ele não aplica a validação RFID.
-                // Para LPR manual, enviamos 0 em ambos (o backend ignora para LPR).
-                // NOTA: A forma recomendada é usar lpr_enabled=true na entidade do veiculo,
-                // não via POST /media manual.
-                if (form.TipoMidiaSelecionado == TipoMidia.Lpr)
+                // EXPLANATION: The backend validates the media format based on the content
+                // of the "description" field. For RFID, it accepts Wiegand/CODE/HEX formats.
+                // For LPR (plate), if we only send the description, the backend tries
+                // to validate it as RFID and returns "invalid RFID format" error.
+                //
+                // SOLUTION: Sending ns32_0 and ns32_1 tells the backend that the binary data
+                // has already been processed, so it doesn't apply RFID validation.
+                // For manual LPR, we send 0 in both (the backend ignores them for LPR).
+                // NOTE: The recommended way is to use lpr_enabled=true on the vehicle entity,
+                // not via manual POST /media.
+                if (form.TipoMidiaSelecionado == MediaType.Lpr)
                 {
                     request.Ns32_0 = 0;
                     request.Ns32_1 = 0;
                 }
 
-                var result = await _api.Midias.CriarAsync(request);
+                var result = await _api.Media.CreateAsync(request);
                 if (result.Success && result.Data?.Ret == 0)
                 {
-                    Log($"Mídia criada: {form.TipoMidiaNome} - {form.DadosMidia} (ID: {result.Data.MediaId})");
-                    await CarregarMidias(_entidadeSelecionada.EntityId);
+                    Log($"Media created: {form.TipoMidiaNome} - {form.DadosMidia} (ID: {result.Data.MediaId})");
+                    await LoadMedia(_entidadeSelecionada.EntityId);
                 }
                 else
                 {
-                    var msg = $"Erro ao criar mÃ­dia:\n{result.Message}";
+                    var msg = $"Error creating media (HTTP {result.StatusCode}):\n{result.Message}";
                     Log(msg);
-                    Aviso(msg);
+                    ShowWarning(msg);
                 }
             }
         }
 
-        private async void btnExcluirMidia_Click(object? sender, EventArgs e)
+        private async void btnExcluirMidia_Click(object sender, EventArgs e)
         {
-            if (listMidias.SelectedItems.Count == 0) { Aviso("Selecione uma mÃ­dia"); return; }
+            if (listMidias.SelectedItems.Count == 0) { ShowWarning("Select a media item"); return; }
 
-            var midia = listMidias.SelectedItems[0].Tag as MidiaAcesso;
+            var midia = listMidias.SelectedItems[0].Tag as AccessMedia;
             if (midia == null) return;
 
-            // Confirmação antes de excluir
+            // Confirmation before deleting
             var confirm = MessageBox.Show(
-                $"Tem certeza que deseja excluir a mídia '{midia.Descricao}'?\n\nEsta ação não pode ser desfeita.",
-                "Confirmar Exclusão",
+                $"Are you sure you want to delete the media '{midia.DescriptionAlias}'?\n\nThis action cannot be undone.",
+                "Confirm Deletion",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
 
-            var result = await _api.Midias.ExcluirAsync(midia.MediaId);
+            var result = await _api.Media.DeleteAsync(midia.MediaId);
             if (result.Success)
             {
-                Log($"Mídia excluída: {midia.Descricao}");
+                Log($"Media deleted: {midia.DescriptionAlias}");
                 if (_entidadeSelecionada != null)
-                    await CarregarMidias(_entidadeSelecionada.EntityId);
+                    await LoadMedia(_entidadeSelecionada.EntityId);
             }
             else
             {
-                var msg = $"Erro ao excluir mÃ­dia:\n{result.Message}";
+                var msg = $"Error deleting media (HTTP {result.StatusCode}):\n{result.Message}";
                 Log(msg);
-                Aviso(msg);
+                ShowWarning(msg);
             }
         }
 
         // =====================================================================
-        //  DETALHES DA MIDIA (Duplo clique)
+        //  MEDIA DETAILS (Double-click)
         // =====================================================================
 
         /// <summary>
-        /// Abre o formulÃ¡rio de detalhes da mÃ­dia ao dar duplo clique.
+        /// Opens the media details form on double-click.
         /// </summary>
-        private async void listMidias_DoubleClick(object? sender, EventArgs e)
+        private async void listMidias_DoubleClick(object sender, EventArgs e)
         {
             if (listMidias.SelectedItems.Count == 0) return;
 
-            var midia = listMidias.SelectedItems[0].Tag as MidiaAcesso;
+            var midia = listMidias.SelectedItems[0].Tag as AccessMedia;
             if (midia == null) return;
 
             using var form = new FormDetalheMidia(midia);
-            
+
             if (form.ShowDialog(this) == DialogResult.OK && form.FoiModificada)
             {
-                bool sucesso = true;
-                string mensagem = "";
+                bool success = true;
+                string message = "";
 
-                // Atualiza o estado de habilitaÃ§Ã£o se alterado
+                // Update the enabled state if changed
                 if (midia.Enabled != form.NovoEstadoEnabled)
                 {
-                    var result = await _api.Midias.AlterarStatusAsync(midia.MediaId, form.NovoEstadoEnabled);
+                    var result = await _api.Media.ChangeStatusAsync(midia.MediaId, form.NovoEstadoEnabled);
                     if (!result.Success)
                     {
-                        sucesso = false;
-                        mensagem = result.Message ?? "Erro ao alterar status";
+                        success = false;
+                        message = result.Message ?? "Error changing status";
                     }
                     else
                     {
-                        var status = form.NovoEstadoEnabled ? "liberada" : "bloqueada";
-                        Log($"Mídia {midia.Descricao} {status} com sucesso!");
+                        var status = form.NovoEstadoEnabled ? "enabled" : "blocked";
+                        Log($"Media {midia.DescriptionAlias} {status} successfully!");
                     }
                 }
 
-                // Atualiza a data de permissão se alterada
-                if (sucesso && form.DataPermissaoAlterada)
+                // Update the permission date if changed
+                if (success && form.DataPermissaoAlterada)
                 {
-                    var result = await _api.Midias.AlterarExpiracaoAsync(midia.MediaId, form.NovaDataPermissao);
+                    var result = await _api.Media.ChangeExpirationAsync(midia.MediaId, form.NovaDataPermissao);
                     if (!result.Success)
                     {
-                        sucesso = false;
-                        mensagem = result.Message ?? "Erro ao alterar data de permissão";
+                        success = false;
+                        message = result.Message ?? "Error changing permission date";
                     }
                     else
                     {
                         if (form.NovaDataPermissao > 0)
-                            Log($"Mídia {midia.Descricao} permitida até {DateTimeOffset.FromUnixTimeSeconds(form.NovaDataPermissao).LocalDateTime:dd/MM/yyyy HH:mm}");
+                            Log($"Media {midia.DescriptionAlias} permitted until {DateTimeOffset.FromUnixTimeSeconds(form.NovaDataPermissao).LocalDateTime:dd/MM/yyyy HH:mm}");
                         else
-                            Log($"Data limite removida da mídia {midia.Descricao}");
+                            Log($"Expiration date removed from media {midia.DescriptionAlias}");
                     }
                 }
 
-                // Se houve erro, mostra mensagem
-                if (!sucesso)
+                // If there was an error, show message
+                if (!success)
                 {
-                    var msg = $"Erro ao atualizar mÃ­dia:\n{mensagem}";
+                    var msg = $"Error updating media:\n{message}";
                     Log(msg);
-                    Aviso(msg);
+                    ShowWarning(msg);
                 }
 
-                // Recarrega a lista em qualquer caso
+                // Reload the list in any case
                 if (_entidadeSelecionada != null)
-                    await CarregarMidias(_entidadeSelecionada.EntityId);
+                    await LoadMedia(_entidadeSelecionada.EntityId);
             }
         }
 
@@ -547,43 +579,45 @@ namespace SmartSdk
             txtLog.AppendText($"[{ts}] {msg}{Environment.NewLine}");
         }
 
-        private void Aviso(string msg) =>
-            MessageBox.Show(msg, "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-        private string? InputBox(string titulo, string prompt)
+        private void ShowWarning(string msg)
         {
-            var form = new Form { Text = titulo, Width = 400, Height = 150, StartPosition = FormStartPosition.CenterParent };
+            MessageBox.Show(msg, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private string? InputBox(string title, string prompt)
+        {
+            var form = new Form { Text = title, Width = 400, Height = 150, StartPosition = FormStartPosition.CenterParent };
             var lbl = new Label { Text = prompt, Left = 10, Top = 10, Width = 360 };
             var txt = new TextBox { Left = 10, Top = 35, Width = 360 };
             var btnOk = new Button { Text = "OK", Left = 220, Top = 70, Width = 75, DialogResult = DialogResult.OK };
-            var btnCancel = new Button { Text = "Cancelar", Left = 300, Top = 70, Width = 75, DialogResult = DialogResult.Cancel };
+            var btnCancel = new Button { Text = "Cancel", Left = 300, Top = 70, Width = 75, DialogResult = DialogResult.Cancel };
             form.Controls.AddRange(new Control[] { lbl, txt, btnOk, btnCancel });
             form.AcceptButton = btnOk;
             form.CancelButton = btnCancel;
             return form.ShowDialog() == DialogResult.OK ? txt.Text : null;
         }
 
-        private int SelecionarOpcao(string titulo, string prompt, string[] opcoes)
+        private int SelectOption(string title, string prompt, string[] options)
         {
-            var form = new Form { Text = titulo, Width = 350, Height = 200, StartPosition = FormStartPosition.CenterParent };
+            var form = new Form { Text = title, Width = 350, Height = 200, StartPosition = FormStartPosition.CenterParent };
             var lbl = new Label { Text = prompt, Left = 10, Top = 10, Width = 320 };
             var combo = new ComboBox { Left = 10, Top = 35, Width = 320, DropDownStyle = ComboBoxStyle.DropDownList };
-            combo.Items.AddRange(opcoes);
+            combo.Items.AddRange(options);
             combo.SelectedIndex = 0;
             var btnOk = new Button { Text = "OK", Left = 170, Top = 70, Width = 75, DialogResult = DialogResult.OK };
-            var btnCancel = new Button { Text = "Cancelar", Left = 250, Top = 70, Width = 75, DialogResult = DialogResult.Cancel };
+            var btnCancel = new Button { Text = "Cancel", Left = 250, Top = 70, Width = 75, DialogResult = DialogResult.Cancel };
             form.Controls.AddRange(new Control[] { lbl, combo, btnOk, btnCancel });
             form.AcceptButton = btnOk;
             form.CancelButton = btnCancel;
             return form.ShowDialog() == DialogResult.OK ? combo.SelectedIndex : -1;
         }
 
-        /// <summary>Exibe diÃ¡logo Sim/NÃ£o e retorna true para sim.</summary>
-        private bool ConfirmarSimNao(string pergunta, string titulo)
+        /// <summary>Displays a Yes/No dialog and returns true for Yes.</summary>
+        private bool ConfirmYesNo(string question, string title)
         {
             var resposta = MessageBox.Show(
-                pergunta,
-                titulo,
+                question,
+                title,
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question,
                 MessageBoxDefaultButton.Button1);
@@ -591,6 +625,3 @@ namespace SmartSdk
         }
     }
 }
-
-
-

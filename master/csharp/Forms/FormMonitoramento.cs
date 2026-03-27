@@ -5,7 +5,7 @@ using MobiCortex.Sdk.Interfaces;
 namespace SmartSdk
 {
     /// <summary>
-    /// Formulário de Monitoramento MQTT - conecta ao broker da controladora.
+    /// MQTT Monitoring Form - connects to the controller broker.
     /// </summary>
     public partial class FormMonitoramento : Form
     {
@@ -33,20 +33,20 @@ namespace SmartSdk
         {
             if (_mqttClient?.IsConnected == true)
             {
-                await Desconectar();
+                await Disconnect();
                 return;
             }
 
             if (!_api.IsAuthenticated || string.IsNullOrEmpty(_api.SessionKey))
             {
-                Aviso("Faça login no MainForm antes de conectar ao MQTT");
+                Warning("Log in on MainForm before connecting to MQTT");
                 return;
             }
 
             try
             {
                 btnConectar.Enabled = false;
-                Log("Conectando ao MQTT via WebSocket...");
+                Log("Connecting to MQTT via WebSocket...");
 
                 var wsUrl = _api.BaseUrl
                     .Replace("https://", "wss://")
@@ -56,32 +56,32 @@ namespace SmartSdk
                 Log($"URL: {wsUrl}");
 
                 _mqttClient = new MqttClientService();
-                _mqttClient.MessageReceived += OnMensagemRecebida;
-                _mqttClient.Disconnected += OnDesconectado;
+                _mqttClient.MessageReceived += OnMessageReceived;
+                _mqttClient.Disconnected += OnDisconnected;
 
-                var topico = txtTopico.Text.Trim();
-                if (string.IsNullOrEmpty(topico)) topico = "#";
+                var topic = txtTopico.Text.Trim();
+                if (string.IsNullOrEmpty(topic)) topic = "#";
 
-                var connected = await _mqttClient.ConnectAsync(wsUrl, _api.SessionKey, new[] { topico });
+                var connected = await _mqttClient.ConnectAsync(wsUrl, _api.SessionKey, new[] { topic });
 
                 if (connected)
                 {
-                    Log("Conectado ao MQTT!");
-                    Log($"Inscrito no tópico: {topico}");
+                    Log("Connected to MQTT!");
+                    Log($"Subscribed to topic: {topic}");
 
-                    btnConectar.Text = "Desconectar";
+                    btnConectar.Text = "Disconnect";
                     btnConectar.BackColor = Color.FromArgb(220, 53, 69);
-                    lblStatus.Text = "Conectado";
+                    lblStatus.Text = "Connected";
                     lblStatus.ForeColor = Color.Green;
                 }
                 else
                 {
-                    Log("Falha ao conectar ao MQTT");
+                    Log("Failed to connect to MQTT");
                 }
             }
             catch (Exception ex)
             {
-                Log($"Erro ao conectar: {ex.Message}");
+                Log($"Error connecting: {ex.Message}");
             }
             finally
             {
@@ -93,54 +93,54 @@ namespace SmartSdk
         {
             if (_mqttClient?.IsConnected != true)
             {
-                Aviso("Conecte primeiro ao MQTT");
+                Warning("Connect to MQTT first");
                 return;
             }
 
             try
             {
-                var topico = txtTopico.Text.Trim();
-                if (string.IsNullOrEmpty(topico)) topico = "#";
+                var topic = txtTopico.Text.Trim();
+                if (string.IsNullOrEmpty(topic)) topic = "#";
 
-                await _mqttClient.SubscribeAsync(topico);
-                Log($"Inscrito no tópico: {topico}");
+                await _mqttClient.SubscribeAsync(topic);
+                Log($"Subscribed to topic: {topic}");
             }
             catch (Exception ex)
             {
-                Log($"Erro ao subscrever: {ex.Message}");
+                Log($"Error subscribing: {ex.Message}");
             }
         }
 
-        private void OnMensagemRecebida(object? sender, MqttMessageReceivedEventArgs e)
+        private void OnMessageReceived(object? sender, MqttMessageReceivedEventArgs e)
         {
             Invoke(() =>
             {
                 Log($"[{e.Topic}] {e.Payload}");
                 _msgCount++;
-                lblContador.Text = $"Mensagens: {_msgCount}";
+                lblContador.Text = $"Messages: {_msgCount}";
             });
         }
 
-        private void OnDesconectado(object? sender, EventArgs e)
+        private void OnDisconnected(object? sender, EventArgs e)
         {
             Invoke(() =>
             {
-                Log("Desconectado do MQTT");
-                btnConectar.Text = "Conectar MQTT";
+                Log("Disconnected from MQTT");
+                btnConectar.Text = "Connect MQTT";
                 btnConectar.BackColor = Color.FromArgb(0, 123, 255);
-                lblStatus.Text = "Desconectado";
+                lblStatus.Text = "Disconnected";
                 lblStatus.ForeColor = Color.Red;
             });
         }
 
-        private async Task Desconectar()
+        private async Task Disconnect()
         {
             if (_mqttClient != null)
             {
                 await _mqttClient.DisconnectAsync();
                 (_mqttClient as IDisposable)?.Dispose();
                 _mqttClient = null;
-                Log("Desconectado do MQTT");
+                Log("Disconnected from MQTT");
             }
         }
 
@@ -148,12 +148,12 @@ namespace SmartSdk
         {
             txtLog.Clear();
             _msgCount = 0;
-            lblContador.Text = "Mensagens: 0";
+            lblContador.Text = "Messages: 0";
         }
 
         protected override async void OnFormClosing(FormClosingEventArgs e)
         {
-            await Desconectar();
+            await Disconnect();
             base.OnFormClosing(e);
         }
 
@@ -164,7 +164,7 @@ namespace SmartSdk
             txtLog.AppendText($"[{ts}] {msg}{Environment.NewLine}");
         }
 
-        private void Aviso(string msg) =>
-            MessageBox.Show(msg, "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        private void Warning(string msg) =>
+            MessageBox.Show(msg, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 }

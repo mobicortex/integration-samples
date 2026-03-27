@@ -7,10 +7,11 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <DefaultItemExcludes>$(DefaultItemExcludes);MobiCortexSdkLib\**</DefaultItemExcludes>
+    <!-- MobiCortexSdkLib local mantido apenas como backup; o projeto referencia a lib compartilhada -->
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MQTTnet" Version="5.0.0.1405" />
+    <!-- MQTTnet agora vem transitivamente via MobiCortex.Sdk -->
   </ItemGroup>
 
   <!-- WinForms Designer Support -->
@@ -24,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="MobiCortexSdkLib\MobiCortex.Sdk.csproj" />
+    <ProjectReference Include="..\MobiCortexSdkLibCsharp\MobiCortex.Sdk.csproj" />
   </ItemGroup>
 
 

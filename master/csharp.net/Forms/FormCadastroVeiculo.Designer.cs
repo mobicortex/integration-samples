@@ -15,360 +15,360 @@ namespace SmartSdk
 
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            panelHeader = new Panel();
-            lblSubtitulo = new Label();
-            lblTitulo = new Label();
-            lblIdentificacao = new Label();
-            panelIdentificacao = new Panel();
-            lblIdInfo = new Label();
-            _numId = new NumericUpDown();
-            lblId = new Label();
-            lblCadastro = new Label();
-            lblDados = new Label();
-            panelDados = new Panel();
-            _txtPlaca = new TextBox();
-            lblPlaca = new Label();
-            _cmbCor = new ComboBox();
-            lblCor = new Label();
-            _txtModelo = new TextBox();
-            lblModelo = new Label();
-            _txtMarca = new ComboBox();
-            lblMarca = new Label();
-            panelLpr = new Panel();
-            lblLprInfo = new Label();
-            _chkLpr = new CheckBox();
-            panelStatus = new Panel();
-            lblStatusInfo = new Label();
-            _chkHabilitado = new CheckBox();
-            panelBotoes = new Panel();
-            btnCancelar = new Button();
-            btnSalvar = new Button();
-            panelHeader.SuspendLayout();
-            panelIdentificacao.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)_numId).BeginInit();
-            panelDados.SuspendLayout();
-            panelLpr.SuspendLayout();
-            panelStatus.SuspendLayout();
-            panelBotoes.SuspendLayout();
-            SuspendLayout();
-            // 
+            this.components = new System.ComponentModel.Container();
+            this.panelHeader = new Panel();
+            this.lblSubtitulo = new Label();
+            this.lblTitulo = new Label();
+            this.lblIdentificacao = new Label();
+            this.panelIdentificacao = new Panel();
+            this.lblIdInfo = new Label();
+            this._numId = new NumericUpDown();
+            this.lblId = new Label();
+            this.lblCadastro = new Label();
+            this.lblDados = new Label();
+            this.panelDados = new Panel();
+            this._txtPlaca = new TextBox();
+            this.lblPlaca = new Label();
+            this._cmbCor = new ComboBox();
+            this.lblCor = new Label();
+            this._txtModelo = new TextBox();
+            this.lblModelo = new Label();
+            this._txtMarca = new ComboBox();
+            this.lblMarca = new Label();
+            this.panelLpr = new Panel();
+            this.lblLprInfo = new Label();
+            this._chkLpr = new CheckBox();
+            this.panelStatus = new Panel();
+            this.lblStatusInfo = new Label();
+            this._chkHabilitado = new CheckBox();
+            this.panelBotoes = new Panel();
+            this.btnCancelar = new Button();
+            this.btnSalvar = new Button();
+            this.panelHeader.SuspendLayout();
+            this.panelIdentificacao.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._numId)).BeginInit();
+            this.panelDados.SuspendLayout();
+            this.panelLpr.SuspendLayout();
+            this.panelStatus.SuspendLayout();
+            this.panelBotoes.SuspendLayout();
+            this.SuspendLayout();
+            //
             // panelHeader
-            // 
-            panelHeader.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            panelHeader.BackColor = Color.FromArgb(244, 246, 248);
-            panelHeader.Controls.Add(lblSubtitulo);
-            panelHeader.Controls.Add(lblTitulo);
-            panelHeader.Location = new Point(0, 0);
-            panelHeader.Name = "panelHeader";
-            panelHeader.Size = new Size(624, 56);
-            panelHeader.TabIndex = 0;
-            // 
+            //
+            this.panelHeader.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            this.panelHeader.BackColor = Color.FromArgb(244, 246, 248);
+            this.panelHeader.Controls.Add(this.lblSubtitulo);
+            this.panelHeader.Controls.Add(this.lblTitulo);
+            this.panelHeader.Location = new Point(0, 0);
+            this.panelHeader.Name = "panelHeader";
+            this.panelHeader.Size = new Size(624, 56);
+            this.panelHeader.TabIndex = 0;
+            //
             // lblSubtitulo
-            // 
-            lblSubtitulo.ForeColor = Color.FromArgb(95, 102, 109);
-            lblSubtitulo.Location = new Point(20, 31);
-            lblSubtitulo.Name = "lblSubtitulo";
-            lblSubtitulo.Size = new Size(520, 15);
-            lblSubtitulo.TabIndex = 1;
-            lblSubtitulo.Text = "Preencha os dados abaixo para cadastrar o veiculo no cadastro selecionado.";
-            // 
+            //
+            this.lblSubtitulo.ForeColor = Color.FromArgb(95, 102, 109);
+            this.lblSubtitulo.Location = new Point(20, 31);
+            this.lblSubtitulo.Name = "lblSubtitulo";
+            this.lblSubtitulo.Size = new Size(520, 15);
+            this.lblSubtitulo.TabIndex = 1;
+            this.lblSubtitulo.Text = "Fill in the data below to register the vehicle in the selected registry.";
+            //
             // lblTitulo
-            // 
-            lblTitulo.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            lblTitulo.ForeColor = Color.FromArgb(32, 36, 40);
-            lblTitulo.Location = new Point(20, 10);
-            lblTitulo.Name = "lblTitulo";
-            lblTitulo.Size = new Size(420, 20);
-            lblTitulo.TabIndex = 0;
-            lblTitulo.Text = "Novo Veiculo";
-            // 
+            //
+            this.lblTitulo.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            this.lblTitulo.ForeColor = Color.FromArgb(32, 36, 40);
+            this.lblTitulo.Location = new Point(20, 10);
+            this.lblTitulo.Name = "lblTitulo";
+            this.lblTitulo.Size = new Size(420, 20);
+            this.lblTitulo.TabIndex = 0;
+            this.lblTitulo.Text = "New Vehicle";
+            //
             // lblIdentificacao
-            // 
-            lblIdentificacao.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            lblIdentificacao.ForeColor = Color.FromArgb(25, 91, 168);
-            lblIdentificacao.Location = new Point(20, 70);
-            lblIdentificacao.Name = "lblIdentificacao";
-            lblIdentificacao.Size = new Size(180, 18);
-            lblIdentificacao.TabIndex = 1;
-            lblIdentificacao.Text = "Identificacao";
-            // 
+            //
+            this.lblIdentificacao.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            this.lblIdentificacao.ForeColor = Color.FromArgb(25, 91, 168);
+            this.lblIdentificacao.Location = new Point(20, 70);
+            this.lblIdentificacao.Name = "lblIdentificacao";
+            this.lblIdentificacao.Size = new Size(180, 18);
+            this.lblIdentificacao.TabIndex = 1;
+            this.lblIdentificacao.Text = "Identification";
+            //
             // panelIdentificacao
-            // 
-            panelIdentificacao.BackColor = Color.White;
-            panelIdentificacao.BorderStyle = BorderStyle.FixedSingle;
-            panelIdentificacao.Controls.Add(lblIdInfo);
-            panelIdentificacao.Controls.Add(_numId);
-            panelIdentificacao.Controls.Add(lblId);
-            panelIdentificacao.Controls.Add(lblCadastro);
-            panelIdentificacao.Location = new Point(20, 92);
-            panelIdentificacao.Name = "panelIdentificacao";
-            panelIdentificacao.Size = new Size(590, 82);
-            panelIdentificacao.TabIndex = 2;
-            // 
+            //
+            this.panelIdentificacao.BackColor = Color.White;
+            this.panelIdentificacao.BorderStyle = BorderStyle.FixedSingle;
+            this.panelIdentificacao.Controls.Add(this.lblIdInfo);
+            this.panelIdentificacao.Controls.Add(this._numId);
+            this.panelIdentificacao.Controls.Add(this.lblId);
+            this.panelIdentificacao.Controls.Add(this.lblCadastro);
+            this.panelIdentificacao.Location = new Point(20, 92);
+            this.panelIdentificacao.Name = "panelIdentificacao";
+            this.panelIdentificacao.Size = new Size(590, 82);
+            this.panelIdentificacao.TabIndex = 2;
+            //
             // lblIdInfo
-            // 
-            lblIdInfo.ForeColor = Color.FromArgb(95, 102, 109);
-            lblIdInfo.Location = new Point(202, 56);
-            lblIdInfo.Name = "lblIdInfo";
-            lblIdInfo.Size = new Size(360, 15);
-            lblIdInfo.TabIndex = 3;
-            lblIdInfo.Text = "0 = geracao automatica pela controladora";
-            // 
+            //
+            this.lblIdInfo.ForeColor = Color.FromArgb(95, 102, 109);
+            this.lblIdInfo.Location = new Point(202, 56);
+            this.lblIdInfo.Name = "lblIdInfo";
+            this.lblIdInfo.Size = new Size(360, 15);
+            this.lblIdInfo.TabIndex = 3;
+            this.lblIdInfo.Text = "0 = automatic generation by the controller";
+            //
             // _numId
-            // 
-            _numId.Location = new Point(52, 53);
-            _numId.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
-            _numId.Name = "_numId";
-            _numId.Size = new Size(140, 23);
-            _numId.TabIndex = 2;
-            // 
+            //
+            this._numId.Location = new Point(52, 53);
+            this._numId.Maximum = new decimal(new int[] { -1, 0, 0, 0 }); // uint.MaxValue = 4294967295
+            this._numId.Name = "_numId";
+            this._numId.Size = new Size(140, 23);
+            this._numId.TabIndex = 2;
+            //
             // lblId
-            // 
-            lblId.Location = new Point(16, 56);
-            lblId.Name = "lblId";
-            lblId.Size = new Size(30, 15);
-            lblId.TabIndex = 1;
-            lblId.Text = "ID:";
-            // 
+            //
+            this.lblId.Location = new Point(16, 56);
+            this.lblId.Name = "lblId";
+            this.lblId.Size = new Size(30, 15);
+            this.lblId.TabIndex = 1;
+            this.lblId.Text = "ID:";
+            //
             // lblCadastro
-            // 
-            lblCadastro.ForeColor = Color.Black;
-            lblCadastro.Location = new Point(16, 28);
-            lblCadastro.Name = "lblCadastro";
-            lblCadastro.Size = new Size(250, 15);
-            lblCadastro.TabIndex = 0;
-            lblCadastro.Text = "Cadastro selecionado: 0";
-            // 
+            //
+            this.lblCadastro.ForeColor = Color.Black;
+            this.lblCadastro.Location = new Point(16, 28);
+            this.lblCadastro.Name = "lblCadastro";
+            this.lblCadastro.Size = new Size(250, 15);
+            this.lblCadastro.TabIndex = 0;
+            this.lblCadastro.Text = "Selected registry: 0";
+            //
             // lblDados
-            // 
-            lblDados.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            lblDados.ForeColor = Color.FromArgb(25, 91, 168);
-            lblDados.Location = new Point(20, 184);
-            lblDados.Name = "lblDados";
-            lblDados.Size = new Size(180, 18);
-            lblDados.TabIndex = 3;
-            lblDados.Text = "Dados do Veiculo";
-            // 
+            //
+            this.lblDados.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            this.lblDados.ForeColor = Color.FromArgb(25, 91, 168);
+            this.lblDados.Location = new Point(20, 184);
+            this.lblDados.Name = "lblDados";
+            this.lblDados.Size = new Size(180, 18);
+            this.lblDados.TabIndex = 3;
+            this.lblDados.Text = "Vehicle Data";
+            //
             // panelDados
-            // 
-            panelDados.BackColor = Color.White;
-            panelDados.BorderStyle = BorderStyle.FixedSingle;
-            panelDados.Controls.Add(_txtPlaca);
-            panelDados.Controls.Add(lblPlaca);
-            panelDados.Controls.Add(_cmbCor);
-            panelDados.Controls.Add(lblCor);
-            panelDados.Controls.Add(_txtModelo);
-            panelDados.Controls.Add(lblModelo);
-            panelDados.Controls.Add(_txtMarca);
-            panelDados.Controls.Add(lblMarca);
-            panelDados.Location = new Point(20, 206);
-            panelDados.Name = "panelDados";
-            panelDados.Size = new Size(590, 186);
-            panelDados.TabIndex = 4;
-            // 
+            //
+            this.panelDados.BackColor = Color.White;
+            this.panelDados.BorderStyle = BorderStyle.FixedSingle;
+            this.panelDados.Controls.Add(this._txtPlaca);
+            this.panelDados.Controls.Add(this.lblPlaca);
+            this.panelDados.Controls.Add(this._cmbCor);
+            this.panelDados.Controls.Add(this.lblCor);
+            this.panelDados.Controls.Add(this._txtModelo);
+            this.panelDados.Controls.Add(this.lblModelo);
+            this.panelDados.Controls.Add(this._txtMarca);
+            this.panelDados.Controls.Add(this.lblMarca);
+            this.panelDados.Location = new Point(20, 206);
+            this.panelDados.Name = "panelDados";
+            this.panelDados.Size = new Size(590, 186);
+            this.panelDados.TabIndex = 4;
+            //
             // _txtPlaca
-            // 
-            _txtPlaca.Location = new Point(16, 151);
-            _txtPlaca.Name = "_txtPlaca";
-            _txtPlaca.Size = new Size(270, 23);
-            _txtPlaca.TabIndex = 9;
-            // 
+            //
+            this._txtPlaca.Location = new Point(16, 151);
+            this._txtPlaca.Name = "_txtPlaca";
+            this._txtPlaca.Size = new Size(270, 23);
+            this._txtPlaca.TabIndex = 9;
+            //
             // lblPlaca
-            // 
-            lblPlaca.Location = new Point(16, 132);
-            lblPlaca.Name = "lblPlaca";
-            lblPlaca.Size = new Size(140, 15);
-            lblPlaca.TabIndex = 8;
-            lblPlaca.Text = "Placa";
-            // 
+            //
+            this.lblPlaca.Location = new Point(16, 132);
+            this.lblPlaca.Name = "lblPlaca";
+            this.lblPlaca.Size = new Size(140, 15);
+            this.lblPlaca.TabIndex = 8;
+            this.lblPlaca.Text = "License Plate";
+            //
             // _cmbCor
-            // 
-            _cmbCor.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbCor.FormattingEnabled = true;
-            _cmbCor.Items.AddRange(new object[] { "Selecionar...", "Branco", "Preto", "Prata", "Cinza", "Azul", "Vermelho", "Verde", "Amarelo", "Marrom", "Outro" });
-            _cmbCor.Location = new Point(302, 49);
-            _cmbCor.Name = "_cmbCor";
-            _cmbCor.Size = new Size(270, 23);
-            _cmbCor.TabIndex = 3;
-            // 
+            //
+            this._cmbCor.DropDownStyle = ComboBoxStyle.DropDownList;
+            this._cmbCor.FormattingEnabled = true;
+            this._cmbCor.Items.AddRange(new object[] { "Select...", "White", "Black", "Silver", "Gray", "Blue", "Red", "Green", "Yellow", "Brown", "Other" });
+            this._cmbCor.Location = new Point(302, 49);
+            this._cmbCor.Name = "_cmbCor";
+            this._cmbCor.Size = new Size(270, 23);
+            this._cmbCor.TabIndex = 3;
+            //
             // lblCor
-            // 
-            lblCor.Location = new Point(302, 30);
-            lblCor.Name = "lblCor";
-            lblCor.Size = new Size(140, 15);
-            lblCor.TabIndex = 2;
-            lblCor.Text = "Cor";
-            // 
+            //
+            this.lblCor.Location = new Point(302, 30);
+            this.lblCor.Name = "lblCor";
+            this.lblCor.Size = new Size(140, 15);
+            this.lblCor.TabIndex = 2;
+            this.lblCor.Text = "Color";
+            //
             // _txtModelo
-            // 
-            _txtModelo.Location = new Point(16, 105);
-            _txtModelo.Name = "_txtModelo";
-            _txtModelo.Size = new Size(270, 23);
-            _txtModelo.TabIndex = 5;
-            // 
+            //
+            this._txtModelo.Location = new Point(16, 105);
+            this._txtModelo.Name = "_txtModelo";
+            this._txtModelo.Size = new Size(270, 23);
+            this._txtModelo.TabIndex = 5;
+            //
             // lblModelo
-            // 
-            lblModelo.Location = new Point(16, 86);
-            lblModelo.Name = "lblModelo";
-            lblModelo.Size = new Size(140, 15);
-            lblModelo.TabIndex = 4;
-            lblModelo.Text = "Modelo";
-            // 
+            //
+            this.lblModelo.Location = new Point(16, 86);
+            this.lblModelo.Name = "lblModelo";
+            this.lblModelo.Size = new Size(140, 15);
+            this.lblModelo.TabIndex = 4;
+            this.lblModelo.Text = "Model";
+            //
             // _txtMarca
-            // 
-            _txtMarca.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            _txtMarca.AutoCompleteSource = AutoCompleteSource.ListItems;
-            _txtMarca.DropDownStyle = ComboBoxStyle.DropDown;
-            _txtMarca.FormattingEnabled = true;
-            _txtMarca.Location = new Point(16, 49);
-            _txtMarca.Name = "_txtMarca";
-            _txtMarca.Size = new Size(270, 23);
-            _txtMarca.TabIndex = 1;
-            // 
+            //
+            this._txtMarca.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            this._txtMarca.AutoCompleteSource = AutoCompleteSource.ListItems;
+            this._txtMarca.DropDownStyle = ComboBoxStyle.DropDown;
+            this._txtMarca.FormattingEnabled = true;
+            this._txtMarca.Location = new Point(16, 49);
+            this._txtMarca.Name = "_txtMarca";
+            this._txtMarca.Size = new Size(270, 23);
+            this._txtMarca.TabIndex = 1;
+            //
             // lblMarca
-            // 
-            lblMarca.Location = new Point(16, 30);
-            lblMarca.Name = "lblMarca";
-            lblMarca.Size = new Size(140, 15);
-            lblMarca.TabIndex = 0;
-            lblMarca.Text = "Marca";
-            // 
+            //
+            this.lblMarca.Location = new Point(16, 30);
+            this.lblMarca.Name = "lblMarca";
+            this.lblMarca.Size = new Size(140, 15);
+            this.lblMarca.TabIndex = 0;
+            this.lblMarca.Text = "Brand";
+            //
             // panelLpr
-            // 
-            panelLpr.BackColor = Color.FromArgb(248, 250, 252);
-            panelLpr.BorderStyle = BorderStyle.FixedSingle;
-            panelLpr.Controls.Add(lblLprInfo);
-            panelLpr.Controls.Add(_chkLpr);
-            panelLpr.Location = new Point(20, 398);
-            panelLpr.Name = "panelLpr";
-            panelLpr.Size = new Size(590, 44);
-            panelLpr.TabIndex = 5;
-            // 
+            //
+            this.panelLpr.BackColor = Color.FromArgb(248, 250, 252);
+            this.panelLpr.BorderStyle = BorderStyle.FixedSingle;
+            this.panelLpr.Controls.Add(this.lblLprInfo);
+            this.panelLpr.Controls.Add(this._chkLpr);
+            this.panelLpr.Location = new Point(20, 398);
+            this.panelLpr.Name = "panelLpr";
+            this.panelLpr.Size = new Size(590, 44);
+            this.panelLpr.TabIndex = 5;
+            //
             // lblLprInfo
-            // 
-            lblLprInfo.ForeColor = Color.FromArgb(95, 102, 109);
-            lblLprInfo.Location = new Point(236, 13);
-            lblLprInfo.Name = "lblLprInfo";
-            lblLprInfo.Size = new Size(330, 15);
-            lblLprInfo.TabIndex = 1;
-            lblLprInfo.Text = "Identificar veiculo automaticamente";
-            // 
+            //
+            this.lblLprInfo.ForeColor = Color.FromArgb(95, 102, 109);
+            this.lblLprInfo.Location = new Point(236, 13);
+            this.lblLprInfo.Name = "lblLprInfo";
+            this.lblLprInfo.Size = new Size(330, 15);
+            this.lblLprInfo.TabIndex = 1;
+            this.lblLprInfo.Text = "Identify vehicle automatically";
+            //
             // _chkLpr
-            // 
-            _chkLpr.AutoSize = true;
-            _chkLpr.Checked = true;
-            _chkLpr.CheckState = CheckState.Checked;
-            _chkLpr.Location = new Point(12, 11);
-            _chkLpr.Name = "_chkLpr";
-            _chkLpr.Size = new Size(162, 19);
-            _chkLpr.TabIndex = 0;
-            _chkLpr.Text = "Leitura de Placa (LPR)";
-            _chkLpr.UseVisualStyleBackColor = true;
-            // 
+            //
+            this._chkLpr.AutoSize = true;
+            this._chkLpr.Checked = true;
+            this._chkLpr.CheckState = CheckState.Checked;
+            this._chkLpr.Location = new Point(12, 11);
+            this._chkLpr.Name = "_chkLpr";
+            this._chkLpr.Size = new Size(162, 19);
+            this._chkLpr.TabIndex = 0;
+            this._chkLpr.Text = "License Plate Reading (LPR)";
+            this._chkLpr.UseVisualStyleBackColor = true;
+            //
             // panelStatus
-            // 
-            panelStatus.BackColor = Color.FromArgb(248, 250, 252);
-            panelStatus.BorderStyle = BorderStyle.FixedSingle;
-            panelStatus.Controls.Add(lblStatusInfo);
-            panelStatus.Controls.Add(_chkHabilitado);
-            panelStatus.Location = new Point(20, 448);
-            panelStatus.Name = "panelStatus";
-            panelStatus.Size = new Size(590, 44);
-            panelStatus.TabIndex = 6;
-            // 
+            //
+            this.panelStatus.BackColor = Color.FromArgb(248, 250, 252);
+            this.panelStatus.BorderStyle = BorderStyle.FixedSingle;
+            this.panelStatus.Controls.Add(this.lblStatusInfo);
+            this.panelStatus.Controls.Add(this._chkHabilitado);
+            this.panelStatus.Location = new Point(20, 448);
+            this.panelStatus.Name = "panelStatus";
+            this.panelStatus.Size = new Size(590, 44);
+            this.panelStatus.TabIndex = 6;
+            //
             // lblStatusInfo
-            // 
-            lblStatusInfo.ForeColor = Color.FromArgb(95, 102, 109);
-            lblStatusInfo.Location = new Point(236, 13);
-            lblStatusInfo.Name = "lblStatusInfo";
-            lblStatusInfo.Size = new Size(330, 15);
-            lblStatusInfo.TabIndex = 1;
-            lblStatusInfo.Text = "Desmarque para desativar o acesso deste veiculo";
-            // 
+            //
+            this.lblStatusInfo.ForeColor = Color.FromArgb(95, 102, 109);
+            this.lblStatusInfo.Location = new Point(236, 13);
+            this.lblStatusInfo.Name = "lblStatusInfo";
+            this.lblStatusInfo.Size = new Size(330, 15);
+            this.lblStatusInfo.TabIndex = 1;
+            this.lblStatusInfo.Text = "Uncheck to disable access for this vehicle";
+            //
             // _chkHabilitado
-            // 
-            _chkHabilitado.AutoSize = true;
-            _chkHabilitado.Checked = true;
-            _chkHabilitado.CheckState = CheckState.Checked;
-            _chkHabilitado.Location = new Point(12, 11);
-            _chkHabilitado.Name = "_chkHabilitado";
-            _chkHabilitado.Size = new Size(91, 19);
-            _chkHabilitado.TabIndex = 0;
-            _chkHabilitado.Text = "Veiculo ativo";
-            _chkHabilitado.UseVisualStyleBackColor = true;
-            // 
+            //
+            this._chkHabilitado.AutoSize = true;
+            this._chkHabilitado.Checked = true;
+            this._chkHabilitado.CheckState = CheckState.Checked;
+            this._chkHabilitado.Location = new Point(12, 11);
+            this._chkHabilitado.Name = "_chkHabilitado";
+            this._chkHabilitado.Size = new Size(91, 19);
+            this._chkHabilitado.TabIndex = 0;
+            this._chkHabilitado.Text = "Active vehicle";
+            this._chkHabilitado.UseVisualStyleBackColor = true;
+            //
             // panelBotoes
-            // 
-            panelBotoes.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            panelBotoes.BackColor = Color.FromArgb(244, 246, 248);
-            panelBotoes.Controls.Add(btnCancelar);
-            panelBotoes.Controls.Add(btnSalvar);
-            panelBotoes.Location = new Point(0, 498);
-            panelBotoes.Name = "panelBotoes";
-            panelBotoes.Size = new Size(624, 42);
-            panelBotoes.TabIndex = 7;
-            // 
+            //
+            this.panelBotoes.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            this.panelBotoes.BackColor = Color.FromArgb(244, 246, 248);
+            this.panelBotoes.Controls.Add(this.btnCancelar);
+            this.panelBotoes.Controls.Add(this.btnSalvar);
+            this.panelBotoes.Location = new Point(0, 498);
+            this.panelBotoes.Name = "panelBotoes";
+            this.panelBotoes.Size = new Size(624, 42);
+            this.panelBotoes.TabIndex = 7;
+            //
             // btnCancelar
-            // 
-            btnCancelar.DialogResult = DialogResult.Cancel;
-            btnCancelar.Location = new Point(530, 8);
-            btnCancelar.Name = "btnCancelar";
-            btnCancelar.Size = new Size(82, 26);
-            btnCancelar.TabIndex = 1;
-            btnCancelar.Text = "Cancelar";
-            btnCancelar.UseVisualStyleBackColor = true;
-            // 
+            //
+            this.btnCancelar.DialogResult = DialogResult.Cancel;
+            this.btnCancelar.Location = new Point(530, 8);
+            this.btnCancelar.Name = "btnCancelar";
+            this.btnCancelar.Size = new Size(82, 26);
+            this.btnCancelar.TabIndex = 1;
+            this.btnCancelar.Text = "Cancel";
+            this.btnCancelar.UseVisualStyleBackColor = true;
+            //
             // btnSalvar
-            // 
-            btnSalvar.BackColor = Color.FromArgb(25, 135, 84);
-            btnSalvar.DialogResult = DialogResult.OK;
-            btnSalvar.FlatAppearance.BorderSize = 0;
-            btnSalvar.FlatStyle = FlatStyle.Flat;
-            btnSalvar.ForeColor = Color.White;
-            btnSalvar.Location = new Point(446, 8);
-            btnSalvar.Name = "btnSalvar";
-            btnSalvar.Size = new Size(78, 26);
-            btnSalvar.TabIndex = 0;
-            btnSalvar.Text = "Salvar";
-            btnSalvar.UseVisualStyleBackColor = false;
-            btnSalvar.Click += BtnSalvar_Click;
-            // 
+            //
+            this.btnSalvar.BackColor = Color.FromArgb(25, 135, 84);
+            this.btnSalvar.DialogResult = DialogResult.OK;
+            this.btnSalvar.FlatAppearance.BorderSize = 0;
+            this.btnSalvar.FlatStyle = FlatStyle.Flat;
+            this.btnSalvar.ForeColor = Color.White;
+            this.btnSalvar.Location = new Point(446, 8);
+            this.btnSalvar.Name = "btnSalvar";
+            this.btnSalvar.Size = new Size(78, 26);
+            this.btnSalvar.TabIndex = 0;
+            this.btnSalvar.Text = "Save";
+            this.btnSalvar.UseVisualStyleBackColor = false;
+            this.btnSalvar.Click += new System.EventHandler(this.btnSalvar_Click);
+            //
             // FormCadastroVeiculo
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.White;
-            CancelButton = btnCancelar;
-            ClientSize = new Size(624, 540);
-            Controls.Add(panelBotoes);
-            Controls.Add(panelStatus);
-            Controls.Add(panelLpr);
-            Controls.Add(panelDados);
-            Controls.Add(lblDados);
-            Controls.Add(panelIdentificacao);
-            Controls.Add(lblIdentificacao);
-            Controls.Add(panelHeader);
-            Font = new Font("Segoe UI", 9F);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            Load += FormCadastroVeiculo_Load;
-            Name = "FormCadastroVeiculo";
-            ShowInTaskbar = false;
-            StartPosition = FormStartPosition.CenterParent;
-            Text = "Cadastrar Veiculo";
-            panelHeader.ResumeLayout(false);
-            panelIdentificacao.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)_numId).EndInit();
-            panelDados.ResumeLayout(false);
-            panelDados.PerformLayout();
-            panelLpr.ResumeLayout(false);
-            panelLpr.PerformLayout();
-            panelStatus.ResumeLayout(false);
-            panelStatus.PerformLayout();
-            panelBotoes.ResumeLayout(false);
-            ResumeLayout(false);
+            //
+            this.AutoScaleDimensions = new SizeF(7F, 15F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.BackColor = Color.White;
+            this.CancelButton = this.btnCancelar;
+            this.ClientSize = new Size(624, 540);
+            this.Controls.Add(this.panelBotoes);
+            this.Controls.Add(this.panelStatus);
+            this.Controls.Add(this.panelLpr);
+            this.Controls.Add(this.panelDados);
+            this.Controls.Add(this.lblDados);
+            this.Controls.Add(this.panelIdentificacao);
+            this.Controls.Add(this.lblIdentificacao);
+            this.Controls.Add(this.panelHeader);
+            this.Font = new Font("Segoe UI", 9F);
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Load += new System.EventHandler(this.FormCadastroVeiculo_Load);
+            this.Name = "FormCadastroVeiculo";
+            this.ShowInTaskbar = false;
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.Text = "Register Vehicle";
+            this.panelHeader.ResumeLayout(false);
+            this.panelIdentificacao.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this._numId)).EndInit();
+            this.panelDados.ResumeLayout(false);
+            this.panelDados.PerformLayout();
+            this.panelLpr.ResumeLayout(false);
+            this.panelLpr.PerformLayout();
+            this.panelStatus.ResumeLayout(false);
+            this.panelStatus.PerformLayout();
+            this.panelBotoes.ResumeLayout(false);
+            this.ResumeLayout(false);
         }
 
         #endregion

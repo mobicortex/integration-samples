@@ -13,6 +13,8 @@ namespace SmartSdk
             base.Dispose(disposing);
         }
 
+        #region Windows Form Designer generated code
+
         private void InitializeComponent()
         {
             this.groupBox1 = new GroupBox();
@@ -57,7 +59,7 @@ namespace SmartSdk
             this.groupBox1.Size = new Size(560, 100);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Conexão";
+            this.groupBox1.Text = "Connection";
             // 
             // txtSessionKey
             // 
@@ -105,7 +107,7 @@ namespace SmartSdk
             this.groupBox2.Size = new Size(300, 150);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Tópicos para Subscrever";
+            this.groupBox2.Text = "Topics to Subscribe";
             // 
             // txtTopicoCustom
             // 
@@ -141,7 +143,7 @@ namespace SmartSdk
             this.chkSensors.Name = "chkSensors";
             this.chkSensors.Size = new Size(66, 19);
             this.chkSensors.TabIndex = 2;
-            this.chkSensors.Text = "Sensores";
+            this.chkSensors.Text = "Sensors";
             this.chkSensors.UseVisualStyleBackColor = true;
             // 
             // chkLogs
@@ -161,7 +163,7 @@ namespace SmartSdk
             this.chkEvents.Name = "chkEvents";
             this.chkEvents.Size = new Size(61, 19);
             this.chkEvents.TabIndex = 0;
-            this.chkEvents.Text = "Eventos";
+            this.chkEvents.Text = "Events";
             this.chkEvents.UseVisualStyleBackColor = true;
             // 
             // btnConectar
@@ -170,9 +172,9 @@ namespace SmartSdk
             this.btnConectar.Name = "btnConectar";
             this.btnConectar.Size = new Size(110, 40);
             this.btnConectar.TabIndex = 2;
-            this.btnConectar.Text = "Conectar";
+            this.btnConectar.Text = "Connect";
             this.btnConectar.UseVisualStyleBackColor = true;
-            this.btnConectar.Click += this.btnConectar_Click;
+            this.btnConectar.Click += new System.EventHandler(this.btnConectar_Click);
             // 
             // lblStatus
             // 
@@ -182,7 +184,7 @@ namespace SmartSdk
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new Size(85, 15);
             this.lblStatus.TabIndex = 3;
-            this.lblStatus.Text = "Desconectado";
+            this.lblStatus.Text = "Disconnected";
             this.lblStatus.ForeColor = Color.Gray;
             // 
             // groupBox3
@@ -199,7 +201,7 @@ namespace SmartSdk
             this.groupBox3.Size = new Size(560, 130);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Publicar Mensagem";
+            this.groupBox3.Text = "Publish Message";
             // 
             // cmbPubQoS
             // 
@@ -226,9 +228,9 @@ namespace SmartSdk
             this.btnPublicar.Name = "btnPublicar";
             this.btnPublicar.Size = new Size(110, 30);
             this.btnPublicar.TabIndex = 4;
-            this.btnPublicar.Text = "Publicar";
+            this.btnPublicar.Text = "Publish";
             this.btnPublicar.UseVisualStyleBackColor = true;
-            this.btnPublicar.Click += this.btnPublicar_Click;
+            this.btnPublicar.Click += new System.EventHandler(this.btnPublicar_Click);
             // 
             // txtPubPayload
             // 
@@ -262,7 +264,7 @@ namespace SmartSdk
             this.label4.Name = "label4";
             this.label4.Size = new Size(43, 15);
             this.label4.TabIndex = 0;
-            this.label4.Text = "Tópico:";
+            this.label4.Text = "Topic:";
             // 
             // txtLog
             // 
@@ -283,9 +285,9 @@ namespace SmartSdk
             this.btnLimpar.Name = "btnLimpar";
             this.btnLimpar.Size = new Size(75, 25);
             this.btnLimpar.TabIndex = 6;
-            this.btnLimpar.Text = "Limpar";
+            this.btnLimpar.Text = "Clear";
             this.btnLimpar.UseVisualStyleBackColor = true;
-            this.btnLimpar.Click += this.btnLimpar_Click;
+            this.btnLimpar.Click += new System.EventHandler(this.btnLimpar_Click);
             // 
             // btnSalvar
             // 
@@ -294,9 +296,9 @@ namespace SmartSdk
             this.btnSalvar.Name = "btnSalvar";
             this.btnSalvar.Size = new Size(100, 25);
             this.btnSalvar.TabIndex = 7;
-            this.btnSalvar.Text = "Salvar JSON";
+            this.btnSalvar.Text = "Save JSON";
             this.btnSalvar.UseVisualStyleBackColor = true;
-            this.btnSalvar.Click += this.btnSalvar_Click;
+            this.btnSalvar.Click += new System.EventHandler(this.btnSalvar_Click);
             // 
             // lblMensagens
             // 
@@ -306,7 +308,7 @@ namespace SmartSdk
             this.lblMensagens.Name = "lblMensagens";
             this.lblMensagens.Size = new Size(80, 15);
             this.lblMensagens.TabIndex = 8;
-            this.lblMensagens.Text = "Mensagens: 0";
+            this.lblMensagens.Text = "Messages: 0";
             // 
             // FormMqttCliente
             // 
@@ -325,8 +327,8 @@ namespace SmartSdk
             this.MinimumSize = new Size(600, 660);
             this.Name = "FormMqttCliente";
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.Text = "Teste MQTT Cliente";
-            this.Load += this.FormMqttCliente_Load;
+            this.Text = "MQTT Client Test";
+            this.Load += new System.EventHandler(this.FormMqttCliente_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -336,6 +338,8 @@ namespace SmartSdk
             this.ResumeLayout(false);
             this.PerformLayout();
         }
+
+        #endregion
 
         private GroupBox groupBox1;
         private TextBox txtWsUrl;

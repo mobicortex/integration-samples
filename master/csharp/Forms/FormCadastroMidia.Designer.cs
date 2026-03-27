@@ -53,7 +53,7 @@ namespace SmartSdk
             lblTitulo.Padding = new Padding(15, 10, 10, 10);
             lblTitulo.Size = new Size(450, 50);
             lblTitulo.TabIndex = 2;
-            lblTitulo.Text = "Cadastro de Mídia";
+            lblTitulo.Text = "Media Registration";
             lblTitulo.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // panelForm
@@ -85,7 +85,7 @@ namespace SmartSdk
             grpDadosMidia.Size = new Size(420, 209);
             grpDadosMidia.TabIndex = 0;
             grpDadosMidia.TabStop = false;
-            grpDadosMidia.Text = "Dados da Mídia";
+            grpDadosMidia.Text = "Media Data";
             // 
             // lblFormatoAtual
             // 
@@ -95,7 +95,7 @@ namespace SmartSdk
             lblFormatoAtual.Name = "lblFormatoAtual";
             lblFormatoAtual.Size = new Size(380, 20);
             lblFormatoAtual.TabIndex = 0;
-            lblFormatoAtual.Text = "Selecione um tipo de mídia";
+            lblFormatoAtual.Text = "Select a media type";
             // 
             // lblExemploFormato
             // 
@@ -106,7 +106,7 @@ namespace SmartSdk
             lblExemploFormato.Name = "lblExemploFormato";
             lblExemploFormato.Size = new Size(105, 13);
             lblExemploFormato.TabIndex = 1;
-            lblExemploFormato.Text = "Formato esperado:";
+            lblExemploFormato.Text = "Expected format:";
             // 
             // txtDadosMidia
             // 
@@ -126,7 +126,7 @@ namespace SmartSdk
             lblDadosMidia.Name = "lblDadosMidia";
             lblDadosMidia.Size = new Size(151, 15);
             lblDadosMidia.TabIndex = 3;
-            lblDadosMidia.Text = "Informe os dados da mídia:";
+            lblDadosMidia.Text = "Enter media data:";
             // 
             // grpIdMidia
             // 
@@ -142,7 +142,7 @@ namespace SmartSdk
             grpIdMidia.Size = new Size(420, 110);
             grpIdMidia.TabIndex = 1;
             grpIdMidia.TabStop = false;
-            grpIdMidia.Text = "ID da Mídia";
+            grpIdMidia.Text = "Media ID";
             // 
             // lblIdInfo
             // 
@@ -153,17 +153,17 @@ namespace SmartSdk
             lblIdInfo.Name = "lblIdInfo";
             lblIdInfo.Size = new Size(347, 13);
             lblIdInfo.TabIndex = 0;
-            lblIdInfo.Text = "💡 Dica: Informe 0 (zero) para que o servidor gere o ID automaticamente";
+            lblIdInfo.Text = "💡 Tip: Enter 0 (zero) for the server to generate the ID automatically";
             // 
             // numIdMidia
             // 
             numIdMidia.Font = new Font("Segoe UI", 10F);
             numIdMidia.Location = new Point(15, 45);
-            numIdMidia.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
+            numIdMidia.Maximum = new decimal(new int[] { -1, 0, 0, 0 }); // uint.MaxValue = 4294967295
             numIdMidia.Name = "numIdMidia";
             numIdMidia.Size = new Size(180, 25);
             numIdMidia.TabIndex = 1;
-            toolTip.SetToolTip(numIdMidia, "Digite 0 para que o servidor gere o ID automaticamente");
+            toolTip.SetToolTip(numIdMidia, "Enter 0 for the server to generate the ID automatically");
             // 
             // lblIdMidia
             // 
@@ -174,7 +174,7 @@ namespace SmartSdk
             lblIdMidia.Name = "lblIdMidia";
             lblIdMidia.Size = new Size(272, 15);
             lblIdMidia.TabIndex = 2;
-            lblIdMidia.Text = "Informe o ID (0 = servidor gera automaticamente):";
+            lblIdMidia.Text = "Enter the ID (0 = server generates automatically):";
             // 
             // grpTipoMidia
             // 
@@ -189,7 +189,7 @@ namespace SmartSdk
             grpTipoMidia.Size = new Size(420, 90);
             grpTipoMidia.TabIndex = 2;
             grpTipoMidia.TabStop = false;
-            grpTipoMidia.Text = "Tipo de Mídia";
+            grpTipoMidia.Text = "Media Type";
             // 
             // cmbTipoMidia
             // 
@@ -210,7 +210,7 @@ namespace SmartSdk
             lblTipoMidia.Name = "lblTipoMidia";
             lblTipoMidia.Size = new Size(94, 15);
             lblTipoMidia.TabIndex = 1;
-            lblTipoMidia.Text = "Selecione o tipo:";
+            lblTipoMidia.Text = "Select the type:";
             // 
             // panelBotoes
             // 
@@ -237,7 +237,7 @@ namespace SmartSdk
             btnSalvar.Name = "btnSalvar";
             btnSalvar.Size = new Size(100, 35);
             btnSalvar.TabIndex = 0;
-            btnSalvar.Text = "Salvar";
+            btnSalvar.Text = "Save";
             btnSalvar.UseVisualStyleBackColor = false;
             btnSalvar.Click += btnSalvar_Click;
             // 
@@ -250,7 +250,7 @@ namespace SmartSdk
             btnCancelar.Name = "btnCancelar";
             btnCancelar.Size = new Size(100, 35);
             btnCancelar.TabIndex = 1;
-            btnCancelar.Text = "Cancelar";
+            btnCancelar.Text = "Cancel";
             // 
             // FormCadastroMidia
             // 

@@ -15,335 +15,335 @@ namespace SmartSdk
 
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            panelHeader = new Panel();
-            lblSubtitulo = new Label();
-            lblTitulo = new Label();
-            grpId = new GroupBox();
-            lblIdInfo = new Label();
-            numId = new NumericUpDown();
-            lblId = new Label();
-            grpNome = new GroupBox();
-            txtNome = new TextBox();
-            lblNome = new Label();
-            grpCamposOpcionais = new GroupBox();
-            txtField4 = new TextBox();
-            lblField4 = new Label();
-            txtField3 = new TextBox();
-            lblField3 = new Label();
-            txtField2 = new TextBox();
-            lblField2 = new Label();
-            txtField1 = new TextBox();
-            lblField1 = new Label();
-            grpStatus = new GroupBox();
-            chkBloqueado = new CheckBox();
-            panelBotoes = new Panel();
-            btnCancelar = new Button();
-            btnSalvar = new Button();
-            panelHeader.SuspendLayout();
-            grpId.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)numId).BeginInit();
-            grpNome.SuspendLayout();
-            grpCamposOpcionais.SuspendLayout();
-            grpStatus.SuspendLayout();
-            panelBotoes.SuspendLayout();
-            SuspendLayout();
-            // 
+            this.components = new System.ComponentModel.Container();
+            this.panelHeader = new Panel();
+            this.lblSubtitulo = new Label();
+            this.lblTitulo = new Label();
+            this.grpId = new GroupBox();
+            this.lblIdInfo = new Label();
+            this.numId = new NumericUpDown();
+            this.lblId = new Label();
+            this.grpNome = new GroupBox();
+            this.txtNome = new TextBox();
+            this.lblNome = new Label();
+            this.grpCamposOpcionais = new GroupBox();
+            this.txtField4 = new TextBox();
+            this.lblField4 = new Label();
+            this.txtField3 = new TextBox();
+            this.lblField3 = new Label();
+            this.txtField2 = new TextBox();
+            this.lblField2 = new Label();
+            this.txtField1 = new TextBox();
+            this.lblField1 = new Label();
+            this.grpStatus = new GroupBox();
+            this.chkBloqueado = new CheckBox();
+            this.panelBotoes = new Panel();
+            this.btnCancelar = new Button();
+            this.btnSalvar = new Button();
+            this.panelHeader.SuspendLayout();
+            this.grpId.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)this.numId).BeginInit();
+            this.grpNome.SuspendLayout();
+            this.grpCamposOpcionais.SuspendLayout();
+            this.grpStatus.SuspendLayout();
+            this.panelBotoes.SuspendLayout();
+            this.SuspendLayout();
+            //
             // panelHeader
-            // 
-            panelHeader.BackColor = Color.FromArgb(244, 246, 248);
-            panelHeader.Controls.Add(lblSubtitulo);
-            panelHeader.Controls.Add(lblTitulo);
-            panelHeader.Dock = DockStyle.Top;
-            panelHeader.Location = new Point(0, 0);
-            panelHeader.Name = "panelHeader";
-            panelHeader.Size = new Size(484, 62);
-            panelHeader.TabIndex = 0;
-            // 
+            //
+            this.panelHeader.BackColor = Color.FromArgb(244, 246, 248);
+            this.panelHeader.Controls.Add(this.lblSubtitulo);
+            this.panelHeader.Controls.Add(this.lblTitulo);
+            this.panelHeader.Dock = DockStyle.Top;
+            this.panelHeader.Location = new Point(0, 0);
+            this.panelHeader.Name = "panelHeader";
+            this.panelHeader.Size = new Size(484, 62);
+            this.panelHeader.TabIndex = 0;
+            //
             // lblSubtitulo
-            // 
-            lblSubtitulo.ForeColor = Color.FromArgb(95, 102, 109);
-            lblSubtitulo.Location = new Point(20, 33);
-            lblSubtitulo.Name = "lblSubtitulo";
-            lblSubtitulo.Size = new Size(440, 15);
-            lblSubtitulo.TabIndex = 1;
-            lblSubtitulo.Text = "Cadastro Central (Unidade/Apartamento/Empresa)";
-            // 
+            //
+            this.lblSubtitulo.ForeColor = Color.FromArgb(95, 102, 109);
+            this.lblSubtitulo.Location = new Point(20, 33);
+            this.lblSubtitulo.Name = "lblSubtitulo";
+            this.lblSubtitulo.Size = new Size(440, 15);
+            this.lblSubtitulo.TabIndex = 1;
+            this.lblSubtitulo.Text = "Central Registry (Unit/Apartment/Company)";
+            //
             // lblTitulo
-            // 
-            lblTitulo.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            lblTitulo.ForeColor = Color.FromArgb(32, 36, 40);
-            lblTitulo.Location = new Point(20, 12);
-            lblTitulo.Name = "lblTitulo";
-            lblTitulo.Size = new Size(420, 20);
-            lblTitulo.TabIndex = 0;
-            lblTitulo.Text = "Cadastro Central";
-            // 
+            //
+            this.lblTitulo.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            this.lblTitulo.ForeColor = Color.FromArgb(32, 36, 40);
+            this.lblTitulo.Location = new Point(20, 12);
+            this.lblTitulo.Name = "lblTitulo";
+            this.lblTitulo.Size = new Size(420, 20);
+            this.lblTitulo.TabIndex = 0;
+            this.lblTitulo.Text = "Central Registry";
+            //
             // grpId
-            // 
-            grpId.Controls.Add(lblIdInfo);
-            grpId.Controls.Add(numId);
-            grpId.Controls.Add(lblId);
-            grpId.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            grpId.ForeColor = Color.FromArgb(25, 91, 168);
-            grpId.Location = new Point(20, 76);
-            grpId.Name = "grpId";
-            grpId.Size = new Size(444, 90);
-            grpId.TabIndex = 1;
-            grpId.TabStop = false;
-            grpId.Text = "Identificacao";
-            // 
+            //
+            this.grpId.Controls.Add(this.lblIdInfo);
+            this.grpId.Controls.Add(this.numId);
+            this.grpId.Controls.Add(this.lblId);
+            this.grpId.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            this.grpId.ForeColor = Color.FromArgb(25, 91, 168);
+            this.grpId.Location = new Point(20, 76);
+            this.grpId.Name = "grpId";
+            this.grpId.Size = new Size(444, 90);
+            this.grpId.TabIndex = 1;
+            this.grpId.TabStop = false;
+            this.grpId.Text = "Identification";
+            //
             // lblIdInfo
-            // 
-            lblIdInfo.Font = new Font("Segoe UI", 8F, FontStyle.Italic);
-            lblIdInfo.ForeColor = Color.Gray;
-            lblIdInfo.Location = new Point(20, 60);
-            lblIdInfo.Name = "lblIdInfo";
-            lblIdInfo.Size = new Size(400, 15);
-            lblIdInfo.TabIndex = 2;
-            lblIdInfo.Text = "0 = geracao automatica pelo servidor";
-            // 
+            //
+            this.lblIdInfo.Font = new Font("Segoe UI", 8F, FontStyle.Italic);
+            this.lblIdInfo.ForeColor = Color.Gray;
+            this.lblIdInfo.Location = new Point(20, 60);
+            this.lblIdInfo.Name = "lblIdInfo";
+            this.lblIdInfo.Size = new Size(400, 15);
+            this.lblIdInfo.TabIndex = 2;
+            this.lblIdInfo.Text = "0 = automatic generation by the server";
+            //
             // numId
-            // 
-            numId.Location = new Point(80, 30);
-            numId.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
-            numId.Name = "numId";
-            numId.Size = new Size(140, 23);
-            numId.TabIndex = 1;
-            // 
+            //
+            this.numId.Location = new Point(80, 30);
+            this.numId.Maximum = new decimal(new int[] { -1, 0, 0, 0 }); // uint.MaxValue = 4294967295
+            this.numId.Name = "numId";
+            this.numId.Size = new Size(140, 23);
+            this.numId.TabIndex = 1;
+            //
             // lblId
-            // 
-            lblId.AutoSize = true;
-            lblId.Font = new Font("Segoe UI", 9F);
-            lblId.ForeColor = Color.Black;
-            lblId.Location = new Point(20, 32);
-            lblId.Name = "lblId";
-            lblId.Size = new Size(21, 15);
-            lblId.TabIndex = 0;
-            lblId.Text = "ID:";
-            // 
+            //
+            this.lblId.AutoSize = true;
+            this.lblId.Font = new Font("Segoe UI", 9F);
+            this.lblId.ForeColor = Color.Black;
+            this.lblId.Location = new Point(20, 32);
+            this.lblId.Name = "lblId";
+            this.lblId.Size = new Size(21, 15);
+            this.lblId.TabIndex = 0;
+            this.lblId.Text = "ID:";
+            //
             // grpNome
-            // 
-            grpNome.Controls.Add(txtNome);
-            grpNome.Controls.Add(lblNome);
-            grpNome.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            grpNome.ForeColor = Color.FromArgb(25, 91, 168);
-            grpNome.Location = new Point(20, 176);
-            grpNome.Name = "grpNome";
-            grpNome.Size = new Size(444, 70);
-            grpNome.TabIndex = 2;
-            grpNome.TabStop = false;
-            grpNome.Text = "Nome";
-            // 
+            //
+            this.grpNome.Controls.Add(this.txtNome);
+            this.grpNome.Controls.Add(this.lblNome);
+            this.grpNome.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            this.grpNome.ForeColor = Color.FromArgb(25, 91, 168);
+            this.grpNome.Location = new Point(20, 176);
+            this.grpNome.Name = "grpNome";
+            this.grpNome.Size = new Size(444, 70);
+            this.grpNome.TabIndex = 2;
+            this.grpNome.TabStop = false;
+            this.grpNome.Text = "Name";
+            //
             // txtNome
-            // 
-            txtNome.Font = new Font("Segoe UI", 10F);
-            txtNome.Location = new Point(80, 28);
-            txtNome.Name = "txtNome";
-            txtNome.Size = new Size(340, 25);
-            txtNome.TabIndex = 1;
-            // 
+            //
+            this.txtNome.Font = new Font("Segoe UI", 10F);
+            this.txtNome.Location = new Point(80, 28);
+            this.txtNome.Name = "txtNome";
+            this.txtNome.Size = new Size(340, 25);
+            this.txtNome.TabIndex = 1;
+            //
             // lblNome
-            // 
-            lblNome.AutoSize = true;
-            lblNome.Font = new Font("Segoe UI", 9F);
-            lblNome.ForeColor = Color.Black;
-            lblNome.Location = new Point(20, 32);
-            lblNome.Name = "lblNome";
-            lblNome.Size = new Size(43, 15);
-            lblNome.TabIndex = 0;
-            lblNome.Text = "Nome:";
-            // 
+            //
+            this.lblNome.AutoSize = true;
+            this.lblNome.Font = new Font("Segoe UI", 9F);
+            this.lblNome.ForeColor = Color.Black;
+            this.lblNome.Location = new Point(20, 32);
+            this.lblNome.Name = "lblNome";
+            this.lblNome.Size = new Size(43, 15);
+            this.lblNome.TabIndex = 0;
+            this.lblNome.Text = "Name:";
+            //
             // grpCamposOpcionais
-            // 
-            grpCamposOpcionais.Controls.Add(txtField4);
-            grpCamposOpcionais.Controls.Add(lblField4);
-            grpCamposOpcionais.Controls.Add(txtField3);
-            grpCamposOpcionais.Controls.Add(lblField3);
-            grpCamposOpcionais.Controls.Add(txtField2);
-            grpCamposOpcionais.Controls.Add(lblField2);
-            grpCamposOpcionais.Controls.Add(txtField1);
-            grpCamposOpcionais.Controls.Add(lblField1);
-            grpCamposOpcionais.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            grpCamposOpcionais.ForeColor = Color.FromArgb(25, 91, 168);
-            grpCamposOpcionais.Location = new Point(20, 256);
-            grpCamposOpcionais.Name = "grpCamposOpcionais";
-            grpCamposOpcionais.Size = new Size(444, 140);
-            grpCamposOpcionais.TabIndex = 3;
-            grpCamposOpcionais.TabStop = false;
-            grpCamposOpcionais.Text = "Campos Opcionais";
-            // 
+            //
+            this.grpCamposOpcionais.Controls.Add(this.txtField4);
+            this.grpCamposOpcionais.Controls.Add(this.lblField4);
+            this.grpCamposOpcionais.Controls.Add(this.txtField3);
+            this.grpCamposOpcionais.Controls.Add(this.lblField3);
+            this.grpCamposOpcionais.Controls.Add(this.txtField2);
+            this.grpCamposOpcionais.Controls.Add(this.lblField2);
+            this.grpCamposOpcionais.Controls.Add(this.txtField1);
+            this.grpCamposOpcionais.Controls.Add(this.lblField1);
+            this.grpCamposOpcionais.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            this.grpCamposOpcionais.ForeColor = Color.FromArgb(25, 91, 168);
+            this.grpCamposOpcionais.Location = new Point(20, 256);
+            this.grpCamposOpcionais.Name = "grpCamposOpcionais";
+            this.grpCamposOpcionais.Size = new Size(444, 140);
+            this.grpCamposOpcionais.TabIndex = 3;
+            this.grpCamposOpcionais.TabStop = false;
+            this.grpCamposOpcionais.Text = "Optional Fields";
+            //
             // txtField4
-            // 
-            txtField4.Font = new Font("Segoe UI", 9F);
-            txtField4.Location = new Point(280, 90);
-            txtField4.Name = "txtField4";
-            txtField4.Size = new Size(140, 23);
-            txtField4.TabIndex = 7;
-            // 
+            //
+            this.txtField4.Font = new Font("Segoe UI", 9F);
+            this.txtField4.Location = new Point(280, 90);
+            this.txtField4.Name = "txtField4";
+            this.txtField4.Size = new Size(140, 23);
+            this.txtField4.TabIndex = 7;
+            //
             // lblField4
-            // 
-            lblField4.AutoSize = true;
-            lblField4.Font = new Font("Segoe UI", 9F);
-            lblField4.ForeColor = Color.Black;
-            lblField4.Location = new Point(230, 93);
-            lblField4.Name = "lblField4";
-            lblField4.Size = new Size(44, 15);
-            lblField4.TabIndex = 6;
-            lblField4.Text = "Campo";
-            // 
+            //
+            this.lblField4.AutoSize = true;
+            this.lblField4.Font = new Font("Segoe UI", 9F);
+            this.lblField4.ForeColor = Color.Black;
+            this.lblField4.Location = new Point(230, 93);
+            this.lblField4.Name = "lblField4";
+            this.lblField4.Size = new Size(44, 15);
+            this.lblField4.TabIndex = 6;
+            this.lblField4.Text = "Field";
+            //
             // txtField3
-            // 
-            txtField3.Font = new Font("Segoe UI", 9F);
-            txtField3.Location = new Point(80, 90);
-            txtField3.Name = "txtField3";
-            txtField3.Size = new Size(140, 23);
-            txtField3.TabIndex = 5;
-            // 
+            //
+            this.txtField3.Font = new Font("Segoe UI", 9F);
+            this.txtField3.Location = new Point(80, 90);
+            this.txtField3.Name = "txtField3";
+            this.txtField3.Size = new Size(140, 23);
+            this.txtField3.TabIndex = 5;
+            //
             // lblField3
-            // 
-            lblField3.AutoSize = true;
-            lblField3.Font = new Font("Segoe UI", 9F);
-            lblField3.ForeColor = Color.Black;
-            lblField3.Location = new Point(20, 93);
-            lblField3.Name = "lblField3";
-            lblField3.Size = new Size(44, 15);
-            lblField3.TabIndex = 4;
-            lblField3.Text = "Campo";
-            // 
+            //
+            this.lblField3.AutoSize = true;
+            this.lblField3.Font = new Font("Segoe UI", 9F);
+            this.lblField3.ForeColor = Color.Black;
+            this.lblField3.Location = new Point(20, 93);
+            this.lblField3.Name = "lblField3";
+            this.lblField3.Size = new Size(44, 15);
+            this.lblField3.TabIndex = 4;
+            this.lblField3.Text = "Field";
+            //
             // txtField2
-            // 
-            txtField2.Font = new Font("Segoe UI", 9F);
-            txtField2.Location = new Point(280, 40);
-            txtField2.Name = "txtField2";
-            txtField2.Size = new Size(140, 23);
-            txtField2.TabIndex = 3;
-            // 
+            //
+            this.txtField2.Font = new Font("Segoe UI", 9F);
+            this.txtField2.Location = new Point(280, 40);
+            this.txtField2.Name = "txtField2";
+            this.txtField2.Size = new Size(140, 23);
+            this.txtField2.TabIndex = 3;
+            //
             // lblField2
-            // 
-            lblField2.AutoSize = true;
-            lblField2.Font = new Font("Segoe UI", 9F);
-            lblField2.ForeColor = Color.Black;
-            lblField2.Location = new Point(230, 43);
-            lblField2.Name = "lblField2";
-            lblField2.Size = new Size(44, 15);
-            lblField2.TabIndex = 2;
-            lblField2.Text = "Campo";
-            // 
+            //
+            this.lblField2.AutoSize = true;
+            this.lblField2.Font = new Font("Segoe UI", 9F);
+            this.lblField2.ForeColor = Color.Black;
+            this.lblField2.Location = new Point(230, 43);
+            this.lblField2.Name = "lblField2";
+            this.lblField2.Size = new Size(44, 15);
+            this.lblField2.TabIndex = 2;
+            this.lblField2.Text = "Field";
+            //
             // txtField1
-            // 
-            txtField1.Font = new Font("Segoe UI", 9F);
-            txtField1.Location = new Point(80, 40);
-            txtField1.Name = "txtField1";
-            txtField1.Size = new Size(140, 23);
-            txtField1.TabIndex = 1;
-            // 
+            //
+            this.txtField1.Font = new Font("Segoe UI", 9F);
+            this.txtField1.Location = new Point(80, 40);
+            this.txtField1.Name = "txtField1";
+            this.txtField1.Size = new Size(140, 23);
+            this.txtField1.TabIndex = 1;
+            //
             // lblField1
-            // 
-            lblField1.AutoSize = true;
-            lblField1.Font = new Font("Segoe UI", 9F);
-            lblField1.ForeColor = Color.Black;
-            lblField1.Location = new Point(20, 43);
-            lblField1.Name = "lblField1";
-            lblField1.Size = new Size(44, 15);
-            lblField1.TabIndex = 0;
-            lblField1.Text = "Campo";
-            // 
+            //
+            this.lblField1.AutoSize = true;
+            this.lblField1.Font = new Font("Segoe UI", 9F);
+            this.lblField1.ForeColor = Color.Black;
+            this.lblField1.Location = new Point(20, 43);
+            this.lblField1.Name = "lblField1";
+            this.lblField1.Size = new Size(44, 15);
+            this.lblField1.TabIndex = 0;
+            this.lblField1.Text = "Field";
+            //
             // grpStatus
-            // 
-            grpStatus.Controls.Add(chkBloqueado);
-            grpStatus.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            grpStatus.ForeColor = Color.FromArgb(220, 53, 69);
-            grpStatus.Location = new Point(20, 406);
-            grpStatus.Name = "grpStatus";
-            grpStatus.Size = new Size(444, 60);
-            grpStatus.TabIndex = 4;
-            grpStatus.TabStop = false;
-            grpStatus.Text = "Status";
-            // 
+            //
+            this.grpStatus.Controls.Add(this.chkBloqueado);
+            this.grpStatus.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            this.grpStatus.ForeColor = Color.FromArgb(220, 53, 69);
+            this.grpStatus.Location = new Point(20, 406);
+            this.grpStatus.Name = "grpStatus";
+            this.grpStatus.Size = new Size(444, 60);
+            this.grpStatus.TabIndex = 4;
+            this.grpStatus.TabStop = false;
+            this.grpStatus.Text = "Status";
+            //
             // chkBloqueado
-            // 
-            chkBloqueado.AutoSize = true;
-            chkBloqueado.Font = new Font("Segoe UI", 9F);
-            chkBloqueado.ForeColor = Color.Black;
-            chkBloqueado.Location = new Point(20, 28);
-            chkBloqueado.Name = "chkBloqueado";
-            chkBloqueado.Size = new Size(190, 19);
-            chkBloqueado.TabIndex = 0;
-            chkBloqueado.Text = "Ativar cadastro";
-            chkBloqueado.UseVisualStyleBackColor = true;
-            // 
+            //
+            this.chkBloqueado.AutoSize = true;
+            this.chkBloqueado.Font = new Font("Segoe UI", 9F);
+            this.chkBloqueado.ForeColor = Color.Black;
+            this.chkBloqueado.Location = new Point(20, 28);
+            this.chkBloqueado.Name = "chkBloqueado";
+            this.chkBloqueado.Size = new Size(190, 19);
+            this.chkBloqueado.TabIndex = 0;
+            this.chkBloqueado.Text = "Enable registry";
+            this.chkBloqueado.UseVisualStyleBackColor = true;
+            //
             // panelBotoes
-            // 
-            panelBotoes.BackColor = Color.FromArgb(244, 246, 248);
-            panelBotoes.Controls.Add(btnCancelar);
-            panelBotoes.Controls.Add(btnSalvar);
-            panelBotoes.Dock = DockStyle.Bottom;
-            panelBotoes.Location = new Point(0, 476);
-            panelBotoes.Name = "panelBotoes";
-            panelBotoes.Size = new Size(484, 60);
-            panelBotoes.TabIndex = 5;
-            // 
+            //
+            this.panelBotoes.BackColor = Color.FromArgb(244, 246, 248);
+            this.panelBotoes.Controls.Add(this.btnCancelar);
+            this.panelBotoes.Controls.Add(this.btnSalvar);
+            this.panelBotoes.Dock = DockStyle.Bottom;
+            this.panelBotoes.Location = new Point(0, 476);
+            this.panelBotoes.Name = "panelBotoes";
+            this.panelBotoes.Size = new Size(484, 60);
+            this.panelBotoes.TabIndex = 5;
+            //
             // btnCancelar
-            // 
-            btnCancelar.DialogResult = DialogResult.Cancel;
-            btnCancelar.Location = new Point(380, 15);
-            btnCancelar.Name = "btnCancelar";
-            btnCancelar.Size = new Size(84, 30);
-            btnCancelar.TabIndex = 1;
-            btnCancelar.Text = "Cancelar";
-            btnCancelar.UseVisualStyleBackColor = true;
-            // 
+            //
+            this.btnCancelar.DialogResult = DialogResult.Cancel;
+            this.btnCancelar.Location = new Point(380, 15);
+            this.btnCancelar.Name = "btnCancelar";
+            this.btnCancelar.Size = new Size(84, 30);
+            this.btnCancelar.TabIndex = 1;
+            this.btnCancelar.Text = "Cancel";
+            this.btnCancelar.UseVisualStyleBackColor = true;
+            //
             // btnSalvar
-            // 
-            btnSalvar.BackColor = Color.FromArgb(25, 135, 84);
-            btnSalvar.DialogResult = DialogResult.OK;
-            btnSalvar.FlatAppearance.BorderSize = 0;
-            btnSalvar.FlatStyle = FlatStyle.Flat;
-            btnSalvar.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            btnSalvar.ForeColor = Color.White;
-            btnSalvar.Location = new Point(280, 15);
-            btnSalvar.Name = "btnSalvar";
-            btnSalvar.Size = new Size(90, 30);
-            btnSalvar.TabIndex = 0;
-            btnSalvar.Text = "Salvar";
-            btnSalvar.UseVisualStyleBackColor = false;
-            btnSalvar.Click += btnSalvar_Click;
-            // 
+            //
+            this.btnSalvar.BackColor = Color.FromArgb(25, 135, 84);
+            this.btnSalvar.DialogResult = DialogResult.OK;
+            this.btnSalvar.FlatAppearance.BorderSize = 0;
+            this.btnSalvar.FlatStyle = FlatStyle.Flat;
+            this.btnSalvar.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            this.btnSalvar.ForeColor = Color.White;
+            this.btnSalvar.Location = new Point(280, 15);
+            this.btnSalvar.Name = "btnSalvar";
+            this.btnSalvar.Size = new Size(90, 30);
+            this.btnSalvar.TabIndex = 0;
+            this.btnSalvar.Text = "Save";
+            this.btnSalvar.UseVisualStyleBackColor = false;
+            this.btnSalvar.Click += new System.EventHandler(this.btnSalvar_Click);
+            //
             // FormCadastroCentral
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.White;
-            CancelButton = btnCancelar;
-            ClientSize = new Size(484, 536);
-            Controls.Add(panelBotoes);
-            Controls.Add(grpStatus);
-            Controls.Add(grpCamposOpcionais);
-            Controls.Add(grpNome);
-            Controls.Add(grpId);
-            Controls.Add(panelHeader);
-            Font = new Font("Segoe UI", 9F);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            Load += FormCadastroCentral_Load;
-            Name = "FormCadastroCentral";
-            ShowInTaskbar = false;
-            StartPosition = FormStartPosition.CenterParent;
-            Text = "Cadastro Central";
-            panelHeader.ResumeLayout(false);
-            grpId.ResumeLayout(false);
-            grpId.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)numId).EndInit();
-            grpNome.ResumeLayout(false);
-            grpNome.PerformLayout();
-            grpCamposOpcionais.ResumeLayout(false);
-            grpCamposOpcionais.PerformLayout();
-            grpStatus.ResumeLayout(false);
-            grpStatus.PerformLayout();
-            panelBotoes.ResumeLayout(false);
-            ResumeLayout(false);
+            //
+            this.AutoScaleDimensions = new SizeF(7F, 15F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.BackColor = Color.White;
+            this.CancelButton = this.btnCancelar;
+            this.ClientSize = new Size(484, 536);
+            this.Controls.Add(this.panelBotoes);
+            this.Controls.Add(this.grpStatus);
+            this.Controls.Add(this.grpCamposOpcionais);
+            this.Controls.Add(this.grpNome);
+            this.Controls.Add(this.grpId);
+            this.Controls.Add(this.panelHeader);
+            this.Font = new Font("Segoe UI", 9F);
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Load += new System.EventHandler(this.FormCadastroCentral_Load);
+            this.Name = "FormCadastroCentral";
+            this.ShowInTaskbar = false;
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.Text = "Central Registry";
+            this.panelHeader.ResumeLayout(false);
+            this.grpId.ResumeLayout(false);
+            this.grpId.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)this.numId).EndInit();
+            this.grpNome.ResumeLayout(false);
+            this.grpNome.PerformLayout();
+            this.grpCamposOpcionais.ResumeLayout(false);
+            this.grpCamposOpcionais.PerformLayout();
+            this.grpStatus.ResumeLayout(false);
+            this.grpStatus.PerformLayout();
+            this.panelBotoes.ResumeLayout(false);
+            this.ResumeLayout(false);
         }
 
         #endregion

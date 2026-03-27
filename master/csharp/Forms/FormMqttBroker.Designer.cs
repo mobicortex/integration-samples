@@ -58,7 +58,7 @@ namespace SmartSdk
             this.groupBox1.Size = new Size(560, 130);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Configuração do Broker";
+            this.groupBox1.Text = "Broker Configuration";
             // 
             // txtSenha
             // 
@@ -75,7 +75,7 @@ namespace SmartSdk
             this.lblSenha.Name = "lblSenha";
             this.lblSenha.Size = new Size(42, 15);
             this.lblSenha.TabIndex = 6;
-            this.lblSenha.Text = "Senha:";
+            this.lblSenha.Text = "Password:";
             // 
             // txtUsuario
             // 
@@ -92,7 +92,7 @@ namespace SmartSdk
             this.lblUsuario.Name = "lblUsuario";
             this.lblUsuario.Size = new Size(50, 15);
             this.lblUsuario.TabIndex = 4;
-            this.lblUsuario.Text = "Usuário:";
+            this.lblUsuario.Text = "User:";
             // 
             // rbAuth
             // 
@@ -101,7 +101,7 @@ namespace SmartSdk
             this.rbAuth.Name = "rbAuth";
             this.rbAuth.Size = new Size(95, 19);
             this.rbAuth.TabIndex = 3;
-            this.rbAuth.Text = "Autenticação";
+            this.rbAuth.Text = "Authentication";
             this.rbAuth.UseVisualStyleBackColor = true;
             this.rbAuth.CheckedChanged += this.rbAuth_CheckedChanged;
             // 
@@ -114,7 +114,7 @@ namespace SmartSdk
             this.rbAnonimo.Size = new Size(118, 19);
             this.rbAnonimo.TabIndex = 2;
             this.rbAnonimo.TabStop = true;
-            this.rbAnonimo.Text = "Acesso Anônimo";
+            this.rbAnonimo.Text = "Anonymous Access";
             this.rbAnonimo.UseVisualStyleBackColor = true;
             this.rbAnonimo.CheckedChanged += this.rbAnonimo_CheckedChanged;
             // 
@@ -133,7 +133,7 @@ namespace SmartSdk
             this.label1.Name = "label1";
             this.label1.Size = new Size(38, 15);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Porta:";
+            this.label1.Text = "Port:";
             // 
             // btnIniciar
             // 
@@ -141,7 +141,7 @@ namespace SmartSdk
             this.btnIniciar.Name = "btnIniciar";
             this.btnIniciar.Size = new Size(110, 40);
             this.btnIniciar.TabIndex = 1;
-            this.btnIniciar.Text = "Iniciar";
+            this.btnIniciar.Text = "Start";
             this.btnIniciar.UseVisualStyleBackColor = true;
             this.btnIniciar.Click += this.btnIniciar_Click;
             // 
@@ -153,7 +153,7 @@ namespace SmartSdk
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new Size(51, 15);
             this.lblStatus.TabIndex = 2;
-            this.lblStatus.Text = "Parado";
+            this.lblStatus.Text = "Stopped";
             this.lblStatus.ForeColor = Color.Gray;
             // 
             // groupBox2
@@ -170,7 +170,7 @@ namespace SmartSdk
             this.groupBox2.Size = new Size(560, 140);
             this.groupBox2.TabIndex = 3;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Publicar Mensagem no Broker";
+            this.groupBox2.Text = "Publish Message to Broker";
             // 
             // cmbQoS
             // 
@@ -197,7 +197,7 @@ namespace SmartSdk
             this.btnPublicar.Name = "btnPublicar";
             this.btnPublicar.Size = new Size(110, 30);
             this.btnPublicar.TabIndex = 4;
-            this.btnPublicar.Text = "Publicar";
+            this.btnPublicar.Text = "Publish";
             this.btnPublicar.UseVisualStyleBackColor = true;
             this.btnPublicar.Click += this.btnPublicar_Click;
             // 
@@ -234,7 +234,7 @@ namespace SmartSdk
             this.label2.Name = "label2";
             this.label2.Size = new Size(43, 15);
             this.label2.TabIndex = 0;
-            this.label2.Text = "Tópico:";
+            this.label2.Text = "Topic:";
             // 
             // txtLog
             // 
@@ -255,7 +255,7 @@ namespace SmartSdk
             this.btnLimpar.Name = "btnLimpar";
             this.btnLimpar.Size = new Size(75, 25);
             this.btnLimpar.TabIndex = 5;
-            this.btnLimpar.Text = "Limpar";
+            this.btnLimpar.Text = "Clear";
             this.btnLimpar.UseVisualStyleBackColor = true;
             this.btnLimpar.Click += this.btnLimpar_Click;
             // 
@@ -266,7 +266,7 @@ namespace SmartSdk
             this.btnSalvar.Name = "btnSalvar";
             this.btnSalvar.Size = new Size(100, 25);
             this.btnSalvar.TabIndex = 6;
-            this.btnSalvar.Text = "Salvar Stats";
+            this.btnSalvar.Text = "Save Stats";
             this.btnSalvar.UseVisualStyleBackColor = true;
             this.btnSalvar.Click += this.btnSalvar_Click;
             // 
@@ -278,7 +278,7 @@ namespace SmartSdk
             this.lblClientes.Name = "lblClientes";
             this.lblClientes.Size = new Size(57, 15);
             this.lblClientes.TabIndex = 7;
-            this.lblClientes.Text = "Clientes: 0";
+            this.lblClientes.Text = "Clients: 0";
             // 
             // lblMensagens
             // 
@@ -288,7 +288,7 @@ namespace SmartSdk
             this.lblMensagens.Name = "lblMensagens";
             this.lblMensagens.Size = new Size(75, 15);
             this.lblMensagens.TabIndex = 8;
-            this.lblMensagens.Text = "Mensagens: 0";
+            this.lblMensagens.Text = "Messages: 0";
             // 
             // FormMqttBroker
             // 
@@ -307,7 +307,7 @@ namespace SmartSdk
             this.MinimumSize = new Size(600, 590);
             this.Name = "FormMqttBroker";
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.Text = "Teste MQTT Broker (Embutido)";
+            this.Text = "MQTT Broker Test (Embedded)";
             this.Load += this.FormMqttBroker_Load;
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

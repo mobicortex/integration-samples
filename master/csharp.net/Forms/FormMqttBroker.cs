@@ -7,8 +7,8 @@ using MqttClientDisconnectedEventArgs = MobiCortex.Sdk.Interfaces.BrokerClientDi
 namespace SmartSdk
 {
     /// <summary>
-    /// Formulário de teste do Broker MQTT embutido.
-    /// Permite que controladores MobiCortex se conectem diretamente nesta aplicação.
+    /// Embedded MQTT Broker test form.
+    /// Allows MobiCortex controllers to connect directly to this application.
     /// </summary>
     public partial class FormMqttBroker : Form
     {
@@ -19,82 +19,93 @@ namespace SmartSdk
             InitializeComponent();
         }
 
-        private void FormMqttBroker_Load(object? sender, EventArgs e)
+        private void rbAnonimo_CheckedChanged(object sender, EventArgs e)
+        {
+            txtUsuario.Enabled = !rbAnonimo.Checked;
+            txtSenha.Enabled = !rbAnonimo.Checked;
+        }
+
+        private void rbAuth_CheckedChanged(object sender, EventArgs e)
+        {
+            txtUsuario.Enabled = rbAuth.Checked;
+            txtSenha.Enabled = rbAuth.Checked;
+        }
+
+        private void FormMqttBroker_Load(object sender, EventArgs e)
         {
             txtPorta.Text = "1883";
-            cmbQoS.SelectedIndex = 1; // QoS 1
-            AtualizarStats();
-            
-            // Aviso importante
-            Log("⚠️ AVISO: Este é um broker MQTT de REFERÊNCIA para testes.");
-            Log("Não foi testado para alta carga (máx ~20 dispositivos).");
-            Log("Para produção com muitos dispositivos, use Mosquitto, EMQX ou HiveMQ.");
+            cmbQoS.SelectedIndex = 1;
+            UpdateStats();
+
+            Log("WARNING: This is a reference MQTT broker for testing.");
+            Log("Not tested for high load (max ~20 devices).");
+            Log("For production with many devices, use Mosquitto, EMQX or HiveMQ.");
             Log("");
         }
 
-        private async void btnIniciar_Click(object? sender, EventArgs e)
+        private async void btnIniciar_Click(object sender, EventArgs e)
         {
             if (_broker?.IsRunning == true)
             {
-                await PararBroker();
+                await StopBroker();
                 return;
             }
 
-            await IniciarBroker();
+            await StartBroker();
         }
 
-        private async Task IniciarBroker()
+        private async Task StartBroker()
         {
             try
             {
-                if (!int.TryParse(txtPorta.Text, out var porta))
+                if (!int.TryParse(txtPorta.Text, out var port))
                 {
-                    MessageBox.Show("Porta inválida", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Invalid port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 btnIniciar.Enabled = false;
-                btnIniciar.Text = "Iniciando...";
+                btnIniciar.Text = "Starting...";
 
-                var anonimo = rbAnonimo.Checked;
-                var usuario = txtUsuario.Text.Trim();
-                var senha = txtSenha.Text;
+                var anonymous = rbAnonimo.Checked;
+                var username = txtUsuario.Text.Trim();
+                var password = txtSenha.Text;
 
                 _broker = new MqttBrokerService();
                 _broker.MessageReceived += OnBrokerMessageReceived;
                 _broker.ClientConnected += OnClientConnected;
                 _broker.ClientDisconnected += OnClientDisconnected;
 
-                var started = await _broker.StartAsync(porta, anonimo, usuario, senha);
+                var started = await _broker.StartAsync(port, anonymous, username, password);
 
                 if (started)
                 {
-                    btnIniciar.Text = "Parar";
+                    btnIniciar.Text = "Stop";
                     btnIniciar.BackColor = Color.FromArgb(220, 53, 69);
-                    lblStatus.Text = $"Rodando na porta {porta}";
+                    lblStatus.Text = $"Running on port {port}";
                     lblStatus.ForeColor = Color.DarkGreen;
 
-                    var info = $"Broker iniciado na porta {porta}";
-                    info += anonimo ? " (acesso anônimo)" : $" (autenticação: {usuario})";
+                    var info = $"Broker started on port {port}";
+                    info += anonymous ? " (anonymous access)" : $" (authentication: {username})";
                     Log(info);
-                    Log($"Endereço: mqtt://{Environment.MachineName}:{porta}");
-                    Log("Configure a controladora para enviar eventos MQTT para este endereço");
+                    Log($"Address: mqtt://{Environment.MachineName}:{port}");
+                    Log("Configure the controller to send MQTT events to this address");
                 }
                 else
                 {
-                    lblStatus.Text = "Falha ao iniciar";
+                    lblStatus.Text = "Failed to start";
                     lblStatus.ForeColor = Color.DarkRed;
-                    Log("Falha ao iniciar broker. Verifique se a porta não está em uso.");
-                    Log("Dica: Execute como Administrador ou use porta > 1024");
+                    Log("Failed to start broker. Check if the port is not in use.");
+                    Log("Tip: Run as Administrator or use a port > 1024");
                     _broker = null;
                 }
 
-                AtualizarStats();
+                UpdateStats();
             }
             catch (Exception ex)
             {
-                Log($"Erro: {ex.Message}");
-                lblStatus.Text = "Erro";
+                Log($"Error: {ex.Message}");
+                lblStatus.Text = "Error";
                 lblStatus.ForeColor = Color.DarkRed;
             }
             finally
@@ -103,7 +114,7 @@ namespace SmartSdk
             }
         }
 
-        private async Task PararBroker()
+        private async Task StopBroker()
         {
             if (_broker != null)
             {
@@ -112,12 +123,12 @@ namespace SmartSdk
                 _broker = null;
             }
 
-            btnIniciar.Text = "Iniciar";
+            btnIniciar.Text = "Start";
             btnIniciar.BackColor = SystemColors.Control;
-            lblStatus.Text = "Parado";
+            lblStatus.Text = "Stopped";
             lblStatus.ForeColor = Color.Gray;
-            Log("Broker parado");
-            AtualizarStats();
+            Log("Broker stopped");
+            UpdateStats();
         }
 
         private void OnBrokerMessageReceived(object? sender, MqttBrokerMessageEventArgs e)
@@ -138,7 +149,7 @@ namespace SmartSdk
             Log($"  Payload: {shortPayload}");
             Log("");
 
-            AtualizarStats();
+            UpdateStats();
         }
 
         private void OnClientConnected(object? sender, BrokerClientConnectedEventArgs e)
@@ -149,8 +160,8 @@ namespace SmartSdk
                 return;
             }
 
-            Log($"Cliente conectado: {e.ClientId}");
-            AtualizarStats();
+            Log($"Client connected: {e.ClientId}");
+            UpdateStats();
         }
 
         private void OnClientDisconnected(object? sender, BrokerClientDisconnectedEventArgs e)
@@ -161,77 +172,81 @@ namespace SmartSdk
                 return;
             }
 
-            Log($"Cliente desconectado: {e.ClientId} ({e.Reason})");
-            AtualizarStats();
+            Log($"Client disconnected: {e.ClientId} ({e.Reason})");
+            UpdateStats();
         }
 
-        private async void btnPublicar_Click(object? sender, EventArgs e)
+        private async void btnPublicar_Click(object sender, EventArgs e)
         {
             if (_broker?.IsRunning != true)
             {
-                MessageBox.Show("Inicie o broker primeiro", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Start the broker first", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var topico = txtPubTopico.Text.Trim();
+            var topic = txtPubTopico.Text.Trim();
             var payload = txtPubPayload.Text.Trim();
             var qos = cmbQoS.SelectedIndex;
 
-            if (string.IsNullOrEmpty(topico))
+            if (string.IsNullOrEmpty(topic))
             {
-                MessageBox.Show("Informe o tópico", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Enter the topic", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var result = await _broker.PublishAsync(topico, payload, qos);
-            Log(result ? $"Publicado em {topico}" : "Falha ao publicar");
+            var result = await _broker.PublishAsync(topic, payload, qos);
+            Log(result ? $"Published to {topic}" : "Failed to publish");
         }
 
-        private void btnLimpar_Click(object? sender, EventArgs e)
+        private void btnLimpar_Click(object sender, EventArgs e)
         {
             txtLog.Clear();
         }
 
-        private void btnSalvar_Click(object? sender, EventArgs e)
+        private void btnSalvar_Click(object sender, EventArgs e)
         {
             if (_broker == null) return;
 
-            using var dlg = new SaveFileDialog
+            using (var dlg = new SaveFileDialog())
             {
-                Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-                FileName = $"broker_stats_{DateTime.Now:yyyyMMdd_HHmmss}.json"
-            };
+                dlg.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
+                dlg.FileName = $"broker_stats_{DateTime.Now:yyyyMMdd_HHmmss}.json";
 
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                var stats = _broker.GetStats();
-                var json = System.Text.Json.JsonSerializer.Serialize(stats, new System.Text.Json.JsonSerializerOptions
+                if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    WriteIndented = true
-                });
-                File.WriteAllText(dlg.FileName, json);
-                Log($"Estatísticas salvas em: {dlg.FileName}");
+                    var stats = _broker.GetStats();
+                    var json = System.Text.Json.JsonSerializer.Serialize(
+                        stats,
+                        new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                    File.WriteAllText(dlg.FileName, json);
+                    Log($"Statistics saved to: {dlg.FileName}");
+                }
             }
         }
 
-        private void AtualizarStats()
+        private void UpdateStats()
         {
             if (_broker == null)
             {
-                lblClientes.Text = "Clientes: 0";
-                lblMensagens.Text = "Mensagens: 0";
+                lblClientes.Text = "Clients: 0";
+                lblMensagens.Text = "Messages: 0";
                 return;
             }
 
             var stats = _broker.GetStats();
-            lblClientes.Text = $"Clientes: {stats.ConnectedClientsCount}";
-            lblMensagens.Text = $"Mensagens: {stats.TotalMessagesReceived}";
+            lblClientes.Text = $"Clients: {stats.ConnectedClientsCount}";
+            lblMensagens.Text = $"Messages: {stats.TotalMessagesReceived}";
         }
 
         private void Log(string message)
         {
             if (txtLog.IsDisposed) return;
-            if (txtLog.InvokeRequired) { txtLog.Invoke(() => Log(message)); return; }
+            if (txtLog.InvokeRequired)
+            {
+                txtLog.Invoke(() => Log(message));
+                return;
+            }
+
             txtLog.AppendText($"{message}{Environment.NewLine}");
         }
 
@@ -241,6 +256,7 @@ namespace SmartSdk
             {
                 _broker.StopAsync().GetAwaiter().GetResult();
             }
+
             (_broker as IDisposable)?.Dispose();
             base.OnFormClosing(e);
         }

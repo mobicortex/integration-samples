@@ -6,22 +6,22 @@ using MobiCortex.Sdk.Models;
 namespace SmartSdk
 {
     // =============================================================================
-    //  FORMULÁRIO PRINCIPAL - Launcher
+    //  MAIN FORM - Launcher
     //
-    //  Este é o ponto de entrada do aplicativo.
-    //  Contém apenas a configuração de conexão (IP, usuário, senha)
-    //  e botões que abrem cada formulário de demonstração.
+    //  This is the application entry point.
+    //  Contains only connection settings (IP, user, password)
+    //  and buttons that open each demo form.
     //
-    //  A instância do MobiCortexApiService é compartilhada entre todos os forms.
-    //  Cada form demonstra uma funcionalidade específica da API.
+    //  The MobiCortexApiService instance is shared among all forms.
+    //  Each form demonstrates a specific API feature.
     // =============================================================================
 
     public partial class MainForm : Form
     {
-        // Cliente da API - compartilhado entre todos os formulários
+        // API client - shared among all forms
         private readonly MobiCortexClient _api;
 
-        // Caminho do arquivo de configurações do usuário
+        // User settings file path
         private static readonly string SettingsPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "SmartSdk", "settings.json");
@@ -30,14 +30,14 @@ namespace SmartSdk
         {
             _api = new MobiCortexClient();
             InitializeComponent();
-            CarregarConfiguracoes();
+            LoadSettings();
         }
 
         // =====================================================================
-        //  PERSISTÊNCIA DE CONFIGURAÇÕES
+        //  SETTINGS PERSISTENCE
         // =====================================================================
 
-        private void CarregarConfiguracoes()
+        private void LoadSettings()
         {
             try
             {
@@ -47,10 +47,10 @@ namespace SmartSdk
                 if (cfg == null) return;
                 if (!string.IsNullOrEmpty(cfg.Ip)) txtIP.Text = cfg.Ip;
             }
-            catch { /* ignora erros de leitura */ }
+            catch { /* ignore read errors */ }
         }
 
-        private void SalvarConfiguracoes()
+        private void SaveSettings()
         {
             try
             {
@@ -58,7 +58,7 @@ namespace SmartSdk
                 var cfg = new AppSettings { Ip = txtIP.Text.Trim() };
                 File.WriteAllText(SettingsPath, JsonSerializer.Serialize(cfg));
             }
-            catch { /* ignora erros de escrita */ }
+            catch { /* ignore write errors */ }
         }
 
         private record AppSettings
@@ -67,131 +67,131 @@ namespace SmartSdk
         }
 
         // =====================================================================
-        //  CONEXÃO
+        //  CONNECTION
         // =====================================================================
 
         private async void btnConectar_Click(object? sender, EventArgs e)
         {
-            // Monta a URL base a partir do IP informado
+            // Build the base URL from the provided IP
             var ip = txtIP.Text.Trim();
-            if (string.IsNullOrEmpty(ip)) { Erro("Informe o IP do controlador"); return; }
+            if (string.IsNullOrEmpty(ip)) { Erro("Enter the controller IP"); return; }
 
-            // Adiciona porta padrão se não informada
+            // Add default port if not provided
             if (!ip.Contains(':')) ip += ":4449";
             if (!ip.StartsWith("https://")) ip = "https://" + ip;
 
-            // Configura a URL base no serviço
+            // Configure the base URL in the service
             _api.ConfigureBaseUrl(ip);
 
             try
             {
                 btnConectar.Enabled = false;
-                btnConectar.Text = "Conectando...";
-                lblStatus.Text = "Fazendo login...";
+                btnConectar.Text = "Connecting...";
+                lblStatus.Text = "Logging in...";
                 lblStatus.ForeColor = Color.DarkBlue;
 
-                // Faz login na API (POST /login com a senha)
-                Log($"DEBUG: Tentando login em {txtIP.Text.Trim()}");
+                // Login to the API (POST /login with password)
+                Log($"DEBUG: Attempting login at {txtIP.Text.Trim()}");
                 var result = await _api.LoginAsync(txtSenha.Text);
                 Log($"DEBUG: Login result - Success={result.Success}, HTTP={(result.RawResponse?.Substring(0, Math.Min(100, result.RawResponse?.Length ?? 0)) ?? "N/A")}");
 
                 if (result.Success && result.Data?.Ret == 0)
                 {
-                    SalvarConfiguracoes();
+                    SaveSettings();
 
-                    // Login OK - habilita os botões de demo
-                    lblStatus.Text = $"Conectado - Session: {result.Data.SessionKey?[..16]}...";
+                    // Login OK - enable demo buttons
+                    lblStatus.Text = $"Connected - Session: {result.Data.SessionKey?[..16]}...";
                     lblStatus.ForeColor = Color.DarkGreen;
-                    btnConectar.Text = "Conectado";
+                    btnConectar.Text = "Connected";
                     btnConectar.BackColor = Color.FromArgb(40, 167, 69);
-                    HabilitarBotoes(true);
-                    Log($"Login OK! Expira em {result.Data.ExpiresIn}s");
+                    EnableButtons(true);
+                    Log($"Login OK! Expires in {result.Data.ExpiresIn}s");
                 }
                 else
                 {
-                    lblStatus.Text = $"Falha: {result.Message ?? "erro desconhecido"}";
+                    lblStatus.Text = $"Failure: {result.Message ?? "unknown error"}";
                     lblStatus.ForeColor = Color.DarkRed;
-                    btnConectar.Text = "Conectar";
+                    btnConectar.Text = "Connect";
                     btnConectar.Enabled = true;
                 }
             }
             catch (Exception ex)
             {
-                lblStatus.Text = $"Erro: {ex.Message}";
+                lblStatus.Text = $"Error: {ex.Message}";
                 lblStatus.ForeColor = Color.DarkRed;
-                btnConectar.Text = "Conectar";
+                btnConectar.Text = "Connect";
                 btnConectar.Enabled = true;
             }
         }
 
-        private void HabilitarBotoes(bool enabled)
+        private void EnableButtons(bool enabled)
         {
             btnCadastroCompleto.Enabled = enabled;
             btnCadastroSimples.Enabled = enabled;
             btnMonitoramento.Enabled = enabled;
             btnDashboard.Enabled = enabled;
-            btnMqttCliente.Enabled = enabled; // Precisa de conexão prévia para obter session key
-            // btnMqttBroker e btnWebhookServer não precisam de conexão - funcionam standalone
+            btnMqttCliente.Enabled = enabled; // Requires prior connection to obtain session key
+            // btnMqttBroker and btnWebhookServer do not require connection - they work standalone
         }
 
         // =====================================================================
-        //  BOTÕES - Abrir formulários de demonstração
-        //  Cada botão abre um Form independente passando o serviço da API.
+        //  BUTTONS - Open demo forms
+        //  Each button opens an independent Form passing the API service.
         // =====================================================================
 
         private void btnCadastroCompleto_Click(object? sender, EventArgs e)
         {
-            // Abre o formulário do modelo MobiCortex (3 níveis: Cadastro → Entidade → Mídia)
+            // Opens the MobiCortex model form (3 levels: Registry -> Entity -> Media)
             new FormCadastroCompleto(_api).Show();
         }
 
         private void btnCadastroSimples_Click(object? sender, EventArgs e)
         {
-            // Abre o formulário do modelo simples (2 níveis: Entidade → Mídia)
+            // Opens the simple model form (2 levels: Entity -> Media)
             new FormCadastroSimples(_api).Show();
         }
 
         private void btnMonitoramento_Click(object? sender, EventArgs e)
         {
-            // Abre o formulário de monitoramento MQTT em tempo real
+            // Opens the real-time MQTT monitoring form
             new FormMonitoramento(_api).Show();
         }
 
         private void btnDashboard_Click(object? sender, EventArgs e)
         {
-            // Abre o formulário de dashboard (informações do dispositivo)
+            // Opens the dashboard form (device information)
             new FormDashboard(_api).Show();
         }
 
         private void btnMqttCliente_Click(object? sender, EventArgs e)
         {
-            // Abre o formulário de teste MQTT Cliente (conecta ao broker da controladora)
+            // Opens the MQTT Client test form (connects to the controller broker)
             new FormMqttCliente(_api).Show();
         }
 
         private void btnMqttBroker_Click(object? sender, EventArgs e)
         {
-            // Abre o formulário de teste MQTT Broker (broker embutido)
+            // Opens the MQTT Broker test form (embedded broker)
             new FormMqttBroker().Show();
         }
 
         private void btnWebhookServer_Click(object? sender, EventArgs e)
         {
-            // Abre o formulário de teste Webhook Server (recebe eventos HTTP)
+            // Opens the Webhook Server test form (receives HTTP events)
             new FormWebhookServer(_api).Show();
         }
 
         private void btnAbrirInterfaceWeb_Click(object? sender, EventArgs e)
         {
-            // Abre a interface web da controladora no navegador padrão
+            // Opens the controller web interface in the default browser
             var ip = txtIP.Text.Trim();
             if (string.IsNullOrEmpty(ip))
             {
-                Erro("Informe o IP do controlador primeiro");
+                Erro("Enter the controller IP first");
                 return;
             }
 
-            // Monta a URL (usa https por padrão)
+            // Build the URL (uses https by default)
             var url = ip.StartsWith("http") ? ip : $"https://{ip}";
 
             try
@@ -201,11 +201,11 @@ namespace SmartSdk
                     FileName = url,
                     UseShellExecute = true
                 });
-                Log($"Abrindo interface web: {url}");
+                Log($"Opening web interface: {url}");
             }
             catch (Exception ex)
             {
-                Erro($"Erro ao abrir navegador: {ex.Message}");
+                Erro($"Error opening browser: {ex.Message}");
             }
         }
 
@@ -227,7 +227,7 @@ namespace SmartSdk
         private void btnLimparLog_Click(object? sender, EventArgs e) => txtLog.Clear();
 
         private void Erro(string msg) =>
-            MessageBox.Show(msg, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
         private void lblStatus_Click(object sender, EventArgs e)
         {
@@ -235,4 +235,3 @@ namespace SmartSdk
         }
     }
 }
-

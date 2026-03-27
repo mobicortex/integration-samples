@@ -14,416 +14,424 @@ namespace SmartSdk
 
         private void InitializeComponent()
         {
-            panelTop = new Panel();
-            lblStatus = new Label();
-            btnConectar = new Button();
-            lblSenha = new Label();
-            txtSenha = new TextBox();
-            lblUsuario = new Label();
-            txtUsuario = new TextBox();
-            lblIP = new Label();
-            txtIP = new TextBox();
-            btnAbrirInterfaceWeb = new Button();
-            panelBotoes = new Panel();
-            lblTituloDemos = new Label();
-            btnCadastroCompleto = new Button();
-            lblDescCompleto = new Label();
-            btnCadastroSimples = new Button();
-            lblDescSimples = new Label();
-            btnMonitoramento = new Button();
-            lblDescMonitoramento = new Label();
-            btnDashboard = new Button();
-            lblDescDashboard = new Label();
-            btnMqttCliente = new Button();
-            lblDescMqttCliente = new Label();
-            btnMqttBroker = new Button();
-            lblDescMqttBroker = new Label();
-            btnWebhookServer = new Button();
-            lblDescWebhookServer = new Label();
-            panelLog = new Panel();
-            txtLog = new TextBox();
-            btnLimparLog = new Button();
-            lblLog = new Label();
-            panelTop.SuspendLayout();
-            panelBotoes.SuspendLayout();
-            panelLog.SuspendLayout();
-            SuspendLayout();
+            this.panelTop = new System.Windows.Forms.Panel();
+            this.lblStatus = new System.Windows.Forms.Label();
+            this.btnConectar = new System.Windows.Forms.Button();
+            this.lblSenha = new System.Windows.Forms.Label();
+            this.txtSenha = new System.Windows.Forms.TextBox();
+            this.lblUsuario = new System.Windows.Forms.Label();
+            this.txtUsuario = new System.Windows.Forms.TextBox();
+            this.lblIP = new System.Windows.Forms.Label();
+            this.txtIP = new System.Windows.Forms.TextBox();
+            this.btnAbrirInterfaceWeb = new System.Windows.Forms.Button();
+            this.panelBotoes = new System.Windows.Forms.Panel();
+            this.lblTituloDemos = new System.Windows.Forms.Label();
+            this.btnCadastroCompleto = new System.Windows.Forms.Button();
+            this.lblDescCompleto = new System.Windows.Forms.Label();
+            this.btnCadastroSimples = new System.Windows.Forms.Button();
+            this.lblDescSimples = new System.Windows.Forms.Label();
+            this.btnMonitoramento = new System.Windows.Forms.Button();
+            this.lblDescMonitoramento = new System.Windows.Forms.Label();
+            this.btnDashboard = new System.Windows.Forms.Button();
+            this.lblDescDashboard = new System.Windows.Forms.Label();
+            this.btnMqttCliente = new System.Windows.Forms.Button();
+            this.lblDescMqttCliente = new System.Windows.Forms.Label();
+            this.btnMqttBroker = new System.Windows.Forms.Button();
+            this.lblDescMqttBroker = new System.Windows.Forms.Label();
+            this.btnWebhookServer = new System.Windows.Forms.Button();
+            this.lblDescWebhookServer = new System.Windows.Forms.Label();
+            this.panelLog = new System.Windows.Forms.Panel();
+            this.txtLog = new System.Windows.Forms.TextBox();
+            this.btnLimparLog = new System.Windows.Forms.Button();
+            this.lblLog = new System.Windows.Forms.Label();
+            this.panelTop.SuspendLayout();
+            this.panelBotoes.SuspendLayout();
+            this.panelLog.SuspendLayout();
+            this.SuspendLayout();
             // 
             // panelTop
             // 
-            panelTop.BackColor = Color.FromArgb(240, 240, 240);
-            panelTop.Controls.Add(lblStatus);
-            panelTop.Controls.Add(btnConectar);
-            panelTop.Controls.Add(lblSenha);
-            panelTop.Controls.Add(txtSenha);
-            panelTop.Controls.Add(lblUsuario);
-            panelTop.Controls.Add(txtUsuario);
-            panelTop.Controls.Add(lblIP);
-            panelTop.Controls.Add(txtIP);
-            panelTop.Controls.Add(btnAbrirInterfaceWeb);
-            panelTop.Dock = DockStyle.Top;
-            panelTop.Location = new Point(0, 0);
-            panelTop.Name = "panelTop";
-            panelTop.Padding = new Padding(15, 10, 15, 10);
-            panelTop.Size = new Size(784, 70);
-            panelTop.TabIndex = 0;
+            this.panelTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.panelTop.Controls.Add(this.lblStatus);
+            this.panelTop.Controls.Add(this.btnConectar);
+            this.panelTop.Controls.Add(this.lblSenha);
+            this.panelTop.Controls.Add(this.txtSenha);
+            this.panelTop.Controls.Add(this.lblUsuario);
+            this.panelTop.Controls.Add(this.txtUsuario);
+            this.panelTop.Controls.Add(this.lblIP);
+            this.panelTop.Controls.Add(this.txtIP);
+            this.panelTop.Controls.Add(this.btnAbrirInterfaceWeb);
+            this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelTop.Location = new System.Drawing.Point(0, 0);
+            this.panelTop.Name = "panelTop";
+            this.panelTop.Padding = new System.Windows.Forms.Padding(13, 9, 13, 9);
+            this.panelTop.Size = new System.Drawing.Size(672, 61);
+            this.panelTop.TabIndex = 0;
             // 
             // lblStatus
             // 
-            lblStatus.AutoSize = true;
-            lblStatus.ForeColor = Color.Gray;
-            lblStatus.Location = new Point(449, 52);
-            lblStatus.Name = "lblStatus";
-            lblStatus.Size = new Size(88, 15);
-            lblStatus.TabIndex = 7;
-            lblStatus.Text = "Não conectado";
-            lblStatus.Click += lblStatus_Click;
+            this.lblStatus.AutoSize = true;
+            this.lblStatus.ForeColor = System.Drawing.Color.Gray;
+            this.lblStatus.Location = new System.Drawing.Point(385, 45);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(81, 13);
+            this.lblStatus.TabIndex = 7;
+            this.lblStatus.Text = "Not connected";
             // 
             // btnConectar
             // 
-            btnConectar.BackColor = Color.FromArgb(0, 122, 204);
-            btnConectar.FlatStyle = FlatStyle.Flat;
-            btnConectar.ForeColor = Color.White;
-            btnConectar.Location = new Point(449, 12);
-            btnConectar.Name = "btnConectar";
-            btnConectar.Size = new Size(110, 28);
-            btnConectar.TabIndex = 6;
-            btnConectar.Text = "Conectar";
-            btnConectar.UseVisualStyleBackColor = false;
-            btnConectar.Click += btnConectar_Click;
+            this.btnConectar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            this.btnConectar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnConectar.ForeColor = System.Drawing.Color.White;
+            this.btnConectar.Location = new System.Drawing.Point(385, 10);
+            this.btnConectar.Name = "btnConectar";
+            this.btnConectar.Size = new System.Drawing.Size(94, 24);
+            this.btnConectar.TabIndex = 6;
+            this.btnConectar.Text = "Connect";
+            this.btnConectar.UseVisualStyleBackColor = false;
+            this.btnConectar.Click += new System.EventHandler(this.btnConectar_Click);
             // 
             // lblSenha
             // 
-            lblSenha.AutoSize = true;
-            lblSenha.Location = new Point(335, 15);
-            lblSenha.Name = "lblSenha";
-            lblSenha.Size = new Size(42, 15);
-            lblSenha.TabIndex = 4;
-            lblSenha.Text = "Senha:";
+            this.lblSenha.AutoSize = true;
+            this.lblSenha.Location = new System.Drawing.Point(287, 13);
+            this.lblSenha.Name = "lblSenha";
+            this.lblSenha.Size = new System.Drawing.Size(41, 13);
+            this.lblSenha.TabIndex = 4;
+            this.lblSenha.Text = "Password:";
             // 
             // txtSenha
             // 
-            txtSenha.Location = new Point(335, 35);
-            txtSenha.Name = "txtSenha";
-            txtSenha.Size = new Size(100, 23);
-            txtSenha.TabIndex = 5;
-            txtSenha.Text = "admin";
-            txtSenha.UseSystemPasswordChar = true;
+            this.txtSenha.Location = new System.Drawing.Point(287, 30);
+            this.txtSenha.Name = "txtSenha";
+            this.txtSenha.Size = new System.Drawing.Size(86, 20);
+            this.txtSenha.TabIndex = 5;
+            this.txtSenha.Text = "admin";
+            this.txtSenha.UseSystemPasswordChar = true;
             // 
             // lblUsuario
             // 
-            lblUsuario.AutoSize = true;
-            lblUsuario.Location = new Point(225, 15);
-            lblUsuario.Name = "lblUsuario";
-            lblUsuario.Size = new Size(50, 15);
-            lblUsuario.TabIndex = 2;
-            lblUsuario.Text = "Usuário:";
+            this.lblUsuario.AutoSize = true;
+            this.lblUsuario.Location = new System.Drawing.Point(193, 13);
+            this.lblUsuario.Name = "lblUsuario";
+            this.lblUsuario.Size = new System.Drawing.Size(46, 13);
+            this.lblUsuario.TabIndex = 2;
+            this.lblUsuario.Text = "User:";
             // 
             // txtUsuario
             // 
-            txtUsuario.Enabled = false;
-            txtUsuario.Location = new Point(225, 35);
-            txtUsuario.Name = "txtUsuario";
-            txtUsuario.Size = new Size(100, 23);
-            txtUsuario.TabIndex = 3;
-            txtUsuario.Text = "master";
+            this.txtUsuario.Enabled = false;
+            this.txtUsuario.Location = new System.Drawing.Point(193, 30);
+            this.txtUsuario.Name = "txtUsuario";
+            this.txtUsuario.Size = new System.Drawing.Size(86, 20);
+            this.txtUsuario.TabIndex = 3;
+            this.txtUsuario.Text = "master";
             // 
             // lblIP
             // 
-            lblIP.AutoSize = true;
-            lblIP.Location = new Point(15, 15);
-            lblIP.Name = "lblIP";
-            lblIP.Size = new Size(104, 15);
-            lblIP.TabIndex = 0;
-            lblIP.Text = "IP do Controlador:";
+            this.lblIP.AutoSize = true;
+            this.lblIP.Location = new System.Drawing.Point(13, 13);
+            this.lblIP.Name = "lblIP";
+            this.lblIP.Size = new System.Drawing.Size(92, 13);
+            this.lblIP.TabIndex = 0;
+            this.lblIP.Text = "Controller IP:";
             // 
             // txtIP
             // 
-            txtIP.Location = new Point(15, 35);
-            txtIP.Name = "txtIP";
-            txtIP.Size = new Size(200, 23);
-            txtIP.TabIndex = 1;
-            txtIP.Text = "192.168.120.45";
+            this.txtIP.Location = new System.Drawing.Point(13, 30);
+            this.txtIP.Name = "txtIP";
+            this.txtIP.Size = new System.Drawing.Size(172, 20);
+            this.txtIP.TabIndex = 1;
+            this.txtIP.Text = "192.168.120.45";
             // 
             // btnAbrirInterfaceWeb
             // 
-            btnAbrirInterfaceWeb.BackColor = Color.FromArgb(32, 201, 151);
-            btnAbrirInterfaceWeb.FlatStyle = FlatStyle.Flat;
-            btnAbrirInterfaceWeb.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            btnAbrirInterfaceWeb.ForeColor = Color.White;
-            btnAbrirInterfaceWeb.Location = new Point(575, 12);
-            btnAbrirInterfaceWeb.Name = "btnAbrirInterfaceWeb";
-            btnAbrirInterfaceWeb.Size = new Size(130, 28);
-            btnAbrirInterfaceWeb.TabIndex = 8;
-            btnAbrirInterfaceWeb.Text = "🌐 Interface Web";
-            btnAbrirInterfaceWeb.UseVisualStyleBackColor = false;
-            btnAbrirInterfaceWeb.Click += btnAbrirInterfaceWeb_Click;
+            this.btnAbrirInterfaceWeb.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(201)))), ((int)(((byte)(151)))));
+            this.btnAbrirInterfaceWeb.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAbrirInterfaceWeb.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.btnAbrirInterfaceWeb.ForeColor = System.Drawing.Color.White;
+            this.btnAbrirInterfaceWeb.Location = new System.Drawing.Point(493, 10);
+            this.btnAbrirInterfaceWeb.Name = "btnAbrirInterfaceWeb";
+            this.btnAbrirInterfaceWeb.Size = new System.Drawing.Size(111, 24);
+            this.btnAbrirInterfaceWeb.TabIndex = 8;
+            this.btnAbrirInterfaceWeb.Text = "🌐 Interface Web";
+            this.btnAbrirInterfaceWeb.UseVisualStyleBackColor = false;
+            this.btnAbrirInterfaceWeb.Click += new System.EventHandler(this.btnAbrirInterfaceWeb_Click);
             // 
             // panelBotoes
             // 
-            panelBotoes.AutoScroll = true;
-            panelBotoes.Controls.Add(lblTituloDemos);
-            panelBotoes.Controls.Add(btnCadastroCompleto);
-            panelBotoes.Controls.Add(lblDescCompleto);
-            panelBotoes.Controls.Add(btnCadastroSimples);
-            panelBotoes.Controls.Add(lblDescSimples);
-            panelBotoes.Controls.Add(btnMonitoramento);
-            panelBotoes.Controls.Add(lblDescMonitoramento);
-            panelBotoes.Controls.Add(btnDashboard);
-            panelBotoes.Controls.Add(lblDescDashboard);
-            panelBotoes.Controls.Add(btnMqttCliente);
-            panelBotoes.Controls.Add(lblDescMqttCliente);
-            panelBotoes.Controls.Add(btnMqttBroker);
-            panelBotoes.Controls.Add(lblDescMqttBroker);
-            panelBotoes.Controls.Add(btnWebhookServer);
-            panelBotoes.Controls.Add(lblDescWebhookServer);
-            panelBotoes.Dock = DockStyle.Fill;
-            panelBotoes.Location = new Point(0, 70);
-            panelBotoes.Name = "panelBotoes";
-            panelBotoes.Padding = new Padding(15);
-            panelBotoes.Size = new Size(784, 520);
-            panelBotoes.TabIndex = 1;
+            this.panelBotoes.AutoScroll = true;
+            this.panelBotoes.Controls.Add(this.lblTituloDemos);
+            this.panelBotoes.Controls.Add(this.btnCadastroCompleto);
+            this.panelBotoes.Controls.Add(this.lblDescCompleto);
+            this.panelBotoes.Controls.Add(this.btnCadastroSimples);
+            this.panelBotoes.Controls.Add(this.lblDescSimples);
+            this.panelBotoes.Controls.Add(this.btnMonitoramento);
+            this.panelBotoes.Controls.Add(this.lblDescMonitoramento);
+            this.panelBotoes.Controls.Add(this.btnDashboard);
+            this.panelBotoes.Controls.Add(this.lblDescDashboard);
+            this.panelBotoes.Controls.Add(this.btnMqttCliente);
+            this.panelBotoes.Controls.Add(this.lblDescMqttCliente);
+            this.panelBotoes.Controls.Add(this.btnMqttBroker);
+            this.panelBotoes.Controls.Add(this.lblDescMqttBroker);
+            this.panelBotoes.Controls.Add(this.btnWebhookServer);
+            this.panelBotoes.Controls.Add(this.lblDescWebhookServer);
+            this.panelBotoes.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelBotoes.Location = new System.Drawing.Point(0, 61);
+            this.panelBotoes.Name = "panelBotoes";
+            this.panelBotoes.Padding = new System.Windows.Forms.Padding(13, 13, 13, 13);
+            this.panelBotoes.Size = new System.Drawing.Size(672, 451);
+            this.panelBotoes.TabIndex = 1;
             // 
             // lblTituloDemos
             // 
-            lblTituloDemos.AutoSize = true;
-            lblTituloDemos.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            lblTituloDemos.Location = new Point(15, 15);
-            lblTituloDemos.Name = "lblTituloDemos";
-            lblTituloDemos.Size = new Size(273, 21);
-            lblTituloDemos.TabIndex = 0;
-            lblTituloDemos.Text = "Exemplos de Integração com a API";
+            this.lblTituloDemos.AutoSize = true;
+            this.lblTituloDemos.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.lblTituloDemos.Location = new System.Drawing.Point(13, 13);
+            this.lblTituloDemos.Name = "lblTituloDemos";
+            this.lblTituloDemos.Size = new System.Drawing.Size(273, 21);
+            this.lblTituloDemos.TabIndex = 0;
+            this.lblTituloDemos.Text = "API Integration Examples";
             // 
             // btnCadastroCompleto
             // 
-            btnCadastroCompleto.BackColor = Color.FromArgb(0, 123, 255);
-            btnCadastroCompleto.Enabled = false;
-            btnCadastroCompleto.FlatStyle = FlatStyle.Flat;
-            btnCadastroCompleto.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnCadastroCompleto.ForeColor = Color.White;
-            btnCadastroCompleto.Location = new Point(15, 55);
-            btnCadastroCompleto.Name = "btnCadastroCompleto";
-            btnCadastroCompleto.Size = new Size(250, 40);
-            btnCadastroCompleto.TabIndex = 1;
-            btnCadastroCompleto.Text = "Cadastro Completo (MobiCortex)";
-            btnCadastroCompleto.UseVisualStyleBackColor = false;
-            btnCadastroCompleto.Click += btnCadastroCompleto_Click;
+            this.btnCadastroCompleto.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(123)))), ((int)(((byte)(255)))));
+            this.btnCadastroCompleto.Enabled = false;
+            this.btnCadastroCompleto.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCadastroCompleto.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnCadastroCompleto.ForeColor = System.Drawing.Color.White;
+            this.btnCadastroCompleto.Location = new System.Drawing.Point(13, 48);
+            this.btnCadastroCompleto.Name = "btnCadastroCompleto";
+            this.btnCadastroCompleto.Size = new System.Drawing.Size(214, 35);
+            this.btnCadastroCompleto.TabIndex = 1;
+            this.btnCadastroCompleto.Text = "Full Registry (MobiCortex)";
+            this.btnCadastroCompleto.UseVisualStyleBackColor = false;
+            this.btnCadastroCompleto.Click += new System.EventHandler(this.btnCadastroCompleto_Click);
             // 
             // lblDescCompleto
             // 
-            lblDescCompleto.ForeColor = Color.Gray;
-            lblDescCompleto.Location = new Point(275, 55);
-            lblDescCompleto.Name = "lblDescCompleto";
-            lblDescCompleto.Size = new Size(490, 40);
-            lblDescCompleto.TabIndex = 2;
-            lblDescCompleto.Text = "Modelo hierárquico de 3 níveis: Cadastro Central → Entidade (pessoa/veículo) → Mídia de Acesso. Ideal para condomínios e empresas.";
+            this.lblDescCompleto.ForeColor = System.Drawing.Color.Gray;
+            this.lblDescCompleto.Location = new System.Drawing.Point(236, 48);
+            this.lblDescCompleto.Name = "lblDescCompleto";
+            this.lblDescCompleto.Size = new System.Drawing.Size(420, 35);
+            this.lblDescCompleto.TabIndex = 2;
+            this.lblDescCompleto.Text = "3-level hierarchical model: Central Registry → Entity (person/vehicle) → Access Me" +
+    "dia. Ideal for condominiums and companies.";
             // 
             // btnCadastroSimples
             // 
-            btnCadastroSimples.BackColor = Color.FromArgb(40, 167, 69);
-            btnCadastroSimples.Enabled = false;
-            btnCadastroSimples.FlatStyle = FlatStyle.Flat;
-            btnCadastroSimples.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnCadastroSimples.ForeColor = Color.White;
-            btnCadastroSimples.Location = new Point(15, 110);
-            btnCadastroSimples.Name = "btnCadastroSimples";
-            btnCadastroSimples.Size = new Size(250, 40);
-            btnCadastroSimples.TabIndex = 3;
-            btnCadastroSimples.Text = "Cadastro Simplificado";
-            btnCadastroSimples.UseVisualStyleBackColor = false;
-            btnCadastroSimples.Click += btnCadastroSimples_Click;
+            this.btnCadastroSimples.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(167)))), ((int)(((byte)(69)))));
+            this.btnCadastroSimples.Enabled = false;
+            this.btnCadastroSimples.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCadastroSimples.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnCadastroSimples.ForeColor = System.Drawing.Color.White;
+            this.btnCadastroSimples.Location = new System.Drawing.Point(13, 95);
+            this.btnCadastroSimples.Name = "btnCadastroSimples";
+            this.btnCadastroSimples.Size = new System.Drawing.Size(214, 35);
+            this.btnCadastroSimples.TabIndex = 3;
+            this.btnCadastroSimples.Text = "Simplified Registry";
+            this.btnCadastroSimples.UseVisualStyleBackColor = false;
+            this.btnCadastroSimples.Click += new System.EventHandler(this.btnCadastroSimples_Click);
             // 
             // lblDescSimples
             // 
-            lblDescSimples.ForeColor = Color.Gray;
-            lblDescSimples.Location = new Point(275, 110);
-            lblDescSimples.Name = "lblDescSimples";
-            lblDescSimples.Size = new Size(490, 40);
-            lblDescSimples.TabIndex = 4;
-            lblDescSimples.Text = "Modelo simplificado de 2 níveis: Pessoa/Veículo → Mídia. IDs gerados automaticamente pelo controlador (createid=true).";
+            this.lblDescSimples.ForeColor = System.Drawing.Color.Gray;
+            this.lblDescSimples.Location = new System.Drawing.Point(236, 95);
+            this.lblDescSimples.Name = "lblDescSimples";
+            this.lblDescSimples.Size = new System.Drawing.Size(420, 35);
+            this.lblDescSimples.TabIndex = 4;
+            this.lblDescSimples.Text = "Simplified 2-level model: Person/Vehicle → Media. IDs automatically generated" +
+    " by the controller (createid=true).";
             // 
             // btnMonitoramento
             // 
-            btnMonitoramento.BackColor = Color.FromArgb(255, 193, 7);
-            btnMonitoramento.Enabled = false;
-            btnMonitoramento.FlatStyle = FlatStyle.Flat;
-            btnMonitoramento.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnMonitoramento.ForeColor = Color.Black;
-            btnMonitoramento.Location = new Point(15, 165);
-            btnMonitoramento.Name = "btnMonitoramento";
-            btnMonitoramento.Size = new Size(250, 40);
-            btnMonitoramento.TabIndex = 5;
-            btnMonitoramento.Text = "Monitoramento (MQTT)";
-            btnMonitoramento.UseVisualStyleBackColor = false;
-            btnMonitoramento.Click += btnMonitoramento_Click;
+            this.btnMonitoramento.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(193)))), ((int)(((byte)(7)))));
+            this.btnMonitoramento.Enabled = false;
+            this.btnMonitoramento.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMonitoramento.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnMonitoramento.ForeColor = System.Drawing.Color.Black;
+            this.btnMonitoramento.Location = new System.Drawing.Point(13, 143);
+            this.btnMonitoramento.Name = "btnMonitoramento";
+            this.btnMonitoramento.Size = new System.Drawing.Size(214, 35);
+            this.btnMonitoramento.TabIndex = 5;
+            this.btnMonitoramento.Text = "Monitoring (MQTT)";
+            this.btnMonitoramento.UseVisualStyleBackColor = false;
+            this.btnMonitoramento.Click += new System.EventHandler(this.btnMonitoramento_Click);
             // 
             // lblDescMonitoramento
             // 
-            lblDescMonitoramento.ForeColor = Color.Gray;
-            lblDescMonitoramento.Location = new Point(275, 165);
-            lblDescMonitoramento.Name = "lblDescMonitoramento";
-            lblDescMonitoramento.Size = new Size(490, 40);
-            lblDescMonitoramento.TabIndex = 6;
-            lblDescMonitoramento.Text = "Recebe eventos em tempo real via MQTT over WebSocket. Monitora acessos, sensores e status do controlador.";
+            this.lblDescMonitoramento.ForeColor = System.Drawing.Color.Gray;
+            this.lblDescMonitoramento.Location = new System.Drawing.Point(236, 143);
+            this.lblDescMonitoramento.Name = "lblDescMonitoramento";
+            this.lblDescMonitoramento.Size = new System.Drawing.Size(420, 35);
+            this.lblDescMonitoramento.TabIndex = 6;
+            this.lblDescMonitoramento.Text = "Receives real-time events via MQTT over WebSocket. Monitors access, sensors " +
+    "and controller status.";
             // 
             // btnDashboard
             // 
-            btnDashboard.BackColor = Color.FromArgb(23, 162, 184);
-            btnDashboard.Enabled = false;
-            btnDashboard.FlatStyle = FlatStyle.Flat;
-            btnDashboard.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnDashboard.ForeColor = Color.White;
-            btnDashboard.Location = new Point(15, 220);
-            btnDashboard.Name = "btnDashboard";
-            btnDashboard.Size = new Size(250, 40);
-            btnDashboard.TabIndex = 7;
-            btnDashboard.Text = "Dashboard / Info Dispositivo";
-            btnDashboard.UseVisualStyleBackColor = false;
-            btnDashboard.Click += btnDashboard_Click;
+            this.btnDashboard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(23)))), ((int)(((byte)(162)))), ((int)(((byte)(184)))));
+            this.btnDashboard.Enabled = false;
+            this.btnDashboard.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDashboard.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnDashboard.ForeColor = System.Drawing.Color.White;
+            this.btnDashboard.Location = new System.Drawing.Point(13, 191);
+            this.btnDashboard.Name = "btnDashboard";
+            this.btnDashboard.Size = new System.Drawing.Size(214, 35);
+            this.btnDashboard.TabIndex = 7;
+            this.btnDashboard.Text = "Dashboard / Device Info";
+            this.btnDashboard.UseVisualStyleBackColor = false;
+            this.btnDashboard.Click += new System.EventHandler(this.btnDashboard_Click);
             // 
             // lblDescDashboard
             // 
-            lblDescDashboard.ForeColor = Color.Gray;
-            lblDescDashboard.Location = new Point(275, 220);
-            lblDescDashboard.Name = "lblDescDashboard";
-            lblDescDashboard.Size = new Size(490, 40);
-            lblDescDashboard.TabIndex = 8;
-            lblDescDashboard.Text = "Exibe informações do controlador: modelo, firmware, CPU, memória, estatísticas de cadastros e mídias.";
+            this.lblDescDashboard.ForeColor = System.Drawing.Color.Gray;
+            this.lblDescDashboard.Location = new System.Drawing.Point(236, 191);
+            this.lblDescDashboard.Name = "lblDescDashboard";
+            this.lblDescDashboard.Size = new System.Drawing.Size(420, 35);
+            this.lblDescDashboard.TabIndex = 8;
+            this.lblDescDashboard.Text = "Displays controller information: model, firmware, CPU, memory, registry and" +
+    " media statistics.";
             // 
             // btnMqttCliente
             // 
-            btnMqttCliente.BackColor = Color.FromArgb(111, 66, 193);
-            btnMqttCliente.Enabled = false;
-            btnMqttCliente.FlatStyle = FlatStyle.Flat;
-            btnMqttCliente.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnMqttCliente.ForeColor = Color.White;
-            btnMqttCliente.Location = new Point(15, 275);
-            btnMqttCliente.Name = "btnMqttCliente";
-            btnMqttCliente.Size = new Size(250, 40);
-            btnMqttCliente.TabIndex = 9;
-            btnMqttCliente.Text = "MQTT Cliente → Controladora";
-            btnMqttCliente.UseVisualStyleBackColor = false;
-            btnMqttCliente.Click += btnMqttCliente_Click;
+            this.btnMqttCliente.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(111)))), ((int)(((byte)(66)))), ((int)(((byte)(193)))));
+            this.btnMqttCliente.Enabled = false;
+            this.btnMqttCliente.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMqttCliente.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnMqttCliente.ForeColor = System.Drawing.Color.White;
+            this.btnMqttCliente.Location = new System.Drawing.Point(13, 238);
+            this.btnMqttCliente.Name = "btnMqttCliente";
+            this.btnMqttCliente.Size = new System.Drawing.Size(214, 35);
+            this.btnMqttCliente.TabIndex = 9;
+            this.btnMqttCliente.Text = "MQTT Client → Controller";
+            this.btnMqttCliente.UseVisualStyleBackColor = false;
+            this.btnMqttCliente.Click += new System.EventHandler(this.btnMqttCliente_Click);
             // 
             // lblDescMqttCliente
             // 
-            lblDescMqttCliente.ForeColor = Color.Gray;
-            lblDescMqttCliente.Location = new Point(275, 275);
-            lblDescMqttCliente.Name = "lblDescMqttCliente";
-            lblDescMqttCliente.Size = new Size(490, 40);
-            lblDescMqttCliente.TabIndex = 10;
-            lblDescMqttCliente.Text = "Conecta como cliente MQTT ao broker da controladora. Recebe eventos em tempo real via WebSocket.";
+            this.lblDescMqttCliente.ForeColor = System.Drawing.Color.Gray;
+            this.lblDescMqttCliente.Location = new System.Drawing.Point(236, 238);
+            this.lblDescMqttCliente.Name = "lblDescMqttCliente";
+            this.lblDescMqttCliente.Size = new System.Drawing.Size(420, 35);
+            this.lblDescMqttCliente.TabIndex = 10;
+            this.lblDescMqttCliente.Text = "Connects as MQTT client to the controller broker. Receives real-time events" +
+    " via WebSocket.";
             // 
             // btnMqttBroker
             // 
-            btnMqttBroker.BackColor = Color.FromArgb(220, 53, 69);
-            btnMqttBroker.FlatStyle = FlatStyle.Flat;
-            btnMqttBroker.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnMqttBroker.ForeColor = Color.White;
-            btnMqttBroker.Location = new Point(15, 330);
-            btnMqttBroker.Name = "btnMqttBroker";
-            btnMqttBroker.Size = new Size(250, 40);
-            btnMqttBroker.TabIndex = 11;
-            btnMqttBroker.Text = "MQTT Broker (Embutido)";
-            btnMqttBroker.UseVisualStyleBackColor = false;
-            btnMqttBroker.Click += btnMqttBroker_Click;
+            this.btnMqttBroker.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(53)))), ((int)(((byte)(69)))));
+            this.btnMqttBroker.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMqttBroker.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnMqttBroker.ForeColor = System.Drawing.Color.White;
+            this.btnMqttBroker.Location = new System.Drawing.Point(13, 286);
+            this.btnMqttBroker.Name = "btnMqttBroker";
+            this.btnMqttBroker.Size = new System.Drawing.Size(214, 35);
+            this.btnMqttBroker.TabIndex = 11;
+            this.btnMqttBroker.Text = "MQTT Broker (Embedded)";
+            this.btnMqttBroker.UseVisualStyleBackColor = false;
+            this.btnMqttBroker.Click += new System.EventHandler(this.btnMqttBroker_Click);
             // 
             // lblDescMqttBroker
             // 
-            lblDescMqttBroker.ForeColor = Color.Gray;
-            lblDescMqttBroker.Location = new Point(275, 330);
-            lblDescMqttBroker.Name = "lblDescMqttBroker";
-            lblDescMqttBroker.Size = new Size(490, 40);
-            lblDescMqttBroker.TabIndex = 12;
-            lblDescMqttBroker.Text = "Inicia um broker MQTT embutido. A controladora pode se conectar diretamente a este servidor.";
+            this.lblDescMqttBroker.ForeColor = System.Drawing.Color.Gray;
+            this.lblDescMqttBroker.Location = new System.Drawing.Point(236, 286);
+            this.lblDescMqttBroker.Name = "lblDescMqttBroker";
+            this.lblDescMqttBroker.Size = new System.Drawing.Size(420, 35);
+            this.lblDescMqttBroker.TabIndex = 12;
+            this.lblDescMqttBroker.Text = "Starts an embedded MQTT broker. The controller can connect directly to this" +
+    " server.";
             // 
             // btnWebhookServer
             // 
-            btnWebhookServer.BackColor = Color.FromArgb(253, 126, 20);
-            btnWebhookServer.FlatStyle = FlatStyle.Flat;
-            btnWebhookServer.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnWebhookServer.ForeColor = Color.White;
-            btnWebhookServer.Location = new Point(15, 385);
-            btnWebhookServer.Name = "btnWebhookServer";
-            btnWebhookServer.Size = new Size(250, 40);
-            btnWebhookServer.TabIndex = 13;
-            btnWebhookServer.Text = "Webhook Server (HTTP)";
-            btnWebhookServer.UseVisualStyleBackColor = false;
-            btnWebhookServer.Click += btnWebhookServer_Click;
+            this.btnWebhookServer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(126)))), ((int)(((byte)(20)))));
+            this.btnWebhookServer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnWebhookServer.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnWebhookServer.ForeColor = System.Drawing.Color.White;
+            this.btnWebhookServer.Location = new System.Drawing.Point(13, 334);
+            this.btnWebhookServer.Name = "btnWebhookServer";
+            this.btnWebhookServer.Size = new System.Drawing.Size(214, 35);
+            this.btnWebhookServer.TabIndex = 13;
+            this.btnWebhookServer.Text = "Webhook Server (HTTP)";
+            this.btnWebhookServer.UseVisualStyleBackColor = false;
+            this.btnWebhookServer.Click += new System.EventHandler(this.btnWebhookServer_Click);
             // 
             // lblDescWebhookServer
             // 
-            lblDescWebhookServer.ForeColor = Color.Gray;
-            lblDescWebhookServer.Location = new Point(275, 385);
-            lblDescWebhookServer.Name = "lblDescWebhookServer";
-            lblDescWebhookServer.Size = new Size(490, 40);
-            lblDescWebhookServer.TabIndex = 14;
-            lblDescWebhookServer.Text = "Inicia um servidor HTTP para receber eventos via webhook. A controladora envia POST com eventos JSON.";
+            this.lblDescWebhookServer.ForeColor = System.Drawing.Color.Gray;
+            this.lblDescWebhookServer.Location = new System.Drawing.Point(236, 334);
+            this.lblDescWebhookServer.Name = "lblDescWebhookServer";
+            this.lblDescWebhookServer.Size = new System.Drawing.Size(420, 35);
+            this.lblDescWebhookServer.TabIndex = 14;
+            this.lblDescWebhookServer.Text = "Starts an HTTP server to receive events via webhook. The controller sends PO" +
+    "ST with JSON events.";
             // 
             // panelLog
             // 
-            panelLog.Controls.Add(txtLog);
-            panelLog.Controls.Add(btnLimparLog);
-            panelLog.Controls.Add(lblLog);
-            panelLog.Dock = DockStyle.Bottom;
-            panelLog.Location = new Point(0, 590);
-            panelLog.Name = "panelLog";
-            panelLog.Padding = new Padding(5);
-            panelLog.Size = new Size(784, 110);
-            panelLog.TabIndex = 2;
+            this.panelLog.Controls.Add(this.txtLog);
+            this.panelLog.Controls.Add(this.btnLimparLog);
+            this.panelLog.Controls.Add(this.lblLog);
+            this.panelLog.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelLog.Location = new System.Drawing.Point(0, 512);
+            this.panelLog.Name = "panelLog";
+            this.panelLog.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panelLog.Size = new System.Drawing.Size(672, 95);
+            this.panelLog.TabIndex = 2;
             // 
             // txtLog
             // 
-            txtLog.BackColor = Color.FromArgb(30, 30, 30);
-            txtLog.Dock = DockStyle.Fill;
-            txtLog.Font = new Font("Consolas", 8.25F);
-            txtLog.ForeColor = Color.FromArgb(220, 220, 220);
-            txtLog.Location = new Point(5, 23);
-            txtLog.Multiline = true;
-            txtLog.Name = "txtLog";
-            txtLog.ReadOnly = true;
-            txtLog.ScrollBars = ScrollBars.Vertical;
-            txtLog.Size = new Size(774, 54);
-            txtLog.TabIndex = 1;
+            this.txtLog.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.txtLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtLog.Font = new System.Drawing.Font("Consolas", 8.25F);
+            this.txtLog.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
+            this.txtLog.Location = new System.Drawing.Point(4, 20);
+            this.txtLog.Multiline = true;
+            this.txtLog.Name = "txtLog";
+            this.txtLog.ReadOnly = true;
+            this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtLog.Size = new System.Drawing.Size(664, 47);
+            this.txtLog.TabIndex = 1;
             // 
             // btnLimparLog
             // 
-            btnLimparLog.Dock = DockStyle.Bottom;
-            btnLimparLog.Location = new Point(5, 77);
-            btnLimparLog.Name = "btnLimparLog";
-            btnLimparLog.Size = new Size(774, 28);
-            btnLimparLog.TabIndex = 2;
-            btnLimparLog.Text = "Limpar Log";
-            btnLimparLog.Click += btnLimparLog_Click;
+            this.btnLimparLog.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.btnLimparLog.Location = new System.Drawing.Point(4, 67);
+            this.btnLimparLog.Name = "btnLimparLog";
+            this.btnLimparLog.Size = new System.Drawing.Size(664, 24);
+            this.btnLimparLog.TabIndex = 2;
+            this.btnLimparLog.Text = "Clear Log";
+            this.btnLimparLog.UseVisualStyleBackColor = true;
+            this.btnLimparLog.Click += new System.EventHandler(this.btnLimparLog_Click);
             // 
             // lblLog
             // 
-            lblLog.Dock = DockStyle.Top;
-            lblLog.Location = new Point(5, 5);
-            lblLog.Name = "lblLog";
-            lblLog.Size = new Size(774, 18);
-            lblLog.TabIndex = 0;
-            lblLog.Text = "Log de Operações:";
+            this.lblLog.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblLog.Location = new System.Drawing.Point(4, 4);
+            this.lblLog.Name = "lblLog";
+            this.lblLog.Size = new System.Drawing.Size(664, 16);
+            this.lblLog.TabIndex = 0;
+            this.lblLog.Text = "Operations Log:";
             // 
             // MainForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(784, 700);
-            Controls.Add(panelBotoes);
-            Controls.Add(panelLog);
-            Controls.Add(panelTop);
-            MinimumSize = new Size(800, 500);
-            Name = "MainForm";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "SmartSDK - Exemplos de Integração MobiCortex";
-            panelTop.ResumeLayout(false);
-            panelTop.PerformLayout();
-            panelBotoes.ResumeLayout(false);
-            panelBotoes.PerformLayout();
-            panelLog.ResumeLayout(false);
-            panelLog.PerformLayout();
-            ResumeLayout(false);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(672, 607);
+            this.Controls.Add(this.panelBotoes);
+            this.Controls.Add(this.panelLog);
+            this.Controls.Add(this.panelTop);
+            this.MinimumSize = new System.Drawing.Size(688, 439);
+            this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "SmartSDK - MobiCortex Integration Examples";
+            this.panelTop.ResumeLayout(false);
+            this.panelTop.PerformLayout();
+            this.panelBotoes.ResumeLayout(false);
+            this.panelBotoes.PerformLayout();
+            this.panelLog.ResumeLayout(false);
+            this.panelLog.PerformLayout();
+            this.ResumeLayout(false);
+
         }
 
         #endregion

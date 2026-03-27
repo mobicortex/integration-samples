@@ -3,43 +3,48 @@ using MobiCortex.Sdk.Models;
 namespace SmartSdk
 {
     /// <summary>
-    /// Diálogo simples para escolher o tipo da entidade a ser criada.
+    /// Simple dialog to choose the type of entity to be created.
     /// </summary>
     public partial class FormSelecionarTipoEntidade : Form
     {
-        public int TipoEntidadeSelecionado =>
-            _rbPessoa.Checked ? (int)TipoEntidade.Pessoa : (int)TipoEntidade.Veiculo;
+        public int TipoEntidadeSelecionado
+        {
+            get
+            {
+                return _rbPessoa.Checked ? (int)EntityType.Person : (int)EntityType.Vehicle;
+            }
+        }
 
         public FormSelecionarTipoEntidade()
         {
             InitializeComponent();
-            
-            // Event handlers dos cards e labels
-            _cardPessoa.Click += (s, e) => SelecionarTipo(true);
-            _cardVeiculo.Click += (s, e) => SelecionarTipo(false);
-            lblPessoaDesc.Click += (s, e) => SelecionarTipo(true);
-            lblVeiculoDesc.Click += (s, e) => SelecionarTipo(false);
-            
-            // Event handlers dos RadioButtons - sincroniza a seleção
-            _rbPessoa.Click += (s, e) => SelecionarTipo(true);
-            _rbVeiculo.Click += (s, e) => SelecionarTipo(false);
-            
-            // Atualiza cores iniciais
-            AtualizarCards();
+
+            // Event handlers for cards and labels
+            _cardPessoa.Click += (s, e) => SelectType(true);
+            _cardVeiculo.Click += (s, e) => SelectType(false);
+            lblPessoaDesc.Click += (s, e) => SelectType(true);
+            lblVeiculoDesc.Click += (s, e) => SelectType(false);
+
+            // Event handlers for RadioButtons - synchronizes the selection
+            _rbPessoa.Click += (s, e) => SelectType(true);
+            _rbVeiculo.Click += (s, e) => SelectType(false);
+
+            // Update initial colors
+            UpdateCards();
         }
 
-        private void SelecionarTipo(bool pessoa)
+        private void SelectType(bool person)
         {
-            // Define o estado dos radio buttons (sincronização manual)
-            // Isso é necessário porque os radio buttons estão em containers diferentes
-            _rbPessoa.Checked = pessoa;
-            _rbVeiculo.Checked = !pessoa;
-            
-            // Atualiza as cores dos cards
-            AtualizarCards();
+            // Set the radio button state (manual synchronization)
+            // This is necessary because the radio buttons are in different containers
+            _rbPessoa.Checked = person;
+            _rbVeiculo.Checked = !person;
+
+            // Update card colors
+            UpdateCards();
         }
 
-        private void AtualizarCards()
+        private void UpdateCards()
         {
             var selected = Color.FromArgb(240, 248, 255);
             var normal = Color.White;

@@ -78,7 +78,7 @@ namespace SmartSdk
             lblTitulo.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblTitulo.ForeColor = Color.FromArgb(0, 120, 60);
             lblTitulo.BackColor = Color.White;
-            lblTitulo.Text = "Cadastro de Entidade";
+            lblTitulo.Text = "Entity Registration";
             lblTitulo.TextAlign = ContentAlignment.MiddleLeft;
             lblTitulo.Padding = new Padding(15, 10, 10, 10);
             lblTitulo.Height = 50;
@@ -94,7 +94,7 @@ namespace SmartSdk
             // ====================================================================
             // GRUPO: Cadastro Central
             // ====================================================================
-            grpCadastroCentral.Text = "Cadastro Central";
+            grpCadastroCentral.Text = "Central Registry";
             grpCadastroCentral.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             grpCadastroCentral.ForeColor = Color.FromArgb(0, 120, 60);
             grpCadastroCentral.Dock = DockStyle.Top;
@@ -102,7 +102,7 @@ namespace SmartSdk
             grpCadastroCentral.Margin = new Padding(0, 0, 0, 10);
             grpCadastroCentral.Name = "grpCadastroCentral";
             
-            lblCadastroId.Text = "ID do Cadastro:";
+            lblCadastroId.Text = "Registry ID:";
             lblCadastroId.Font = new Font("Segoe UI", 9F);
             lblCadastroId.ForeColor = Color.Black;
             lblCadastroId.Location = new Point(15, 25);
@@ -122,7 +122,7 @@ namespace SmartSdk
             // ====================================================================
             // GRUPO: Tipo de Entidade
             // ====================================================================
-            grpTipoEntidade.Text = "Tipo de Entidade";
+            grpTipoEntidade.Text = "Entity Type";
             grpTipoEntidade.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             grpTipoEntidade.ForeColor = Color.FromArgb(0, 120, 60);
             grpTipoEntidade.Dock = DockStyle.Top;
@@ -130,7 +130,7 @@ namespace SmartSdk
             grpTipoEntidade.Margin = new Padding(0, 0, 0, 10);
             grpTipoEntidade.Name = "grpTipoEntidade";
             
-            lblTipoEntidade.Text = "Selecione o tipo:";
+            lblTipoEntidade.Text = "Select the type:";
             lblTipoEntidade.Font = new Font("Segoe UI", 9F);
             lblTipoEntidade.ForeColor = Color.Black;
             lblTipoEntidade.Location = new Point(15, 25);
@@ -150,7 +150,7 @@ namespace SmartSdk
             // ====================================================================
             // GRUPO: ID da Entidade
             // ====================================================================
-            grpIdEntidade.Text = "ID da Entidade";
+            grpIdEntidade.Text = "Entity ID";
             grpIdEntidade.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             grpIdEntidade.ForeColor = Color.FromArgb(0, 120, 60);
             grpIdEntidade.Dock = DockStyle.Top;
@@ -158,7 +158,7 @@ namespace SmartSdk
             grpIdEntidade.Margin = new Padding(0, 0, 0, 10);
             grpIdEntidade.Name = "grpIdEntidade";
             
-            lblIdEntidade.Text = "Informe o ID (0 = servidor gera automaticamente):";
+            lblIdEntidade.Text = "Enter the ID (0 = server generates automatically):";
             lblIdEntidade.Font = new Font("Segoe UI", 9F);
             lblIdEntidade.ForeColor = Color.Black;
             lblIdEntidade.Location = new Point(15, 25);
@@ -169,11 +169,11 @@ namespace SmartSdk
             numIdEntidade.Location = new Point(15, 45);
             numIdEntidade.Size = new Size(180, 25);
             numIdEntidade.Minimum = 0;
-            numIdEntidade.Maximum = 999999999;
+            numIdEntidade.Maximum = 4294967295; // uint.MaxValue
             numIdEntidade.Name = "numIdEntidade";
             toolTip.SetToolTip(numIdEntidade, "Digite 0 para que o servidor gere o ID automaticamente");
             
-            lblIdInfo.Text = "💡 Dica: Informe 0 (zero) para que o servidor gere o ID automaticamente";
+            lblIdInfo.Text = "💡 Tip: Enter 0 (zero) for the server to generate the ID automatically";
             lblIdInfo.Font = new Font("Segoe UI", 8F, FontStyle.Italic);
             lblIdInfo.ForeColor = Color.Gray;
             lblIdInfo.Location = new Point(15, 75);
@@ -187,7 +187,7 @@ namespace SmartSdk
             // ====================================================================
             // GRUPO: Nome
             // ====================================================================
-            grpNome.Text = "Nome";
+            grpNome.Text = "Name";
             grpNome.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             grpNome.ForeColor = Color.FromArgb(0, 120, 60);
             grpNome.Dock = DockStyle.Top;
@@ -195,7 +195,7 @@ namespace SmartSdk
             grpNome.Margin = new Padding(0, 0, 0, 10);
             grpNome.Name = "grpNome";
             
-            lblNome.Text = "Nome da entidade:";
+            lblNome.Text = "Entity name:";
             lblNome.Font = new Font("Segoe UI", 9F);
             lblNome.ForeColor = Color.Black;
             lblNome.Location = new Point(15, 25);
@@ -213,7 +213,7 @@ namespace SmartSdk
             // ====================================================================
             // GRUPO: Documento
             // ====================================================================
-            grpDocumento.Text = "Documento";
+            grpDocumento.Text = "Document";
             grpDocumento.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             grpDocumento.ForeColor = Color.FromArgb(0, 120, 60);
             grpDocumento.Dock = DockStyle.Top;
@@ -221,7 +221,7 @@ namespace SmartSdk
             grpDocumento.Margin = new Padding(0, 0, 0, 10);
             grpDocumento.Name = "grpDocumento";
             
-            lblDocumento.Text = "CPF ou Placa:";
+            lblDocumento.Text = "CPF or Plate:";
             lblDocumento.Font = new Font("Segoe UI", 9F);
             lblDocumento.ForeColor = Color.Black;
             lblDocumento.Location = new Point(15, 25);
@@ -234,7 +234,7 @@ namespace SmartSdk
             txtDocumento.CharacterCasing = CharacterCasing.Upper;
             txtDocumento.Name = "txtDocumento";
             
-            lblDocInfo.Text = "Para veículos: informe a placa para ativar reconhecimento LPR";
+            lblDocInfo.Text = "For vehicles: enter the plate to enable LPR recognition";
             lblDocInfo.Font = new Font("Segoe UI", 8F, FontStyle.Italic);
             lblDocInfo.ForeColor = Color.Gray;
             lblDocInfo.Location = new Point(15, 75);
@@ -248,7 +248,7 @@ namespace SmartSdk
             // ====================================================================
             // GRUPO: LPR
             // ====================================================================
-            grpLpr.Text = "Reconhecimento de Placa (LPR)";
+            grpLpr.Text = "License Plate Recognition (LPR)";
             grpLpr.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             grpLpr.ForeColor = Color.FromArgb(0, 120, 60);
             grpLpr.Dock = DockStyle.Top;
@@ -256,13 +256,13 @@ namespace SmartSdk
             grpLpr.Margin = new Padding(0, 0, 0, 10);
             grpLpr.Name = "grpLpr";
             
-            chkLprAtivo.Text = "Ativar reconhecimento automático de placa (LPR)";
+            chkLprAtivo.Text = "Enable automatic plate recognition (LPR)";
             chkLprAtivo.Font = new Font("Segoe UI", 9F);
             chkLprAtivo.Location = new Point(15, 25);
             chkLprAtivo.AutoSize = true;
             chkLprAtivo.Name = "chkLprAtivo";
             
-            lblLprInfo.Text = "Cria automaticamente uma mídia LPR usando o documento/placa";
+            lblLprInfo.Text = "Automatically creates an LPR media using the document/plate";
             lblLprInfo.Font = new Font("Segoe UI", 8F, FontStyle.Italic);
             lblLprInfo.ForeColor = Color.Gray;
             lblLprInfo.Location = new Point(33, 45);
@@ -289,7 +289,7 @@ namespace SmartSdk
             panelBotoes.Padding = new Padding(10);
             panelBotoes.Name = "panelBotoes";
             
-            btnCancelar.Text = "Cancelar";
+            btnCancelar.Text = "Cancel";
             btnCancelar.Font = new Font("Segoe UI", 9F);
             btnCancelar.Size = new Size(100, 35);
             btnCancelar.Location = new Point(310, 12);
@@ -297,7 +297,7 @@ namespace SmartSdk
             btnCancelar.DialogResult = DialogResult.Cancel;
             btnCancelar.Name = "btnCancelar";
             
-            btnSalvar.Text = "Salvar";
+            btnSalvar.Text = "Save";
             btnSalvar.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btnSalvar.Size = new Size(100, 35);
             btnSalvar.Location = new Point(200, 12);

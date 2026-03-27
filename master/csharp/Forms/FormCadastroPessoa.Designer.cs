@@ -47,7 +47,7 @@ namespace SmartSdk
             this.lblTitulo.Name = "lblTitulo";
             this.lblTitulo.Size = new Size(180, 25);
             this.lblTitulo.TabIndex = 0;
-            this.lblTitulo.Text = "Cadastrar Pessoa";
+            this.lblTitulo.Text = "Register Person";
             // 
             // lblSubtitulo
             // 
@@ -57,7 +57,7 @@ namespace SmartSdk
             this.lblSubtitulo.Name = "lblSubtitulo";
             this.lblSubtitulo.Size = new Size(220, 15);
             this.lblSubtitulo.TabIndex = 1;
-            this.lblSubtitulo.Text = "Entidade do tipo Pessoa (tipo = 1)";
+            this.lblSubtitulo.Text = "Person entity (type = 1)";
             // 
             // grpIdentificacao
             // 
@@ -69,7 +69,7 @@ namespace SmartSdk
             this.grpIdentificacao.Size = new Size(360, 90);
             this.grpIdentificacao.TabIndex = 2;
             this.grpIdentificacao.TabStop = false;
-            this.grpIdentificacao.Text = "Identificação";
+            this.grpIdentificacao.Text = "Identification";
             // 
             // lblIdInfo
             // 
@@ -80,12 +80,12 @@ namespace SmartSdk
             this.lblIdInfo.Name = "lblIdInfo";
             this.lblIdInfo.Size = new Size(180, 13);
             this.lblIdInfo.TabIndex = 2;
-            this.lblIdInfo.Text = "0 = geração automática pelo servidor";
+            this.lblIdInfo.Text = "0 = automatic generation by the server";
             // 
             // numId
             // 
             this.numId.Location = new Point(80, 25);
-            this.numId.Maximum = new decimal(new int[] { 999999999, 0, 0, 0 });
+            this.numId.Maximum = new decimal(new int[] { -1, 0, 0, 0 }); // uint.MaxValue = 4294967295
             this.numId.Name = "numId";
             this.numId.Size = new Size(120, 23);
             this.numId.TabIndex = 1;
@@ -108,7 +108,7 @@ namespace SmartSdk
             this.grpNome.Size = new Size(360, 80);
             this.grpNome.TabIndex = 3;
             this.grpNome.TabStop = false;
-            this.grpNome.Text = "Nome";
+            this.grpNome.Text = "Name";
             // 
             // txtNome
             // 
@@ -124,7 +124,7 @@ namespace SmartSdk
             this.lblNome.Name = "lblNome";
             this.lblNome.Size = new Size(95, 15);
             this.lblNome.TabIndex = 0;
-            this.lblNome.Text = "Nome completo:";
+            this.lblNome.Text = "Full name:";
             // 
             // grpDocumento
             // 
@@ -135,13 +135,13 @@ namespace SmartSdk
             this.grpDocumento.Size = new Size(360, 80);
             this.grpDocumento.TabIndex = 4;
             this.grpDocumento.TabStop = false;
-            this.grpDocumento.Text = "Documento";
+            this.grpDocumento.Text = "Document";
             // 
             // txtDocumento
             // 
             this.txtDocumento.Location = new Point(15, 45);
             this.txtDocumento.Name = "txtDocumento";
-            this.txtDocumento.PlaceholderText = "CPF (opcional)";
+            this.txtDocumento.PlaceholderText = "CPF (optional)";
             this.txtDocumento.Size = new Size(200, 23);
             this.txtDocumento.TabIndex = 1;
             // 
@@ -163,7 +163,7 @@ namespace SmartSdk
             this.grpOpcoes.Size = new Size(360, 80);
             this.grpOpcoes.TabIndex = 5;
             this.grpOpcoes.TabStop = false;
-            this.grpOpcoes.Text = "Opções";
+            this.grpOpcoes.Text = "Options";
             // 
             // chkLprAtivo
             // 
@@ -172,7 +172,7 @@ namespace SmartSdk
             this.chkLprAtivo.Name = "chkLprAtivo";
             this.chkLprAtivo.Size = new Size(194, 19);
             this.chkLprAtivo.TabIndex = 1;
-            this.chkLprAtivo.Text = "LPR Ativo (reconhecimento facial)";
+            this.chkLprAtivo.Text = "LPR Active (facial recognition)";
             this.chkLprAtivo.UseVisualStyleBackColor = true;
             // 
             // chkHabilitado
@@ -184,7 +184,7 @@ namespace SmartSdk
             this.chkHabilitado.Name = "chkHabilitado";
             this.chkHabilitado.Size = new Size(113, 19);
             this.chkHabilitado.TabIndex = 0;
-            this.chkHabilitado.Text = "Entidade ativa";
+            this.chkHabilitado.Text = "Active entity";
             this.chkHabilitado.UseVisualStyleBackColor = true;
             // 
             // btnSalvar
@@ -197,7 +197,7 @@ namespace SmartSdk
             this.btnSalvar.Name = "btnSalvar";
             this.btnSalvar.Size = new Size(80, 35);
             this.btnSalvar.TabIndex = 6;
-            this.btnSalvar.Text = "Salvar";
+            this.btnSalvar.Text = "Save";
             this.btnSalvar.UseVisualStyleBackColor = false;
             this.btnSalvar.Click += this.btnSalvar_Click;
             // 
@@ -211,7 +211,7 @@ namespace SmartSdk
             this.btnCancelar.Name = "btnCancelar";
             this.btnCancelar.Size = new Size(80, 35);
             this.btnCancelar.TabIndex = 7;
-            this.btnCancelar.Text = "Cancelar";
+            this.btnCancelar.Text = "Cancel";
             this.btnCancelar.UseVisualStyleBackColor = false;
             this.btnCancelar.Click += this.btnCancelar_Click;
             // 
@@ -233,7 +233,7 @@ namespace SmartSdk
             this.MinimizeBox = false;
             this.Name = "FormCadastroPessoa";
             this.StartPosition = FormStartPosition.CenterParent;
-            this.Text = "Cadastrar Pessoa";
+            this.Text = "Register Person";
             this.Load += this.FormCadastroPessoa_Load;
             this.grpIdentificacao.ResumeLayout(false);
             this.grpIdentificacao.PerformLayout();

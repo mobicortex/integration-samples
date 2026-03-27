@@ -61,7 +61,7 @@ namespace SmartSdk
             lblSubtitulo.Name = "lblSubtitulo";
             lblSubtitulo.Size = new Size(440, 15);
             lblSubtitulo.TabIndex = 1;
-            lblSubtitulo.Text = "Visualize e edite as informacoes da midia de acesso.";
+            lblSubtitulo.Text = "View and edit access media information.";
             // 
             // lblTitulo
             // 
@@ -71,7 +71,7 @@ namespace SmartSdk
             lblTitulo.Name = "lblTitulo";
             lblTitulo.Size = new Size(420, 20);
             lblTitulo.TabIndex = 0;
-            lblTitulo.Text = "Detalhes da Midia";
+            lblTitulo.Text = "Media Details";
             // 
             // grpInformacoes
             // 
@@ -92,7 +92,7 @@ namespace SmartSdk
             grpInformacoes.Size = new Size(444, 180);
             grpInformacoes.TabIndex = 1;
             grpInformacoes.TabStop = false;
-            grpInformacoes.Text = "Informacoes";
+            grpInformacoes.Text = "Information";
             // 
             // lblDataEdicaoValor
             // 
@@ -113,7 +113,7 @@ namespace SmartSdk
             lblDataEdicao.Name = "lblDataEdicao";
             lblDataEdicao.Size = new Size(71, 15);
             lblDataEdicao.TabIndex = 8;
-            lblDataEdicao.Text = "Data edicao:";
+            lblDataEdicao.Text = "Edit date:";
             // 
             // lblDataCadastroValor
             // 
@@ -134,7 +134,7 @@ namespace SmartSdk
             lblDataCadastro.Name = "lblDataCadastro";
             lblDataCadastro.Size = new Size(89, 15);
             lblDataCadastro.TabIndex = 6;
-            lblDataCadastro.Text = "Data cadastro:";
+            lblDataCadastro.Text = "Registry date:";
             // 
             // lblDescricaoValor
             // 
@@ -155,7 +155,7 @@ namespace SmartSdk
             lblDescricao.Name = "lblDescricao";
             lblDescricao.Size = new Size(61, 15);
             lblDescricao.TabIndex = 4;
-            lblDescricao.Text = "Descricao:";
+            lblDescricao.Text = "Description:";
             // 
             // lblTipoValor
             // 
@@ -176,7 +176,7 @@ namespace SmartSdk
             lblTipo.Name = "lblTipo";
             lblTipo.Size = new Size(33, 15);
             lblTipo.TabIndex = 2;
-            lblTipo.Text = "Tipo:";
+            lblTipo.Text = "Type:";
             // 
             // lblIdValor
             // 
@@ -212,7 +212,7 @@ namespace SmartSdk
             grpBloqueio.Size = new Size(444, 120);
             grpBloqueio.TabIndex = 2;
             grpBloqueio.TabStop = false;
-            grpBloqueio.Text = "Bloqueio";
+            grpBloqueio.Text = "Blocking";
             // 
             // btnLimparData
             // 
@@ -221,7 +221,7 @@ namespace SmartSdk
             btnLimparData.Name = "btnLimparData";
             btnLimparData.Size = new Size(100, 23);
             btnLimparData.TabIndex = 3;
-            btnLimparData.Text = "Remover Data";
+            btnLimparData.Text = "Remove Date";
             btnLimparData.UseVisualStyleBackColor = true;
             btnLimparData.Click += btnLimparData_Click;
             // 
@@ -245,7 +245,7 @@ namespace SmartSdk
             chkBloqueioPorData.Name = "chkBloqueioPorData";
             chkBloqueioPorData.Size = new Size(95, 19);
             chkBloqueioPorData.TabIndex = 1;
-            chkBloqueioPorData.Text = "Permitido ate:";
+            chkBloqueioPorData.Text = "Allowed until:";
             chkBloqueioPorData.UseVisualStyleBackColor = true;
             chkBloqueioPorData.CheckedChanged += chkBloqueioPorData_CheckedChanged;
             // 
@@ -258,7 +258,7 @@ namespace SmartSdk
             chkBloqueada.Name = "chkBloqueada";
             chkBloqueada.Size = new Size(250, 19);
             chkBloqueada.TabIndex = 0;
-            chkBloqueada.Text = "Bloquear midia (acesso totalmente negado)";
+            chkBloqueada.Text = "Block media (access fully denied)";
             chkBloqueada.UseVisualStyleBackColor = true;
             // 
             // panelBotoes
@@ -279,7 +279,7 @@ namespace SmartSdk
             btnCancelar.Name = "btnCancelar";
             btnCancelar.Size = new Size(84, 30);
             btnCancelar.TabIndex = 1;
-            btnCancelar.Text = "Cancelar";
+            btnCancelar.Text = "Cancel";
             btnCancelar.UseVisualStyleBackColor = true;
             // 
             // btnSalvar
@@ -294,7 +294,7 @@ namespace SmartSdk
             btnSalvar.Name = "btnSalvar";
             btnSalvar.Size = new Size(90, 30);
             btnSalvar.TabIndex = 0;
-            btnSalvar.Text = "Salvar";
+            btnSalvar.Text = "Save";
             btnSalvar.UseVisualStyleBackColor = false;
             btnSalvar.Click += btnSalvar_Click;
             // 

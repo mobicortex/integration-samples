@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MobiCortexSdkLib", "MobiCortexSdkLib", "{7525F425-A154-8FF7-7D30-D7452CC5B0D3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MobiCortex.Sdk", "MobiCortexSdkLib\MobiCortex.Sdk.csproj", "{B470BBAB-0608-418F-94F3-96D51568CFED}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartSdk", "SmartSdk.csproj", "{B5B74BCE-45DC-4207-AB46-380F821E5850}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MobiCortex.Sdk", "..\MobiCortexSdkLibCsharp\MobiCortex.Sdk.csproj", "{F6C38EF2-66F4-D725-455A-D74D6617853E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,18 +17,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B470BBAB-0608-418F-94F3-96D51568CFED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B470BBAB-0608-418F-94F3-96D51568CFED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B470BBAB-0608-418F-94F3-96D51568CFED}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{B470BBAB-0608-418F-94F3-96D51568CFED}.Debug|x64.Build.0 = Debug|Any CPU
-		{B470BBAB-0608-418F-94F3-96D51568CFED}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{B470BBAB-0608-418F-94F3-96D51568CFED}.Debug|x86.Build.0 = Debug|Any CPU
-		{B470BBAB-0608-418F-94F3-96D51568CFED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B470BBAB-0608-418F-94F3-96D51568CFED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B470BBAB-0608-418F-94F3-96D51568CFED}.Release|x64.ActiveCfg = Release|Any CPU
-		{B470BBAB-0608-418F-94F3-96D51568CFED}.Release|x64.Build.0 = Release|Any CPU
-		{B470BBAB-0608-418F-94F3-96D51568CFED}.Release|x86.ActiveCfg = Release|Any CPU
-		{B470BBAB-0608-418F-94F3-96D51568CFED}.Release|x86.Build.0 = Release|Any CPU
 		{B5B74BCE-45DC-4207-AB46-380F821E5850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B5B74BCE-45DC-4207-AB46-380F821E5850}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5B74BCE-45DC-4207-AB46-380F821E5850}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -43,14 +29,20 @@ Global
 		{B5B74BCE-45DC-4207-AB46-380F821E5850}.Release|x64.Build.0 = Release|Any CPU
 		{B5B74BCE-45DC-4207-AB46-380F821E5850}.Release|x86.ActiveCfg = Release|Any CPU
 		{B5B74BCE-45DC-4207-AB46-380F821E5850}.Release|x86.Build.0 = Release|Any CPU
+		{F6C38EF2-66F4-D725-455A-D74D6617853E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6C38EF2-66F4-D725-455A-D74D6617853E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6C38EF2-66F4-D725-455A-D74D6617853E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F6C38EF2-66F4-D725-455A-D74D6617853E}.Debug|x64.Build.0 = Debug|Any CPU
+		{F6C38EF2-66F4-D725-455A-D74D6617853E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F6C38EF2-66F4-D725-455A-D74D6617853E}.Debug|x86.Build.0 = Debug|Any CPU
+		{F6C38EF2-66F4-D725-455A-D74D6617853E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6C38EF2-66F4-D725-455A-D74D6617853E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6C38EF2-66F4-D725-455A-D74D6617853E}.Release|x64.ActiveCfg = Release|Any CPU
+		{F6C38EF2-66F4-D725-455A-D74D6617853E}.Release|x64.Build.0 = Release|Any CPU
+		{F6C38EF2-66F4-D725-455A-D74D6617853E}.Release|x86.ActiveCfg = Release|Any CPU
+		{F6C38EF2-66F4-D725-455A-D74D6617853E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{B470BBAB-0608-418F-94F3-96D51568CFED} = {7525F425-A154-8FF7-7D30-D7452CC5B0D3}
-	EndGlobalSection
-	GlobalSection(ProjectDependencies) = postSolution
-		{B5B74BCE-45DC-4207-AB46-380F821E5850}.0 = {B470BBAB-0608-418F-94F3-96D51568CFED}
 	EndGlobalSection
 EndGlobal

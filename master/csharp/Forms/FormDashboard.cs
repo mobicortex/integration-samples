@@ -6,17 +6,17 @@ using MobiCortex.Sdk.Interfaces;
 namespace SmartSdk
 {
     // =============================================================================
-    //  DASHBOARD - Informações do Controlador
+    //  DASHBOARD - Controller Information
     //
-    //  Este formulário demonstra como obter informações do dispositivo
-    //  e estatísticas gerais do controlador.
+    //  This form demonstrates how to obtain device information
+    //  and general statistics from the controller.
     //
     //  ENDPOINTS:
-    //  GET /device-info → Hardware (modelo, firmware, CPU, memória, uptime)
-    //  GET /dashboard   → Estatísticas (cadastros, pessoas, veículos, mídias)
-    //  GET /central-registry/stats → Capacidade de armazenamento
+    //  GET /device-info -> Hardware (model, firmware, CPU, memory, uptime)
+    //  GET /dashboard   -> Statistics (registries, people, vehicles, media)
+    //  GET /central-registry/stats -> Storage capacity
     //
-    //  Todas chamadas são GET simples, sem parâmetros.
+    //  All calls are simple GETs, with no parameters.
     // =============================================================================
 
     public partial class FormDashboard : Form
@@ -24,7 +24,7 @@ namespace SmartSdk
         private IMobiCortexClient _api = null!;
 
         /// <summary>
-        /// Serviço da API. Pode ser definido via propriedade para uso no designer.
+        /// API service. Can be set via property for designer use.
         /// </summary>
         public IMobiCortexClient ApiService
         {
@@ -33,7 +33,7 @@ namespace SmartSdk
         }
 
         /// <summary>
-        /// Construtor padrão para o Designer do Visual Studio.
+        /// Default constructor for Visual Studio Designer.
         /// </summary>
         public FormDashboard()
         {
@@ -46,27 +46,27 @@ namespace SmartSdk
         }
 
         // =====================================================================
-        //  CARREGAR DADOS
+        //  LOAD DATA
         // =====================================================================
 
         private async void FormDashboard_Load(object? sender, EventArgs e)
         {
-            // No modo design do VS, _api pode ser null - não carregar dados
+            // In VS design mode, _api may be null - do not load data
             if (_api == null) return;
-            await CarregarTudo();
+            await LoadAll();
         }
 
         /// <summary>
-        /// Carrega todas as informações do controlador.
+        /// Loads all controller information.
         /// </summary>
-        private async Task CarregarTudo()
+        private async Task LoadAll()
         {
-            Log("Carregando informações do controlador...");
+            Log("Loading controller information...");
 
-            // Executa as 3 chamadas em paralelo para eficiência
-            var taskDevice = _api.Sistema.ObterDeviceInfoAsync();
-            var taskDashboard = _api.Sistema.ObterDashboardAsync();
-            var taskStats = _api.Cadastros.ObterEstatisticasAsync();
+            // Execute all 3 calls in parallel for efficiency
+            var taskDevice = _api.SystemInfo.GetDeviceInfoAsync();
+            var taskDashboard = _api.SystemInfo.GetDashboardAsync();
+            var taskStats = _api.Registries.GetStatisticsAsync();
 
             await Task.WhenAll(taskDevice, taskDashboard, taskStats);
 
@@ -85,7 +85,7 @@ namespace SmartSdk
             }
             else
             {
-                Log($"Erro device-info: {deviceResult.Message}");
+                Log($"Error device-info: {deviceResult.Message}");
             }
 
             // ---- Dashboard ----
@@ -93,41 +93,43 @@ namespace SmartSdk
             if (dashResult.Success && dashResult.Data != null)
             {
                 var s = dashResult.Data;
-                lblCadastros.Text = s.Cadastros.ToString("N0");
-                lblPessoas.Text = s.Pessoas.ToString("N0");
-                lblVeiculos.Text = s.Veiculos.ToString("N0");
-                lblMidias.Text = s.TotalMidias.ToString("N0");
-                lblFacial.Text = s.Facial.ToString("N0");
-                lblRfid.Text = s.Rfid.ToString("N0");
-                lblLpr.Text = s.Lpr.ToString("N0");
-                lblControle.Text = s.ControleRemoto.ToString("N0");
-                Log($"Dashboard: {s.Cadastros} cadastros, {s.Pessoas} pessoas, {s.Veiculos} veículos");
+                var c = s.Counts;
+                var m = s.Media;
+                lblCadastros.Text = c.Registries.ToString("N0");
+                lblPessoas.Text = c.People.ToString("N0");
+                lblVeiculos.Text = c.Vehicles.ToString("N0");
+                lblMidias.Text = c.MemoryRecords.ToString("N0");
+                lblFacial.Text = m.Facial.ToString("N0");
+                lblRfid.Text = m.Rfid.ToString("N0");
+                lblLpr.Text = m.Lpr.ToString("N0");
+                lblControle.Text = m.RemoteControl.ToString("N0");
+                Log($"Dashboard: {c.Registries} registries, {c.People} people, {c.Vehicles} vehicles");
             }
             else
             {
-                Log($"Erro dashboard: {dashResult.Message}");
+                Log($"Error dashboard: {dashResult.Message}");
             }
 
-            // ---- Stats (capacidade) ----
+            // ---- Stats (capacity) ----
             var statsResult = taskStats.Result;
             if (statsResult.Success && statsResult.Data != null)
             {
                 var st = statsResult.Data;
                 lblCapacidade.Text = $"{st.CurrentTotal:N0} / {st.MaxCapacity:N0} ({st.UsagePercent:F1}%)";
                 progressCapacidade.Value = Math.Min(100, (int)st.UsagePercent);
-                Log($"Capacidade: {st.UsagePercent:F1}% utilizado");
+                Log($"Capacity: {st.UsagePercent:F1}% used");
             }
             else
             {
-                Log($"Erro stats: {statsResult.Message}");
+                Log($"Error stats: {statsResult.Message}");
             }
 
-            Log("Informações carregadas com sucesso.");
+            Log("Information loaded successfully.");
         }
 
         private async void btnAtualizar_Click(object? sender, EventArgs e)
         {
-            await CarregarTudo();
+            await LoadAll();
         }
 
         // =====================================================================

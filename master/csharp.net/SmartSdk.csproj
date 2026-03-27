@@ -7,6 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <LangVersion>latest</LangVersion>
     <DefaultItemExcludes>$(DefaultItemExcludes);MobiCortexSdkLib\**</DefaultItemExcludes>
+    <!-- MobiCortexSdkLib local mantido apenas como backup; o projeto referencia a lib compartilhada -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +19,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="MQTTnet" Version="4.3.7.1207" />
+    <!-- MQTTnet agora vem transitivamente via MobiCortex.Sdk -->
   </ItemGroup>
 
   <!-- WinForms Designer Support -->
@@ -26,13 +27,66 @@
     <Compile Update="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Forms\*.cs">
-      <SubType>Form</SubType>
+    <Compile Update="MainForm.Designer.cs">
+      <SubType>Designer</SubType>
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Update="Forms\FormCadastroCentral.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormCadastroCentral.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormCadastroCentral.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormCadastroCompleto.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormCadastroCompleto.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormCadastroCompleto.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormCadastroEntidade.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormCadastroEntidade.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormCadastroEntidade.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormCadastroMidia.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormCadastroMidia.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormCadastroMidia.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormCadastroPessoa.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormCadastroPessoa.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormCadastroPessoa.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormCadastroPessoaEdit.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormCadastroPessoaEdit.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormCadastroPessoaEdit.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormCadastroSimples.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormCadastroSimples.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormCadastroSimples.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormCadastroVeiculo.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormCadastroVeiculo.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormCadastroVeiculo.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormDashboard.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormDashboard.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormDashboard.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormDetalheMidia.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormDetalheMidia.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormDetalheMidia.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormMonitoramento.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormMonitoramento.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormMonitoramento.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormMqttBroker.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormMqttBroker.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormMqttBroker.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormMqttCliente.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormMqttCliente.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormMqttCliente.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormSelecionarTipoEntidade.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormSelecionarTipoEntidade.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormSelecionarTipoEntidade.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormWebhookServer.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormWebhookServer.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormWebhookServer.cs</DependentUpon></Compile>
+  </ItemGroup>
+
+  <!-- Incluir arquivos de recursos (.resx) explicitamente -->
+  <ItemGroup>
+    <EmbeddedResource Update="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormCadastroCentral.resx"><DependentUpon>FormCadastroCentral.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormCadastroCompleto.resx"><DependentUpon>FormCadastroCompleto.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormCadastroEntidade.resx"><DependentUpon>FormCadastroEntidade.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormCadastroMidia.resx"><DependentUpon>FormCadastroMidia.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormCadastroPessoa.resx"><DependentUpon>FormCadastroPessoa.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormCadastroPessoaEdit.resx"><DependentUpon>FormCadastroPessoaEdit.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormCadastroSimples.resx"><DependentUpon>FormCadastroSimples.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormCadastroVeiculo.resx"><DependentUpon>FormCadastroVeiculo.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormDashboard.resx"><DependentUpon>FormDashboard.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormDetalheMidia.resx"><DependentUpon>FormDetalheMidia.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormMonitoramento.resx"><DependentUpon>FormMonitoramento.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormMqttBroker.resx"><DependentUpon>FormMqttBroker.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormMqttCliente.resx"><DependentUpon>FormMqttCliente.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormSelecionarTipoEntidade.resx"><DependentUpon>FormSelecionarTipoEntidade.cs</DependentUpon></EmbeddedResource>
+    <EmbeddedResource Update="Forms\FormWebhookServer.resx"><DependentUpon>FormWebhookServer.cs</DependentUpon></EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="MobiCortexSdkLib\MobiCortex.Sdk.csproj" />
+    <ProjectReference Include="..\MobiCortexSdkLibCsharp\MobiCortex.Sdk.csproj" />
   </ItemGroup>
 
 

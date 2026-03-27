@@ -104,7 +104,7 @@ namespace SmartSdk
             groupDevice.Name = "groupDevice";
             groupDevice.Size = new Size(286, 194);
             groupDevice.TabIndex = 0;
-            groupDevice.Text = "Dispositivo (device-info)";
+            groupDevice.Text = "Device (device-info)";
             // 
             // tableDevice
             // 
@@ -138,7 +138,7 @@ namespace SmartSdk
             // 
             // Labels do device
             // 
-            label1.Text = "Modelo:"; label1.Font = new Font("Segoe UI", 9F); label1.Dock = DockStyle.Fill; label1.TextAlign = ContentAlignment.MiddleLeft;
+            label1.Text = "Model:"; label1.Font = new Font("Segoe UI", 9F); label1.Dock = DockStyle.Fill; label1.TextAlign = ContentAlignment.MiddleLeft;
             lblModelo.Text = "-"; lblModelo.Font = new Font("Segoe UI", 9F, FontStyle.Bold); lblModelo.Dock = DockStyle.Fill; lblModelo.TextAlign = ContentAlignment.MiddleLeft;
             label3.Text = "Firmware:"; label3.Font = new Font("Segoe UI", 9F); label3.Dock = DockStyle.Fill; label3.TextAlign = ContentAlignment.MiddleLeft;
             lblFirmware.Text = "-"; lblFirmware.Font = new Font("Segoe UI", 9F); lblFirmware.Dock = DockStyle.Fill; lblFirmware.TextAlign = ContentAlignment.MiddleLeft;
@@ -148,7 +148,7 @@ namespace SmartSdk
             lblUptime.Text = "-"; lblUptime.Font = new Font("Segoe UI", 9F); lblUptime.Dock = DockStyle.Fill; lblUptime.TextAlign = ContentAlignment.MiddleLeft;
             label9.Text = "CPU:"; label9.Font = new Font("Segoe UI", 9F); label9.Dock = DockStyle.Fill; label9.TextAlign = ContentAlignment.MiddleLeft;
             lblCpu.Text = "-"; lblCpu.Font = new Font("Segoe UI", 9F); lblCpu.Dock = DockStyle.Fill; lblCpu.TextAlign = ContentAlignment.MiddleLeft;
-            label11.Text = "Memória:"; label11.Font = new Font("Segoe UI", 9F); label11.Dock = DockStyle.Fill; label11.TextAlign = ContentAlignment.MiddleLeft;
+            label11.Text = "Memory:"; label11.Font = new Font("Segoe UI", 9F); label11.Dock = DockStyle.Fill; label11.TextAlign = ContentAlignment.MiddleLeft;
             lblMemoria.Text = "-"; lblMemoria.Font = new Font("Segoe UI", 9F); lblMemoria.Dock = DockStyle.Fill; lblMemoria.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // groupStats - Estatísticas
@@ -160,7 +160,7 @@ namespace SmartSdk
             groupStats.Name = "groupStats";
             groupStats.Size = new Size(286, 194);
             groupStats.TabIndex = 1;
-            groupStats.Text = "Estatísticas (dashboard)";
+            groupStats.Text = "Statistics (dashboard)";
             // 
             // tableStats
             // 
@@ -200,21 +200,21 @@ namespace SmartSdk
             // 
             // Labels de stats
             // 
-            label13.Text = "Cadastros:"; label13.Font = new Font("Segoe UI", 9F); label13.Dock = DockStyle.Fill; label13.TextAlign = ContentAlignment.MiddleLeft;
+            label13.Text = "Registries:"; label13.Font = new Font("Segoe UI", 9F); label13.Dock = DockStyle.Fill; label13.TextAlign = ContentAlignment.MiddleLeft;
             lblCadastros.Text = "-"; lblCadastros.Font = new Font("Segoe UI", 9F, FontStyle.Bold); lblCadastros.Dock = DockStyle.Fill; lblCadastros.TextAlign = ContentAlignment.MiddleLeft;
-            label15.Text = "Pessoas:"; label15.Font = new Font("Segoe UI", 9F); label15.Dock = DockStyle.Fill; label15.TextAlign = ContentAlignment.MiddleLeft;
+            label15.Text = "Persons:"; label15.Font = new Font("Segoe UI", 9F); label15.Dock = DockStyle.Fill; label15.TextAlign = ContentAlignment.MiddleLeft;
             lblPessoas.Text = "-"; lblPessoas.Font = new Font("Segoe UI", 9F); lblPessoas.Dock = DockStyle.Fill; lblPessoas.TextAlign = ContentAlignment.MiddleLeft;
-            label17.Text = "Veículos:"; label17.Font = new Font("Segoe UI", 9F); label17.Dock = DockStyle.Fill; label17.TextAlign = ContentAlignment.MiddleLeft;
+            label17.Text = "Vehicles:"; label17.Font = new Font("Segoe UI", 9F); label17.Dock = DockStyle.Fill; label17.TextAlign = ContentAlignment.MiddleLeft;
             lblVeiculos.Text = "-"; lblVeiculos.Font = new Font("Segoe UI", 9F); lblVeiculos.Dock = DockStyle.Fill; lblVeiculos.TextAlign = ContentAlignment.MiddleLeft;
-            label19.Text = "Total Mídias:"; label19.Font = new Font("Segoe UI", 9F); label19.Dock = DockStyle.Fill; label19.TextAlign = ContentAlignment.MiddleLeft;
+            label19.Text = "Total Media:"; label19.Font = new Font("Segoe UI", 9F); label19.Dock = DockStyle.Fill; label19.TextAlign = ContentAlignment.MiddleLeft;
             lblMidias.Text = "-"; lblMidias.Font = new Font("Segoe UI", 9F); lblMidias.Dock = DockStyle.Fill; lblMidias.TextAlign = ContentAlignment.MiddleLeft;
             label21.Text = "Facial:"; label21.Font = new Font("Segoe UI", 9F); label21.Dock = DockStyle.Fill; label21.TextAlign = ContentAlignment.MiddleLeft;
             lblFacial.Text = "-"; lblFacial.Font = new Font("Segoe UI", 9F); lblFacial.Dock = DockStyle.Fill; lblFacial.TextAlign = ContentAlignment.MiddleLeft;
             label23.Text = "RFID:"; label23.Font = new Font("Segoe UI", 9F); label23.Dock = DockStyle.Fill; label23.TextAlign = ContentAlignment.MiddleLeft;
             lblRfid.Text = "-"; lblRfid.Font = new Font("Segoe UI", 9F); lblRfid.Dock = DockStyle.Fill; lblRfid.TextAlign = ContentAlignment.MiddleLeft;
-            label25.Text = "LPR (placas):"; label25.Font = new Font("Segoe UI", 9F); label25.Dock = DockStyle.Fill; label25.TextAlign = ContentAlignment.MiddleLeft;
+            label25.Text = "LPR (plates):"; label25.Font = new Font("Segoe UI", 9F); label25.Dock = DockStyle.Fill; label25.TextAlign = ContentAlignment.MiddleLeft;
             lblLpr.Text = "-"; lblLpr.Font = new Font("Segoe UI", 9F); lblLpr.Dock = DockStyle.Fill; lblLpr.TextAlign = ContentAlignment.MiddleLeft;
-            label27.Text = "Controle:"; label27.Font = new Font("Segoe UI", 9F); label27.Dock = DockStyle.Fill; label27.TextAlign = ContentAlignment.MiddleLeft;
+            label27.Text = "Control:"; label27.Font = new Font("Segoe UI", 9F); label27.Dock = DockStyle.Fill; label27.TextAlign = ContentAlignment.MiddleLeft;
             lblControle.Text = "-"; lblControle.Font = new Font("Segoe UI", 9F); lblControle.Dock = DockStyle.Fill; lblControle.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // groupCapacidade
@@ -227,7 +227,7 @@ namespace SmartSdk
             groupCapacidade.Name = "groupCapacidade";
             groupCapacidade.Size = new Size(286, 78);
             groupCapacidade.TabIndex = 2;
-            groupCapacidade.Text = "Capacidade (central-registry/stats)";
+            groupCapacidade.Text = "Capacity (central-registry/stats)";
             // 
             // lblCapacidade
             // 
@@ -267,7 +267,7 @@ namespace SmartSdk
             btnAtualizar.Name = "btnAtualizar";
             btnAtualizar.Size = new Size(120, 30);
             btnAtualizar.TabIndex = 0;
-            btnAtualizar.Text = "Atualizar";
+            btnAtualizar.Text = "Refresh";
             btnAtualizar.UseVisualStyleBackColor = false;
             btnAtualizar.Click += btnAtualizar_Click;
             // 

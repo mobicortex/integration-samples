@@ -57,7 +57,7 @@ namespace SmartSdk
             this.groupBox1.Size = new Size(760, 100);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Configuração do Servidor Webhook";
+            this.groupBox1.Text = "Webhook Server Configuration";
             // 
             // lblUrl
             // 
@@ -86,7 +86,7 @@ namespace SmartSdk
             this.txtToken.Name = "txtToken";
             this.txtToken.Size = new Size(300, 23);
             this.txtToken.TabIndex = 3;
-            this.txtToken.Text = "seu-token-aqui";
+            this.txtToken.Text = "your-token-here";
             // 
             // chkAuth
             // 
@@ -95,7 +95,7 @@ namespace SmartSdk
             this.chkAuth.Name = "chkAuth";
             this.chkAuth.Size = new Size(129, 19);
             this.chkAuth.TabIndex = 2;
-            this.chkAuth.Text = "Autenticação Bearer";
+            this.chkAuth.Text = "Bearer Authentication";
             this.chkAuth.UseVisualStyleBackColor = true;
             this.chkAuth.CheckedChanged += this.chkAuth_CheckedChanged;
             // 
@@ -115,7 +115,7 @@ namespace SmartSdk
             this.label1.Name = "label1";
             this.label1.Size = new Size(38, 15);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Porta:";
+            this.label1.Text = "Port:";
             // 
             // btnIniciar
             // 
@@ -123,7 +123,7 @@ namespace SmartSdk
             this.btnIniciar.Name = "btnIniciar";
             this.btnIniciar.Size = new Size(110, 40);
             this.btnIniciar.TabIndex = 1;
-            this.btnIniciar.Text = "Iniciar";
+            this.btnIniciar.Text = "Start";
             this.btnIniciar.UseVisualStyleBackColor = true;
             this.btnIniciar.Click += this.btnIniciar_Click;
             // 
@@ -135,7 +135,7 @@ namespace SmartSdk
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new Size(51, 15);
             this.lblStatus.TabIndex = 2;
-            this.lblStatus.Text = "Parado";
+            this.lblStatus.Text = "Stopped";
             this.lblStatus.ForeColor = Color.Gray;
             // 
             // txtLog
@@ -157,7 +157,7 @@ namespace SmartSdk
             this.btnLimpar.Name = "btnLimpar";
             this.btnLimpar.Size = new Size(75, 25);
             this.btnLimpar.TabIndex = 4;
-            this.btnLimpar.Text = "Limpar";
+            this.btnLimpar.Text = "Clear";
             this.btnLimpar.UseVisualStyleBackColor = true;
             this.btnLimpar.Click += this.btnLimpar_Click;
             // 
@@ -168,7 +168,7 @@ namespace SmartSdk
             this.btnSalvar.Name = "btnSalvar";
             this.btnSalvar.Size = new Size(100, 25);
             this.btnSalvar.TabIndex = 5;
-            this.btnSalvar.Text = "Salvar JSON";
+            this.btnSalvar.Text = "Save JSON";
             this.btnSalvar.UseVisualStyleBackColor = true;
             this.btnSalvar.Click += this.btnSalvar_Click;
             // 
@@ -182,7 +182,7 @@ namespace SmartSdk
             this.groupBox2.Size = new Size(392, 335);
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Webhooks Recebidos";
+            this.groupBox2.Text = "Received Webhooks";
             // 
             // gridWebhooks
             // 
@@ -251,7 +251,7 @@ namespace SmartSdk
             this.btnVerDetalhes.Name = "btnVerDetalhes";
             this.btnVerDetalhes.Size = new Size(100, 25);
             this.btnVerDetalhes.TabIndex = 1;
-            this.btnVerDetalhes.Text = "Ver Detalhes";
+            this.btnVerDetalhes.Text = "View Details";
             this.btnVerDetalhes.UseVisualStyleBackColor = true;
             this.btnVerDetalhes.Click += this.btnVerDetalhes_Click;
             // 
@@ -274,7 +274,7 @@ namespace SmartSdk
             this.lblSucesso.Name = "lblSucesso";
             this.lblSucesso.Size = new Size(56, 15);
             this.lblSucesso.TabIndex = 8;
-            this.lblSucesso.Text = "Sucesso: 0";
+            this.lblSucesso.Text = "Success: 0";
             // 
             // lblErros
             // 
@@ -285,7 +285,7 @@ namespace SmartSdk
             this.lblErros.Name = "lblErros";
             this.lblErros.Size = new Size(45, 15);
             this.lblErros.TabIndex = 9;
-            this.lblErros.Text = "Erros: 0";
+            this.lblErros.Text = "Errors: 0";
             // 
             // FormWebhookServer
             // 
@@ -305,7 +305,7 @@ namespace SmartSdk
             this.MinimumSize = new Size(800, 540);
             this.Name = "FormWebhookServer";
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.Text = "Teste Webhook Server";
+            this.Text = "Webhook Server Test";
             this.Load += this.FormWebhookServer_Load;
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

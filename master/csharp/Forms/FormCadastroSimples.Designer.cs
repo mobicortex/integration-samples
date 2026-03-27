@@ -70,7 +70,7 @@ namespace SmartSdk
             lblExplicacao.Padding = new Padding(10, 5, 10, 5);
             lblExplicacao.Size = new Size(1050, 40);
             lblExplicacao.TabIndex = 2;
-            lblExplicacao.Text = "CADASTRO SIMPLIFICADO (2 níveis): Crie entidades com createid=true — o controlador gera os IDs automaticamente. Não é necessário criar cadastro central antes.";
+            lblExplicacao.Text = "SIMPLIFIED REGISTRY (2 levels): Create entities with createid=true — the controller generates IDs automatically. No need to create a central registry first.";
             lblExplicacao.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // splitMain
@@ -125,21 +125,21 @@ namespace SmartSdk
             // 
             // colEntTipo
             // 
-            colEntTipo.Text = "Tipo";
+            colEntTipo.Text = "Type";
             // 
             // colEntNome
             // 
-            colEntNome.Text = "Descrição";
+            colEntNome.Text = "Description";
             colEntNome.Width = 150;
             // 
             // colEntDoc
             // 
-            colEntDoc.Text = "Doc/Placa";
+            colEntDoc.Text = "Doc/Plate";
             colEntDoc.Width = 90;
             // 
             // colEntAtivo
             // 
-            colEntAtivo.Text = "Ativo";
+            colEntAtivo.Text = "Active";
             colEntAtivo.Width = 50;
             // 
             // colEntCadId
@@ -168,7 +168,7 @@ namespace SmartSdk
             btnAnterior.Name = "btnAnterior";
             btnAnterior.Size = new Size(75, 27);
             btnAnterior.TabIndex = 0;
-            btnAnterior.Text = "<< Ant.";
+            btnAnterior.Text = "<< Prev";
             btnAnterior.Click += btnAnterior_Click;
             // 
             // lblPagina
@@ -191,7 +191,7 @@ namespace SmartSdk
             btnProxima.Name = "btnProxima";
             btnProxima.Size = new Size(75, 27);
             btnProxima.TabIndex = 2;
-            btnProxima.Text = "Próx. >>";
+            btnProxima.Text = "Next >>";
             btnProxima.Click += btnProxima_Click;
             // 
             // panelEntBotoes
@@ -218,7 +218,7 @@ namespace SmartSdk
             btnNovaEntidade.Name = "btnNovaEntidade";
             btnNovaEntidade.Size = new Size(76, 27);
             btnNovaEntidade.TabIndex = 0;
-            btnNovaEntidade.Text = "+ Entidade";
+            btnNovaEntidade.Text = "+ Entity";
             btnNovaEntidade.UseVisualStyleBackColor = false;
             btnNovaEntidade.Click += btnNovaEntidade_Click;
             // 
@@ -232,7 +232,7 @@ namespace SmartSdk
             btnExcluirEntidade.Name = "btnExcluirEntidade";
             btnExcluirEntidade.Size = new Size(75, 27);
             btnExcluirEntidade.TabIndex = 1;
-            btnExcluirEntidade.Text = "Excluir";
+            btnExcluirEntidade.Text = "Delete";
             btnExcluirEntidade.Click += btnExcluirEntidade_Click;
             // 
             // txtFiltroEntidade
@@ -240,7 +240,7 @@ namespace SmartSdk
             txtFiltroEntidade.Location = new Point(175, 4);
             txtFiltroEntidade.Margin = new Padding(12, 4, 0, 0);
             txtFiltroEntidade.Name = "txtFiltroEntidade";
-            txtFiltroEntidade.PlaceholderText = "ID ou nome...";
+            txtFiltroEntidade.PlaceholderText = "ID or name...";
             txtFiltroEntidade.Size = new Size(140, 23);
             txtFiltroEntidade.TabIndex = 2;
             txtFiltroEntidade.KeyDown += txtFiltroEntidade_KeyDown;
@@ -254,7 +254,7 @@ namespace SmartSdk
             btnBuscarEntidade.Name = "btnBuscarEntidade";
             btnBuscarEntidade.Size = new Size(75, 27);
             btnBuscarEntidade.TabIndex = 3;
-            btnBuscarEntidade.Text = "Buscar";
+            btnBuscarEntidade.Text = "Search";
             btnBuscarEntidade.Click += btnBuscarEntidade_Click;
             // 
             // lblStatusEntidades
@@ -266,7 +266,7 @@ namespace SmartSdk
             lblStatusEntidades.Name = "lblStatusEntidades";
             lblStatusEntidades.Size = new Size(648, 20);
             lblStatusEntidades.TabIndex = 3;
-            lblStatusEntidades.Text = "Carregando...";
+            lblStatusEntidades.Text = "Loading...";
             // 
             // lblEntidadesTitulo
             // 
@@ -277,7 +277,7 @@ namespace SmartSdk
             lblEntidadesTitulo.Name = "lblEntidadesTitulo";
             lblEntidadesTitulo.Size = new Size(648, 28);
             lblEntidadesTitulo.TabIndex = 4;
-            lblEntidadesTitulo.Text = "Entidades";
+            lblEntidadesTitulo.Text = "Entities";
             lblEntidadesTitulo.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // panelMidias
@@ -314,17 +314,17 @@ namespace SmartSdk
             // 
             // colMidTipo
             // 
-            colMidTipo.Text = "Tipo";
+            colMidTipo.Text = "Type";
             colMidTipo.Width = 80;
             // 
             // colMidDesc
             // 
-            colMidDesc.Text = "Descrição";
+            colMidDesc.Text = "Description";
             colMidDesc.Width = 150;
             // 
             // colMidHab
             // 
-            colMidHab.Text = "Hab";
+            colMidHab.Text = "Ena";
             colMidHab.Width = 40;
             // 
             // panelMidBotoes
@@ -349,7 +349,7 @@ namespace SmartSdk
             btnNovaMidia.Name = "btnNovaMidia";
             btnNovaMidia.Size = new Size(75, 27);
             btnNovaMidia.TabIndex = 0;
-            btnNovaMidia.Text = "+ Mídia";
+            btnNovaMidia.Text = "+ Media";
             btnNovaMidia.UseVisualStyleBackColor = false;
             btnNovaMidia.Click += btnNovaMidia_Click;
             // 
@@ -363,7 +363,7 @@ namespace SmartSdk
             btnExcluirMidia.Name = "btnExcluirMidia";
             btnExcluirMidia.Size = new Size(75, 27);
             btnExcluirMidia.TabIndex = 1;
-            btnExcluirMidia.Text = "Excluir";
+            btnExcluirMidia.Text = "Delete";
             btnExcluirMidia.Click += btnExcluirMidia_Click;
             // 
             // lblStatusMidias
@@ -375,7 +375,7 @@ namespace SmartSdk
             lblStatusMidias.Name = "lblStatusMidias";
             lblStatusMidias.Size = new Size(398, 20);
             lblStatusMidias.TabIndex = 2;
-            lblStatusMidias.Text = "Selecione uma entidade";
+            lblStatusMidias.Text = "Select an entity";
             // 
             // lblMidiasTitulo
             // 
@@ -386,7 +386,7 @@ namespace SmartSdk
             lblMidiasTitulo.Name = "lblMidiasTitulo";
             lblMidiasTitulo.Size = new Size(398, 28);
             lblMidiasTitulo.TabIndex = 3;
-            lblMidiasTitulo.Text = "Mídias";
+            lblMidiasTitulo.Text = "Media";
             lblMidiasTitulo.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // txtLog

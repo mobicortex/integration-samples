@@ -3,68 +3,68 @@ using MobiCortex.Sdk.Models;
 namespace SmartSdk
 {
     /// <summary>
-    /// Formulário de edição de Pessoa (Entidade tipo 1).
+    /// Form for editing a Person (Entity type 1).
     /// </summary>
     public partial class FormCadastroPessoaEdit : Form
     {
-        // Dados da pessoa (preenchidos ao salvar)
+        // Person data (filled on save)
         public string Nome { get; private set; } = string.Empty;
         public string Documento { get; private set; } = string.Empty;
         public bool EntidadeEnabled { get; private set; } = true;
-        
-        // Dados para edição
-        private readonly Entidade _entidade;
-        
+
+        // Data for editing
+        private readonly Entity _entidade;
+
         /// <summary>
-        /// Construtor para editar pessoa existente
+        /// Constructor for editing an existing person
         /// </summary>
-        public FormCadastroPessoaEdit(Entidade entidade)
+        public FormCadastroPessoaEdit(Entity entidade)
         {
             _entidade = entidade;
             InitializeComponent();
         }
-        
+
         private void FormCadastroPessoaEdit_Load(object? sender, EventArgs e)
         {
-            // Preenche campos com dados da entidade
+            // Fill fields with entity data
             lblEntityId.Text = _entidade.EntityId.ToString();
             txtNome.Text = _entidade.Name;
             txtDocumento.Text = _entidade.Doc;
-            
-            System.Diagnostics.Debug.WriteLine($"[DEBUG] Carregando entidade ID={_entidade.EntityId}, Enabled={_entidade.Enabled}");
+
+            System.Diagnostics.Debug.WriteLine($"[DEBUG] Loading entity ID={_entidade.EntityId}, Enabled={_entidade.Enabled}");
             chkHabilitado.Checked = _entidade.Enabled;
-            
-            // Mostra datas
-            lblCreatedAt.Text = _entidade.CriadoEm;
-            lblUpdatedAt.Text = _entidade.AtualizadoEm;
+
+            // Show dates
+            lblCreatedAt.Text = _entidade.CreatedAtFormatted;
+            lblUpdatedAt.Text = _entidade.UpdatedAtFormatted;
         }
-        
+
         /// <summary>
-        /// Valida e salva os dados da pessoa
+        /// Validates and saves the person data
         /// </summary>
         private void btnSalvar_Click(object? sender, EventArgs e)
         {
-            // Valida nome
+            // Validate name
             if (string.IsNullOrWhiteSpace(txtNome.Text))
             {
-                MessageBox.Show("Informe o nome da pessoa.", "Validação", 
+                MessageBox.Show("Enter the name of the person.", "Validation",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtNome.Focus();
                 DialogResult = DialogResult.None;
                 return;
             }
-            
-            // Armazena os dados
+
+            // Store the data
             Nome = txtNome.Text.Trim();
             Documento = txtDocumento.Text.Trim();
-            
+
             EntidadeEnabled = chkHabilitado.Checked;
-            System.Diagnostics.Debug.WriteLine($"[DEBUG] Salvando entidade - Nome={Nome}, Enabled={EntidadeEnabled}, Checked={chkHabilitado.Checked}");
-            
+            System.Diagnostics.Debug.WriteLine($"[DEBUG] Saving entity - Name={Nome}, Enabled={EntidadeEnabled}, Checked={chkHabilitado.Checked}");
+
             DialogResult = DialogResult.OK;
             Close();
         }
-        
+
         private void btnCancelar_Click(object? sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;

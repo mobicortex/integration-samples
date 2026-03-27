@@ -116,7 +116,7 @@ namespace SmartSdk
             lblCadastrosTitulo.Name = "lblCadastrosTitulo";
             lblCadastrosTitulo.Size = new Size(340, 22);
             lblCadastrosTitulo.TabIndex = 0;
-            lblCadastrosTitulo.Text = "1. Cadastros Centrais";
+            lblCadastrosTitulo.Text = "1. Central Registries";
             // 
             // lblStatusCadastros
             // 
@@ -126,7 +126,7 @@ namespace SmartSdk
             lblStatusCadastros.Name = "lblStatusCadastros";
             lblStatusCadastros.Size = new Size(340, 18);
             lblStatusCadastros.TabIndex = 1;
-            lblStatusCadastros.Text = "Carregando...";
+            lblStatusCadastros.Text = "Loading...";
             // 
             // panelCadastrosBotoes
             // 
@@ -145,7 +145,7 @@ namespace SmartSdk
             // 
             txtFiltroCadastro.Location = new Point(0, 4);
             txtFiltroCadastro.Name = "txtFiltroCadastro";
-            txtFiltroCadastro.PlaceholderText = "ID ou nome...";
+            txtFiltroCadastro.PlaceholderText = "ID or name...";
             txtFiltroCadastro.Size = new Size(100, 23);
             txtFiltroCadastro.TabIndex = 0;
             txtFiltroCadastro.KeyDown += txtFiltroCadastro_KeyDown;
@@ -156,7 +156,7 @@ namespace SmartSdk
             btnBuscarCadastro.Name = "btnBuscarCadastro";
             btnBuscarCadastro.Size = new Size(55, 25);
             btnBuscarCadastro.TabIndex = 1;
-            btnBuscarCadastro.Text = "Buscar";
+            btnBuscarCadastro.Text = "Search";
             btnBuscarCadastro.Click += btnBuscarCadastro_Click;
             // 
             // btnNovoCadastro
@@ -178,7 +178,7 @@ namespace SmartSdk
             btnNovoCadastro.Name = "btnNovoCadastro";
             btnNovoCadastro.Size = new Size(60, 25);
             btnNovoCadastro.TabIndex = 3;
-            btnNovoCadastro.Text = "+ Novo";
+            btnNovoCadastro.Text = "+ New";
             btnNovoCadastro.UseVisualStyleBackColor = false;
             btnNovoCadastro.Click += btnNovoCadastro_Click;
             // 
@@ -191,7 +191,7 @@ namespace SmartSdk
             btnExcluirCadastro.Name = "btnExcluirCadastro";
             btnExcluirCadastro.Size = new Size(60, 25);
             btnExcluirCadastro.TabIndex = 3;
-            btnExcluirCadastro.Text = "Excluir";
+            btnExcluirCadastro.Text = "Delete";
             btnExcluirCadastro.UseVisualStyleBackColor = false;
             btnExcluirCadastro.Click += btnExcluirCadastro_Click;
             // 
@@ -214,7 +214,7 @@ namespace SmartSdk
             btnAnterior.Name = "btnAnterior";
             btnAnterior.Size = new Size(65, 23);
             btnAnterior.TabIndex = 0;
-            btnAnterior.Text = "<< Ant.";
+            btnAnterior.Text = "<< Prev";
             btnAnterior.Click += btnAnterior_Click;
             // 
             // lblPagina
@@ -235,7 +235,7 @@ namespace SmartSdk
             btnProxima.Name = "btnProxima";
             btnProxima.Size = new Size(65, 23);
             btnProxima.TabIndex = 2;
-            btnProxima.Text = "Próx. >>";
+            btnProxima.Text = "Next >>";
             btnProxima.Click += btnProxima_Click;
             // 
             // listCadastros
@@ -261,17 +261,17 @@ namespace SmartSdk
             // 
             // colCadNome
             // 
-            colCadNome.Text = "Nome";
+            colCadNome.Text = "Name";
             colCadNome.Width = 130;
             // 
             // colCadAtivo
             // 
-            colCadAtivo.Text = "Ativo";
+            colCadAtivo.Text = "Active";
             colCadAtivo.Width = 45;
             // 
             // colCadContagem
             // 
-            colCadContagem.Text = "Entidades";
+            colCadContagem.Text = "Entities";
             colCadContagem.Width = 80;
             // 
             // panelEntidades - Nível 2: Entidades
@@ -295,7 +295,7 @@ namespace SmartSdk
             lblEntidadesTitulo.Name = "lblEntidadesTitulo";
             lblEntidadesTitulo.Size = new Size(336, 22);
             lblEntidadesTitulo.TabIndex = 0;
-            lblEntidadesTitulo.Text = "2. Entidades (selecione um cadastro)";
+            lblEntidadesTitulo.Text = "2. Entities (select a registry)";
             // 
             // lblStatusEntidades
             // 
@@ -334,7 +334,7 @@ namespace SmartSdk
             btnNovaEntidade.Name = "btnNovaEntidade";
             btnNovaEntidade.Size = new Size(100, 25);
             btnNovaEntidade.TabIndex = 1;
-            btnNovaEntidade.Text = "+ Pessoa/Veíc.";
+            btnNovaEntidade.Text = "+ Person/Veh.";
             btnNovaEntidade.UseVisualStyleBackColor = false;
             btnNovaEntidade.Click += btnNovaEntidade_Click;
             // 
@@ -347,7 +347,7 @@ namespace SmartSdk
             btnExcluirEntidade.Name = "btnExcluirEntidade";
             btnExcluirEntidade.Size = new Size(70, 25);
             btnExcluirEntidade.TabIndex = 1;
-            btnExcluirEntidade.Text = "Excluir";
+            btnExcluirEntidade.Text = "Delete";
             btnExcluirEntidade.UseVisualStyleBackColor = false;
             btnExcluirEntidade.Click += btnExcluirEntidade_Click;
             // 
@@ -374,12 +374,12 @@ namespace SmartSdk
             // 
             // colEntTipo
             // 
-            colEntTipo.Text = "Tipo";
+            colEntTipo.Text = "Type";
             colEntTipo.Width = 60;
             // 
             // colEntNome
             // 
-            colEntNome.Text = "Descrição";
+            colEntNome.Text = "Description";
             colEntNome.Width = 100;
             // 
             // colEntDoc
@@ -389,7 +389,7 @@ namespace SmartSdk
             // 
             // colEntAtivo
             // 
-            colEntAtivo.Text = "Ativo";
+            colEntAtivo.Text = "Active";
             colEntAtivo.Width = 45;
             // 
             // colEntLpr
@@ -418,7 +418,7 @@ namespace SmartSdk
             lblMidiasTitulo.Name = "lblMidiasTitulo";
             lblMidiasTitulo.Size = new Size(386, 22);
             lblMidiasTitulo.TabIndex = 0;
-            lblMidiasTitulo.Text = "3. Mídias (selecione uma entidade)";
+            lblMidiasTitulo.Text = "3. Media (select an entity)";
             // 
             // lblStatusMidias
             // 
@@ -457,7 +457,7 @@ namespace SmartSdk
             btnNovaMidia.Name = "btnNovaMidia";
             btnNovaMidia.Size = new Size(90, 25);
             btnNovaMidia.TabIndex = 1;
-            btnNovaMidia.Text = "+ Mídia";
+            btnNovaMidia.Text = "+ Media";
             btnNovaMidia.UseVisualStyleBackColor = false;
             btnNovaMidia.Click += btnNovaMidia_Click;
             // 
@@ -470,7 +470,7 @@ namespace SmartSdk
             btnExcluirMidia.Name = "btnExcluirMidia";
             btnExcluirMidia.Size = new Size(70, 25);
             btnExcluirMidia.TabIndex = 1;
-            btnExcluirMidia.Text = "Excluir";
+            btnExcluirMidia.Text = "Delete";
             btnExcluirMidia.UseVisualStyleBackColor = false;
             btnExcluirMidia.Click += btnExcluirMidia_Click;
             // 
@@ -496,17 +496,17 @@ namespace SmartSdk
             // 
             // colMidTipo
             // 
-            colMidTipo.Text = "Tipo";
+            colMidTipo.Text = "Type";
             colMidTipo.Width = 100;
             // 
             // colMidDesc
             // 
-            colMidDesc.Text = "Descrição";
+            colMidDesc.Text = "Description";
             colMidDesc.Width = 120;
             // 
             // colMidAtivo
             // 
-            colMidAtivo.Text = "Ativo";
+            colMidAtivo.Text = "Active";
             colMidAtivo.Width = 45;
             // 
             // txtLog
@@ -533,7 +533,7 @@ namespace SmartSdk
             MinimumSize = new Size(900, 500);
             Name = "FormCadastroCompleto";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Cadastro Completo - Modelo MobiCortex (Cadastro → Entidade → Mídia)";
+            Text = "Full Registry - MobiCortex Model (Registry → Entity → Media)";
             Load += FormCadastroCompleto_Load;
             splitMain.Panel1.ResumeLayout(false);
             splitMain.Panel2.ResumeLayout(false);

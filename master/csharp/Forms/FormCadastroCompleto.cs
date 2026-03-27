@@ -1,4 +1,4 @@
-﻿using MobiCortex.Sdk;
+using MobiCortex.Sdk;
 using MobiCortex.Sdk.Services;
 using MobiCortex.Sdk.Models;
 using MobiCortex.Sdk.Interfaces;
@@ -6,28 +6,28 @@ using MobiCortex.Sdk.Interfaces;
 namespace SmartSdk
 {
     // =============================================================================
-    //  CADASTRO COMPLETO - Modelo MobiCortex (3 NÃ­veis)
+    //  COMPLETE REGISTRATION - MobiCortex Model (3 Levels)
     //
-    //  Este formulÃ¡rio demonstra o modelo hierÃ¡rquico completo:
+    //  This form demonstrates the complete hierarchical model:
     //
-    //  1. CADASTRO CENTRAL (central-registry)
-    //     Representa um "apartamento", "empresa", "unidade", etc.
-    //     Ã‰ o nÃ³ raiz que agrupa entidades.
+    //  1. CENTRAL REGISTRY (central-registry)
+    //     Represents an "apartment", "company", "unit", etc.
+    //     It is the root node that groups entities.
     //
-    //  2. ENTIDADE (entities)
-    //     Representa uma pessoa, veÃ­culo ou animal vinculado ao cadastro.
-    //     Cada cadastro pode ter vÃ¡rias entidades.
+    //  2. ENTITY (entities)
+    //     Represents a person, vehicle or animal linked to the registry.
+    //     Each registry can have multiple entities.
     //
-    //  3. MÃDIA DE ACESSO (media)
-    //     Representa uma credencial de acesso (cartÃ£o RFID, biometria, placa, etc).
-    //     Cada entidade pode ter vÃ¡rias mÃ­dias.
+    //  3. ACCESS MEDIA (media)
+    //     Represents an access credential (RFID card, biometrics, plate, etc).
+    //     Each entity can have multiple media.
     //
-    //  FLUXO:
-    //  1. Criar um Cadastro Central (ex: "Apt 101")
-    //  2. Adicionar Entidades ao cadastro (ex: "JoÃ£o Silva", "Carro ABC-1234")
-    //  3. Adicionar MÃ­dias Ã s entidades (ex: cartÃ£o RFID, placa LPR)
+    //  FLOW:
+    //  1. Create a Central Registry (e.g.: "Apt 101")
+    //  2. Add Entities to the registry (e.g.: "John Smith", "Car ABC-1234")
+    //  3. Add Media to the entities (e.g.: RFID card, LPR plate)
     //
-    //  ENDPOINTS USADOS:
+    //  ENDPOINTS USED:
     //  - GET/POST/DELETE /central-registry
     //  - GET/POST/PUT/DELETE /entities
     //  - GET/POST/DELETE /media
@@ -37,17 +37,17 @@ namespace SmartSdk
     {
         private IMobiCortexClient _api = null!;
 
-        // Itens selecionados atualmente (para navegaÃ§Ã£o hierÃ¡rquica)
-        private CadastroCentral? _cadastroSelecionado;
-        private Entidade? _entidadeSelecionada;
+        // Currently selected items (for hierarchical navigation)
+        private CentralRegistry? _selectedRegistry;
+        private Entity? _selectedEntity;
 
-        // Estado de paginaÃ§Ã£o dos cadastros
+        // Registry pagination state
         private int _currentOffset = 0;
         private const int PageSize = 20;
-        private uint _totalCadastros = 0;
+        private uint _totalRegistries = 0;
 
         /// <summary>
-        /// ServiÃ§o da API. Pode ser definido via propriedade para uso no designer.
+        /// API service. Can be set via property for designer use.
         /// </summary>
         public IMobiCortexClient ApiService
         {
@@ -56,7 +56,7 @@ namespace SmartSdk
         }
 
         /// <summary>
-        /// Construtor padrÃ£o para o Designer do Visual Studio.
+        /// Default constructor for Visual Studio Designer.
         /// </summary>
         public FormCadastroCompleto()
         {
@@ -69,140 +69,140 @@ namespace SmartSdk
         }
 
         // =====================================================================
-        //  CADASTROS CENTRAIS (NÃ­vel 1)
-        //  Endpoint: GET /central-registry?offset=0&count=20&name=filtro
+        //  CENTRAL REGISTRIES (Level 1)
+        //  Endpoint: GET /central-registry?offset=0&count=20&name=filter
         // =====================================================================
 
         private async void FormCadastroCompleto_Load(object? sender, EventArgs e)
         {
-            // No modo design do VS, _api pode ser null - nÃ£o carregar dados
+            // In VS design mode, _api may be null - do not load data
             if (_api == null) return;
-            await CarregarCadastros();
+            await LoadRegistries();
         }
 
         /// <summary>
-        /// Carrega a lista de cadastros centrais com paginaÃ§Ã£o.
-        /// Se o campo de busca contÃ©m um nÃºmero, busca pelo ID.
-        /// Se contÃ©m texto, filtra pelo nome.
+        /// Loads the list of central registries with pagination.
+        /// If the search field contains a number, searches by ID.
+        /// If it contains text, filters by name.
         /// </summary>
-        private async Task CarregarCadastros()
+        private async Task LoadRegistries()
         {
-            var filtro = txtFiltroCadastro.Text.Trim();
+            var filter = txtFiltroCadastro.Text.Trim();
 
-            // Se digitou um nÃºmero, busca direto pelo ID
-            if (uint.TryParse(filtro, out uint idBusca))
+            // If a number was entered, search directly by ID
+            if (uint.TryParse(filter, out uint searchId))
             {
-                await BuscarCadastroPorId(idBusca);
+                await SearchRegistryById(searchId);
                 return;
             }
 
-            // Busca paginada (com filtro por nome opcional)
-            var result = await _api.Cadastros.ListarAsync(
+            // Paginated search (with optional name filter)
+            var result = await _api.Registries.ListAsync(
                 _currentOffset, PageSize,
-                string.IsNullOrEmpty(filtro) ? null : filtro);
+                string.IsNullOrEmpty(filter) ? null : filter);
 
             listCadastros.Items.Clear();
             listEntidades.Items.Clear();
             listMidias.Items.Clear();
-            _cadastroSelecionado = null;
-            _entidadeSelecionada = null;
+            _selectedRegistry = null;
+            _selectedEntity = null;
 
             if (result.Success && result.Data != null)
             {
-                _totalCadastros = result.Data.Total;
+                _totalRegistries = result.Data.Total;
                 foreach (var c in result.Data.Items)
                 {
                     var item = new ListViewItem(c.Id.ToString());
                     item.SubItems.Add(c.Name);
-                    item.SubItems.Add(c.Enabled ? "Sim" : "NÃ£o");
+                    item.SubItems.Add(c.Enabled ? "Yes" : "No");
                     item.SubItems.Add($"{c.PeopleCount}P / {c.VehicleCount}V");
                     item.Tag = c;
                     listCadastros.Items.Add(item);
                 }
-                AtualizarPaginacao();
+                UpdatePagination();
             }
             else
             {
-                _totalCadastros = 0;
-                AtualizarPaginacao();
-                lblStatusCadastros.Text = $"Erro: {result.Message}";
+                _totalRegistries = 0;
+                UpdatePagination();
+                lblStatusCadastros.Text = $"Error: {result.Message}";
             }
         }
 
         /// <summary>
-        /// Busca um cadastro especÃ­fico pelo ID e exibe na lista.
+        /// Searches for a specific registry by ID and displays it in the list.
         /// GET /central-registry?id=X
         /// </summary>
-        private async Task BuscarCadastroPorId(uint id)
+        private async Task SearchRegistryById(uint id)
         {
             listCadastros.Items.Clear();
             listEntidades.Items.Clear();
             listMidias.Items.Clear();
-            _cadastroSelecionado = null;
-            _entidadeSelecionada = null;
+            _selectedRegistry = null;
+            _selectedEntity = null;
 
-            var result = await _api.Cadastros.ObterAsync(id);
+            var result = await _api.Registries.GetAsync(id);
 
             if (result.Success && result.Data != null)
             {
                 var c = result.Data;
                 var item = new ListViewItem(c.Id.ToString());
                 item.SubItems.Add(c.Name);
-                item.SubItems.Add(c.Enabled ? "Sim" : "NÃ£o");
+                item.SubItems.Add(c.Enabled ? "Yes" : "No");
                 item.SubItems.Add($"{c.PeopleCount}P / {c.VehicleCount}V");
                 item.Tag = c;
                 listCadastros.Items.Add(item);
 
-                _totalCadastros = 1;
-                lblStatusCadastros.Text = $"Busca por ID {id} â€” 1 resultado";
+                _totalRegistries = 1;
+                lblStatusCadastros.Text = $"Search by ID {id} - 1 result";
                 btnAnterior.Enabled = false;
                 btnProxima.Enabled = false;
                 lblPagina.Text = "ID";
             }
             else
             {
-                _totalCadastros = 0;
-                lblStatusCadastros.Text = $"ID {id} nÃ£o encontrado";
+                _totalRegistries = 0;
+                lblStatusCadastros.Text = $"ID {id} not found";
                 btnAnterior.Enabled = false;
                 btnProxima.Enabled = false;
                 lblPagina.Text = "0/0";
             }
         }
 
-        /// <summary>Atualiza label de status e botÃµes de paginaÃ§Ã£o</summary>
-        private void AtualizarPaginacao()
+        /// <summary>Updates status label and pagination buttons</summary>
+        private void UpdatePagination()
         {
-            int totalPages = (int)((_totalCadastros + PageSize - 1) / PageSize);
+            int totalPages = (int)((_totalRegistries + PageSize - 1) / PageSize);
             int currentPage = totalPages > 0 ? (_currentOffset / PageSize) + 1 : 0;
 
             lblPagina.Text = $"{currentPage}/{totalPages}";
             btnAnterior.Enabled = _currentOffset > 0;
-            btnProxima.Enabled = (_currentOffset + PageSize) < _totalCadastros;
-            lblStatusCadastros.Text = $"{_totalCadastros} cadastro(s)";
+            btnProxima.Enabled = (_currentOffset + PageSize) < _totalRegistries;
+            lblStatusCadastros.Text = $"{_totalRegistries} registry(ies)";
         }
 
-        /// <summary>Ao selecionar um cadastro, carrega suas entidades (nÃ­vel 2).</summary>
+        /// <summary>When selecting a registry, loads its entities (level 2).</summary>
         private async void listCadastros_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (listCadastros.SelectedItems.Count == 0) return;
 
-            _cadastroSelecionado = listCadastros.SelectedItems[0].Tag as CadastroCentral;
-            if (_cadastroSelecionado == null) return;
+            _selectedRegistry = listCadastros.SelectedItems[0].Tag as CentralRegistry;
+            if (_selectedRegistry == null) return;
 
-            lblEntidadesTitulo.Text = $"Entidades de: {_cadastroSelecionado.Name}";
-            await CarregarEntidades(_cadastroSelecionado.Id);
+            lblEntidadesTitulo.Text = $"Entities of: {_selectedRegistry.Name}";
+            await LoadEntities(_selectedRegistry.Id);
         }
 
         /// <summary>
-        /// Cria um novo cadastro central usando o formulÃ¡rio completo.
-        /// POST /central-registry com body: { "id": auto, "name": "...", "enabled": true }
+        /// Creates a new central registry using the complete form.
+        /// POST /central-registry with body: { "id": auto, "name": "...", "enabled": true }
         /// </summary>
         private async void btnNovoCadastro_Click(object? sender, EventArgs e)
         {
             using var form = new FormCadastroCentral();
             if (form.ShowDialog(this) != DialogResult.OK) return;
 
-            var cadastro = new CadastroCentral
+            var cadastro = new CentralRegistry
             {
                 Id = form.IdCadastro,
                 Name = form.Nome,
@@ -213,40 +213,45 @@ namespace SmartSdk
                 Field4 = form.Field4
             };
 
-            var result = await _api.Cadastros.CriarAsync(cadastro);
+            var result = await _api.Registries.CreateAsync(cadastro);
 
-            if (result.Success)
+            if (result.Success && result.Data?.Ret == 0)
             {
-                Log($"Cadastro criado: {form.Nome}");
-                await CarregarCadastros();
+                Log($"Registry created: {form.Nome}");
+                await LoadRegistries();
+            }
+            else if (result.IsConflict)
+            {
+                Log($"Registry already exists: {form.Nome} (HTTP 409)");
+                Warning($"The registry '{form.Nome}' already exists on the controller.");
             }
             else
             {
-                var msg = $"Erro ao criar cadastro:\n{result.Message}";
+                var msg = $"Error creating registry (HTTP {result.StatusCode}):\n{result.Message}";
                 Log(msg);
-                Aviso(msg);
+                Warning(msg);
             }
         }
 
         /// <summary>
-        /// Edita o cadastro selecionado ao dar duplo clique.
+        /// Edits the selected registry on double click.
         /// PUT /central-registry?id=X
         /// </summary>
         private async void listCadastros_DoubleClick(object? sender, EventArgs e)
         {
-            // ObtÃ©m o item clicado diretamente (funciona mesmo se nÃ£o estiver selecionado)
+            // Get the clicked item directly (works even if not selected)
             if (listCadastros.SelectedItems.Count == 0) return;
-            
-            var cadastro = listCadastros.SelectedItems[0].Tag as CadastroCentral;
+
+            var cadastro = listCadastros.SelectedItems[0].Tag as CentralRegistry;
             if (cadastro == null) return;
-            
-            // Atualiza o cadastro selecionado
-            _cadastroSelecionado = cadastro;
+
+            // Update the selected registry
+            _selectedRegistry = cadastro;
 
             using var form = new FormCadastroCentral(cadastro);
             if (form.ShowDialog(this) != DialogResult.OK) return;
 
-            var cadastroAtualizado = new CadastroCentral
+            var updatedRegistry = new CentralRegistry
             {
                 Id = form.IdCadastro,
                 Name = form.Nome,
@@ -257,563 +262,592 @@ namespace SmartSdk
                 Field4 = form.Field4
             };
 
-            // Log para debug
-            var jsonDebug = System.Text.Json.JsonSerializer.Serialize(cadastroAtualizado);
-            Log($"DEBUG: Atualizando cadastro ID={cadastroAtualizado.Id}, JSON={jsonDebug}");
+            // Debug log
+            var jsonDebug = System.Text.Json.JsonSerializer.Serialize(updatedRegistry);
+            Log($"DEBUG: Updating registry ID={updatedRegistry.Id}, JSON={jsonDebug}");
 
-            var result = await _api.Cadastros.AtualizarAsync(cadastroAtualizado);
+            var result = await _api.Registries.UpdateAsync(updatedRegistry);
 
             if (result.Success)
             {
-                Log($"Cadastro atualizado: {form.Nome}");
-                await CarregarCadastros();
+                Log($"Registry updated: {form.Nome}");
+                await LoadRegistries();
             }
             else
             {
-                var msg = $"Erro ao atualizar cadastro:\n{result.Message}";
+                var msg = $"Error updating registry (HTTP {result.StatusCode}):\n{result.Message}";
                 Log(msg);
-                Aviso(msg);
+                Warning(msg);
             }
         }
 
         /// <summary>
-        /// Exclui o cadastro selecionado e todas suas entidades/mÃ­dias.
+        /// Deletes the selected registry and all its entities/media.
         /// DELETE /central-registry?id=X
         /// </summary>
         private async void btnExcluirCadastro_Click(object? sender, EventArgs e)
         {
-            if (_cadastroSelecionado == null) { Aviso("Selecione um cadastro"); return; }
+            if (_selectedRegistry == null) { Warning("Select a registry"); return; }
 
             var confirm = MessageBox.Show(
-                $"Excluir '{_cadastroSelecionado.Name}' e todas suas entidades/mÃ­dias?",
-                "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                $"Delete '{_selectedRegistry.Name}' and all its entities/media?",
+                "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
 
-            var result = await _api.Cadastros.ExcluirAsync(_cadastroSelecionado.Id);
+            var result = await _api.Registries.DeleteAsync(_selectedRegistry.Id);
             if (result.Success)
             {
-                Log($"Cadastro excluÃ­do: {_cadastroSelecionado.Name}");
-                await CarregarCadastros();
+                Log($"Registry deleted: {_selectedRegistry.Name}");
+                await LoadRegistries();
             }
             else
             {
-                var msg = $"Erro ao excluir cadastro:\n{result.Message}";
+                var msg = $"Error deleting registry (HTTP {result.StatusCode}):\n{result.Message}";
                 Log(msg);
-                Aviso(msg);
+                Warning(msg);
             }
         }
 
         private async void btnBuscarCadastro_Click(object? sender, EventArgs e)
         {
-            _currentOffset = 0; // Nova busca sempre comeÃ§a do inÃ­cio
-            await CarregarCadastros();
+            _currentOffset = 0; // New search always starts from the beginning
+            await LoadRegistries();
         }
 
         private async void btnRefreshCadastros_Click(object? sender, EventArgs e)
         {
-            await CarregarCadastros();
+            await LoadRegistries();
         }
 
         private async void btnAnterior_Click(object? sender, EventArgs e)
         {
             _currentOffset = Math.Max(0, _currentOffset - PageSize);
-            await CarregarCadastros();
+            await LoadRegistries();
         }
 
         private async void btnProxima_Click(object? sender, EventArgs e)
         {
             _currentOffset += PageSize;
-            await CarregarCadastros();
+            await LoadRegistries();
         }
 
-        /// <summary>Enter no campo de busca dispara a pesquisa</summary>
+        /// <summary>Enter key in the search field triggers the search</summary>
         private async void txtFiltroCadastro_KeyDown(object? sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
                 e.SuppressKeyPress = true;
                 _currentOffset = 0;
-                await CarregarCadastros();
+                await LoadRegistries();
             }
         }
 
         // =====================================================================
-        //  ENTIDADES (NÃ­vel 2)
+        //  ENTITIES (Level 2)
         //  Endpoint: GET /entities?central_registry_id=X
         // =====================================================================
 
         /// <summary>
-        /// Lista as entidades (pessoas/veÃ­culos) vinculadas ao cadastro selecionado.
+        /// Lists the entities (people/vehicles) linked to the selected registry.
         /// </summary>
-        private async Task CarregarEntidades(uint cadastroId)
+        private async Task LoadEntities(uint registryId)
         {
             listEntidades.Items.Clear();
             listMidias.Items.Clear();
-            _entidadeSelecionada = null;
+            _selectedEntity = null;
 
-            var result = await _api.Entidades.ListarPorCadastroAsync(cadastroId);
+            var result = await _api.Entities.ListByRegistryAsync(registryId);
 
             if (result.Success && result.Data != null)
             {
-                lblStatusEntidades.Text = $"{result.Data.Count} entidade(s)";
+                lblStatusEntidades.Text = $"{result.Data.Count} entity(ies)";
                 foreach (var ent in result.Data.Items)
                 {
                     var item = new ListViewItem(ent.EntityId.ToString());
-                    item.SubItems.Add(ent.TipoNome);
-                    item.SubItems.Add(ent.NomeExibicao);
+                    item.SubItems.Add(ent.TypeName);
+                    item.SubItems.Add(ent.DisplayName);
                     item.SubItems.Add(ent.Doc);
-                    item.SubItems.Add(ent.Enabled ? "S" : "N");
-                    item.SubItems.Add(ent.LprAtivo ? "Sim" : "");
+                    item.SubItems.Add(ent.Enabled ? "Y" : "N");
+                    item.SubItems.Add(ent.LprActive ? "Yes" : "");
                     item.Tag = ent;
                     listEntidades.Items.Add(item);
                 }
             }
             else
             {
-                lblStatusEntidades.Text = $"Erro: {result.Message}";
+                lblStatusEntidades.Text = $"Error: {result.Message}";
             }
         }
 
-        /// <summary>Ao selecionar uma entidade, carrega suas mÃ­dias (nÃ­vel 3).</summary>
+        /// <summary>When selecting an entity, loads its media (level 3).</summary>
         private async void listEntidades_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (listEntidades.SelectedItems.Count == 0) return;
 
-            _entidadeSelecionada = listEntidades.SelectedItems[0].Tag as Entidade;
-            if (_entidadeSelecionada == null) return;
+            _selectedEntity = listEntidades.SelectedItems[0].Tag as Entity;
+            if (_selectedEntity == null) return;
 
-            lblMidiasTitulo.Text = $"MÃ­dias de: {_entidadeSelecionada.NomeExibicao}";
-            await CarregarMidias(_entidadeSelecionada.EntityId);
+            lblMidiasTitulo.Text = $"Media of: {_selectedEntity.DisplayName}";
+            await LoadMedia(_selectedEntity.EntityId);
         }
 
         /// <summary>
-        /// Edita a entidade selecionada ao dar duplo clique.
+        /// Edits the selected entity on double click.
         /// </summary>
         private async void listEntidades_DoubleClick(object? sender, EventArgs e)
         {
             if (listEntidades.SelectedItems.Count == 0) return;
 
-            var entidade = listEntidades.SelectedItems[0].Tag as Entidade;
+            var entidade = listEntidades.SelectedItems[0].Tag as Entity;
             if (entidade == null) return;
 
-            _entidadeSelecionada = entidade;
+            _selectedEntity = entidade;
 
-            // Verifica o tipo de entidade
-            if (entidade.Tipo == (int)TipoEntidade.Veiculo)
+            // Check entity type
+            if (entidade.TypeAlias == (int)EntityType.Vehicle)
             {
-                // Abre formulÃ¡rio de ediÃ§Ã£o de veÃ­culo
+                // Open vehicle edit form
                 using var formVeiculo = new FormCadastroVeiculo(entidade, _api);
                 if (formVeiculo.ShowDialog(this) != DialogResult.OK) return;
 
-                // Cria o request de atualizaÃ§Ã£o (PUT /entities?id=X)
-                var entidadeAtualizada = new AtualizarEntidadeRequest
+                // Create the update request (PUT /entities?id=X)
+                var updatedEntity = new UpdateEntityRequest
                 {
                     Doc = formVeiculo.Placa,
                     Enabled = formVeiculo.EntidadeEnabled,
                     Brand = string.IsNullOrWhiteSpace(formVeiculo.Marca) ? null : formVeiculo.Marca,
                     Model = string.IsNullOrWhiteSpace(formVeiculo.Modelo) ? null : formVeiculo.Modelo,
                     Color = string.IsNullOrWhiteSpace(formVeiculo.Cor) ? null : formVeiculo.Cor,
-                    LprAtivo = formVeiculo.LprAtivo
+                    LprActive = formVeiculo.LprAtivo
                 };
 
-                // DEBUG: Log do JSON sendo enviado
-                var jsonDebug = System.Text.Json.JsonSerializer.Serialize(entidadeAtualizada);
+                // DEBUG: Log the JSON being sent
+                var jsonDebug = System.Text.Json.JsonSerializer.Serialize(updatedEntity);
                 Log($"DEBUG PUT /entities?id={entidade.EntityId}: {jsonDebug}");
 
-                var result = await _api.Entidades.AtualizarAsync(entidade.EntityId, entidadeAtualizada);
+                var result = await _api.Entities.UpdateAsync(entidade.EntityId, updatedEntity);
                 if (result.Success)
                 {
-                    Log($"VeÃ­culo atualizado: {entidade.NomeExibicao}");
-                    if (_cadastroSelecionado != null)
-                        await CarregarEntidades(_cadastroSelecionado.Id);
+                    Log($"Vehicle updated: {entidade.DisplayName}");
+                    if (_selectedRegistry != null)
+                        await LoadEntities(_selectedRegistry.Id);
                 }
                 else
                 {
-                    var msg = $"Erro ao atualizar veÃ­culo:\n{result.Message}\nResposta: {result.RawResponse}";
+                    var msg = $"Error updating vehicle:\n{result.Message}\nResponse: {result.RawResponse}";
                     Log(msg);
-                    Aviso(msg);
+                    Warning(msg);
                 }
                 return;
             }
 
-            // Abre formulÃ¡rio de ediÃ§Ã£o de pessoa
+            // Open person edit form
             using var form = new FormCadastroPessoaEdit(entidade);
             if (form.ShowDialog(this) != DialogResult.OK) return;
 
-            // Cria o request de atualizaÃ§Ã£o (PUT /entities?id=X)
-            // Usa AtualizarEntidadeRequest - sÃ³ envia os campos que quer alterar
-            var docLimpo = string.IsNullOrWhiteSpace(form.Documento) ? null : form.Documento.Trim();
-            var entidadeAtualizadaPessoa = new AtualizarEntidadeRequest
+            // Create the update request (PUT /entities?id=X)
+            // Uses UpdateEntityRequest - only sends the fields to be changed
+            var cleanDoc = string.IsNullOrWhiteSpace(form.Documento) ? null : form.Documento.Trim();
+            var updatedPerson = new UpdateEntityRequest
             {
                 Name = form.Nome,
-                Doc = docLimpo, // null se vazio (nÃ£o serÃ¡ enviado no JSON)
+                Doc = cleanDoc, // null if empty (will not be sent in JSON)
                 Enabled = form.EntidadeEnabled,
-                // Pessoas (tipo 1) nÃ£o usam LPR - nÃ£o envia o campo (null)
-                LprAtivo = entidade.Tipo == 1 ? null : entidade.LprAtivo
+                // People (type 1) do not use LPR - do not send the field (null)
+                LprActive = entidade.TypeAlias == 1 ? null : entidade.LprActive
             };
 
-            // DEBUG: Log do JSON sendo enviado
+            // DEBUG: Log the JSON being sent
             System.Diagnostics.Debug.WriteLine($"[DEBUG] Form.EntidadeEnabled = {form.EntidadeEnabled}");
-            var jsonDebugPessoa = System.Text.Json.JsonSerializer.Serialize(entidadeAtualizadaPessoa);
+            var jsonDebugPessoa = System.Text.Json.JsonSerializer.Serialize(updatedPerson);
             Log($"DEBUG PUT /entities?id={entidade.EntityId}: {jsonDebugPessoa}");
 
-            var resultPessoa = await _api.Entidades.AtualizarAsync(entidade.EntityId, entidadeAtualizadaPessoa);
+            var resultPessoa = await _api.Entities.UpdateAsync(entidade.EntityId, updatedPerson);
             if (resultPessoa.Success)
             {
-                Log($"Entidade atualizada: {form.Nome}");
-                if (_cadastroSelecionado != null)
-                    await CarregarEntidades(_cadastroSelecionado.Id);
+                Log($"Entity updated: {form.Nome}");
+                if (_selectedRegistry != null)
+                    await LoadEntities(_selectedRegistry.Id);
             }
             else
             {
-                var msg = $"Erro ao atualizar entidade:\n{resultPessoa.Message}\nResposta: {resultPessoa.RawResponse}";
+                var msg = $"Error updating entity:\n{resultPessoa.Message}\nResponse: {resultPessoa.RawResponse}";
                 Log(msg);
-                Aviso(msg);
+                Warning(msg);
             }
         }
 
         /// <summary>
-        /// Cria uma nova entidade vinculada ao cadastro selecionado.
-        /// POST /entities com body: { "central_registry_id": X, "type": 1, "name": "...", "doc": "..." }
+        /// Creates a new entity linked to the selected registry.
+        /// POST /entities with body: { "central_registry_id": X, "type": 1, "name": "...", "doc": "..." }
         ///
-        /// NOTA: Neste modelo (completo), informamos o central_registry_id do cadastro existente.
-        /// Se o ID da entidade for 0, o cliente envia createid=true para a controladora gerar o entity_id.
+        /// NOTE: In this model (complete), we provide the central_registry_id of the existing registry.
+        /// If the entity ID is 0, the client sends createid=true for the controller to generate the entity_id.
         /// </summary>
         private async void btnNovaEntidade_Click(object? sender, EventArgs e)
         {
-            if (_cadastroSelecionado == null) { Aviso("Selecione um cadastro primeiro"); return; }
+            if (_selectedRegistry == null) { Warning("Select a registry first"); return; }
 
-            // Seleciona o tipo em um formulario dedicado (mais claro do que Yes/No).
+            // Select the type in a dedicated form (clearer than Yes/No).
             using var formTipo = new FormSelecionarTipoEntidade();
             if (formTipo.ShowDialog(this) != DialogResult.OK) return;
             int tipo = formTipo.TipoEntidadeSelecionado;
 
-            CriarEntidadeRequest request;
-            string nomeLog;
+            CreateEntityRequest request;
+            string nameLog;
 
-            if (tipo == (int)TipoEntidade.Veiculo)
+            if (tipo == (int)EntityType.Vehicle)
             {
-                using var formVeiculo = new FormCadastroVeiculo(_cadastroSelecionado.Id, _api);
+                using var formVeiculo = new FormCadastroVeiculo(_selectedRegistry.Id, _api);
                 if (formVeiculo.ShowDialog(this) != DialogResult.OK) return;
 
-                request = new CriarEntidadeRequest
+                request = new CreateEntityRequest
                 {
                     Id = formVeiculo.IdVeiculo,
                     CreateId = formVeiculo.IdVeiculo == 0 ? true : null,
-                    CadastroId = _cadastroSelecionado.Id,
-                    Tipo = (int)TipoEntidade.Veiculo,
+                    RegistryId = _selectedRegistry.Id,
+                    TypeAlias = (int)EntityType.Vehicle,
                     Doc = formVeiculo.Placa,
                     Enabled = formVeiculo.EntidadeEnabled,
                     Brand = string.IsNullOrWhiteSpace(formVeiculo.Marca) ? null : formVeiculo.Marca,
                     Model = string.IsNullOrWhiteSpace(formVeiculo.Modelo) ? null : formVeiculo.Modelo,
                     Color = string.IsNullOrWhiteSpace(formVeiculo.Cor) ? null : formVeiculo.Cor,
-                    LprAtivo = formVeiculo.LprAtivo
+                    LprActive = formVeiculo.LprAtivo
                 };
 
-                nomeLog = $"{formVeiculo.Placa}";
+                nameLog = $"{formVeiculo.Placa}";
             }
             else
             {
-                using var formPessoa = new FormCadastroPessoa(_cadastroSelecionado.Id);
+                using var formPessoa = new FormCadastroPessoa(_selectedRegistry.Id);
                 if (formPessoa.ShowDialog(this) != DialogResult.OK) return;
 
-                request = new CriarEntidadeRequest
+                request = new CreateEntityRequest
                 {
                     Id = formPessoa.Id,
-                    CadastroId = _cadastroSelecionado.Id,
-                    Tipo = tipo,
+                    RegistryId = _selectedRegistry.Id,
+                    TypeAlias = tipo,
                     Name = formPessoa.Nome,
                     Doc = formPessoa.Documento,
-                    LprAtivo = formPessoa.LprAtivo,
+                    LprActive = formPessoa.LprAtivo,
                     Enabled = formPessoa.EntidadeEnabled
                 };
-                nomeLog = formPessoa.Nome;
+                nameLog = formPessoa.Nome;
             }
 
-            // Log do JSON para debug
+            // Log JSON for debug
             var jsonDebug = System.Text.Json.JsonSerializer.Serialize(request);
-            Log($"DEBUG JSON Entidade: {jsonDebug}");
+            Log($"DEBUG JSON Entity: {jsonDebug}");
 
-            var result = await _api.Entidades.CriarAsync(request);
+            var result = await _api.Entities.CreateAsync(request);
             if (result.Success && result.Data?.Ret == 0)
             {
-                Log($"Entidade criada: {nomeLog} (ID: {result.Data.EntityId})");
-                await CarregarEntidades(_cadastroSelecionado.Id);
+                Log($"Entity created: {nameLog} (ID: {result.Data.EntityId})");
+                await LoadEntities(_selectedRegistry.Id);
+            }
+            else if (result.IsConflict)
+            {
+                // HTTP 409 = entity already exists on the controller.
+                Log($"Entity already exists: {nameLog} (HTTP 409 Conflict)");
+
+                var answer = MessageBox.Show(
+                    $"The entity '{nameLog}' already exists on the controller.\n\nDo you want to overwrite the existing data?",
+                    "Entity already registered",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (answer == DialogResult.Yes)
+                {
+                    request.Overwrite = true;
+                    var retryResult = await _api.Entities.CreateAsync(request);
+                    if (retryResult.Success && retryResult.Data?.Ret == 0)
+                    {
+                        Log($"Entity overwritten: {nameLog} (entity_id={retryResult.Data.EntityId})");
+                        await LoadEntities(_selectedRegistry.Id);
+                    }
+                    else
+                    {
+                        var msg = $"Error overwriting entity (HTTP {retryResult.StatusCode}):\n{retryResult.Message}";
+                        Log(msg);
+                        Warning(msg);
+                    }
+                }
             }
             else
             {
-                var msg = $"Erro ao criar entidade:\n{result.Message}\nJSON: {jsonDebug}";
+                var msg = $"Error creating entity (HTTP {result.StatusCode}):\n{result.Message}\nJSON: {jsonDebug}";
+                if (!string.IsNullOrEmpty(result.RawResponse))
+                    msg += $"\nResponse: {result.RawResponse}";
                 Log(msg);
-                Aviso(msg);
+                Warning(msg);
             }
         }
 
         /// <summary>
-        /// Exclui a entidade selecionada e todas as suas mÃ­dias.
-        /// DELETE /entities?id=X (cascade: remove mÃ­dias vinculadas)
+        /// Deletes the selected entity and all its media.
+        /// DELETE /entities?id=X (cascade: removes linked media)
         /// </summary>
         private async void btnExcluirEntidade_Click(object? sender, EventArgs e)
         {
-            if (_entidadeSelecionada == null) { Aviso("Selecione uma entidade"); return; }
+            if (_selectedEntity == null) { Warning("Select an entity"); return; }
 
             var confirm = MessageBox.Show(
-                $"Excluir '{_entidadeSelecionada.NomeExibicao}' e todas suas mÃ­dias?",
-                "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                $"Delete '{_selectedEntity.DisplayName}' and all its media?",
+                "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
 
-            var result = await _api.Entidades.ExcluirAsync(_entidadeSelecionada.EntityId);
+            var result = await _api.Entities.DeleteAsync(_selectedEntity.EntityId);
             if (result.Success)
             {
-                Log($"Entidade excluÃ­da: {_entidadeSelecionada.NomeExibicao}");
-                if (_cadastroSelecionado != null)
-                    await CarregarEntidades(_cadastroSelecionado.Id);
+                Log($"Entity deleted: {_selectedEntity.DisplayName}");
+                if (_selectedRegistry != null)
+                    await LoadEntities(_selectedRegistry.Id);
             }
             else
             {
-                var msg = $"Erro ao excluir entidade:\n{result.Message}";
+                var msg = $"Error deleting entity (HTTP {result.StatusCode}):\n{result.Message}";
                 Log(msg);
-                Aviso(msg);
+                Warning(msg);
             }
         }
 
         private async void btnRefreshEntidades_Click(object? sender, EventArgs e)
         {
-            if (_cadastroSelecionado != null)
-                await CarregarEntidades(_cadastroSelecionado.Id);
+            if (_selectedRegistry != null)
+                await LoadEntities(_selectedRegistry.Id);
         }
 
         // =====================================================================
-        //  MÃDIAS DE ACESSO (NÃ­vel 3)
+        //  ACCESS MEDIA (Level 3)
         //  Endpoint: GET /media?entity_id=X
         // =====================================================================
 
-        /// <summary>Lista as mÃ­dias de acesso da entidade selecionada.</summary>
-        private async Task CarregarMidias(uint entityId)
+        /// <summary>Lists the access media of the selected entity.</summary>
+        private async Task LoadMedia(uint entityId)
         {
             listMidias.Items.Clear();
 
-            var result = await _api.Midias.ListarPorEntidadeAsync(entityId);
+            var result = await _api.Media.ListByEntityAsync(entityId);
 
             if (result.Success && result.Data != null)
             {
-                lblStatusMidias.Text = $"{result.Data.Count} mÃ­dia(s)";
+                lblStatusMidias.Text = $"{result.Data.Count} media item(s)";
                 foreach (var m in result.Data.Items)
                 {
                     var item = new ListViewItem(m.MediaId.ToString());
-                    item.SubItems.Add(m.TipoNome);
-                    item.SubItems.Add(m.Descricao);
-                    item.SubItems.Add(m.Enabled ? "Sim" : "NÃ£o");
+                    item.SubItems.Add(m.TypeName);
+                    item.SubItems.Add(m.DescriptionAlias);
+                    item.SubItems.Add(m.Enabled ? "Yes" : "No");
                     item.Tag = m;
                     listMidias.Items.Add(item);
                 }
             }
             else
             {
-                lblStatusMidias.Text = $"Erro: {result.Message}";
+                lblStatusMidias.Text = $"Error: {result.Message}";
             }
         }
 
         /// <summary>
-        /// Cria uma nova mÃ­dia vinculada Ã  entidade selecionada.
-        /// POST /media com body: { "entity_id": X, "central_registry_id": Y, "type": 21, "description": "..." }
+        /// Creates a new media linked to the selected entity.
+        /// POST /media with body: { "entity_id": X, "central_registry_id": Y, "type": 21, "description": "..." }
         ///
-        /// Tipos comuns:
-        /// - 21 = RFID Wiegand 26 (cartÃ£o de proximidade)
+        /// Common types:
+        /// - 21 = RFID Wiegand 26 (proximity card)
         /// - 22 = RFID Wiegand 34
-        /// - 17 = LPR (placa de veÃ­culo)
+        /// - 17 = LPR (vehicle plate)
         /// - 20 = Facial
         /// </summary>
         private async void btnNovaMidia_Click(object? sender, EventArgs e)
         {
-            if (_entidadeSelecionada == null) { Aviso("Selecione uma entidade"); return; }
+            if (_selectedEntity == null) { Warning("Select an entity"); return; }
 
-            // Seleciona o tipo de mÃ­dia
-            var tipos = new[] { "RFID Wiegand 26", "RFID Wiegand 34", "Placa (LPR)", "Facial" };
-            var tipoIdx = SelecionarOpcao("Tipo de MÃ­dia", "Selecione o tipo:", tipos);
-            if (tipoIdx < 0) return;
+            // Select media type
+            var types = new[] { "RFID Wiegand 26", "RFID Wiegand 34", "Plate (LPR)", "Facial" };
+            var typeIdx = SelectOption("Media Type", "Select the type:", types);
+            if (typeIdx < 0) return;
 
-            int tipoMidia = tipoIdx switch
+            int mediaType = typeIdx switch
             {
-                0 => TipoMidia.Wiegand26,
-                1 => TipoMidia.Wiegand34,
-                2 => TipoMidia.Lpr,
-                3 => TipoMidia.Facial,
-                _ => TipoMidia.Wiegand26
+                0 => MediaType.Wiegand26,
+                1 => MediaType.Wiegand34,
+                2 => MediaType.Lpr,
+                3 => MediaType.Facial,
+                _ => MediaType.Wiegand26
             };
 
-            // LPR sÃ³ deve ser cadastrado para entidades do tipo veÃ­culo.
-            if (tipoMidia == TipoMidia.Lpr && _entidadeSelecionada.Tipo != (int)TipoEntidade.Veiculo)
+            // LPR should only be registered for vehicle-type entities.
+            if (mediaType == MediaType.Lpr && _selectedEntity.TypeAlias != (int)EntityType.Vehicle)
             {
-                Aviso("A mÃ­dia LPR (placa) sÃ³ pode ser cadastrada para entidades do tipo VeÃ­culo.");
+                Warning("LPR (plate) media can only be registered for Vehicle-type entities.");
                 return;
             }
 
-            string? descricao;
-            if (tipoMidia == TipoMidia.Lpr)
+            string? description;
+            if (mediaType == MediaType.Lpr)
             {
-                // Para veÃ­culo, reaproveita a prÃ³pria placa da entidade sem perguntar novamente.
-                descricao = _entidadeSelecionada.Doc;
-                if (string.IsNullOrWhiteSpace(descricao))
+                // For vehicles, reuse the entity plate without asking again.
+                description = _selectedEntity.Doc;
+                if (string.IsNullOrWhiteSpace(description))
                 {
-                    Aviso("Este veÃ­culo nÃ£o possui placa preenchida no campo documento.");
+                    Warning("This vehicle does not have a plate filled in the document field.");
                     return;
                 }
             }
             else
             {
-                descricao = InputBox("Nova MÃ­dia", "CÃ³digo/DescriÃ§Ã£o da mÃ­dia:");
+                description = InputBox("New Media", "Media code/description:");
             }
-            if (string.IsNullOrEmpty(descricao)) return;
+            if (string.IsNullOrEmpty(description)) return;
 
-            var request = new CriarMidiaRequest
+            var request = new CreateMediaRequest
             {
-                EntityId = _entidadeSelecionada.EntityId,
-                CadastroId = _entidadeSelecionada.CadastroId,
-                Tipo = tipoMidia,
-                Descricao = descricao
+                EntityId = _selectedEntity.EntityId,
+                RegistryId = _selectedEntity.RegistryId,
+                TypeAlias = mediaType,
+                DescriptionAlias = description
             };
 
-            // EXPLICAÃ‡ÃƒO: O backend valida o formato da mÃ­dia baseado no conteÃºdo
-            // do campo "descricao". Para RFID, ele aceita formatos Wiegand/CODE/HEX.
-            // Para LPR (placa), se enviarmos apenas a descricao, o backend tenta
-            // validar como RFID e retorna erro "formato RFID invalido".
-            // 
-            // SOLUÃ‡ÃƒO: Enviar ns32_0 e ns32_1 indica ao backend que os dados binÃ¡rios
-            // jÃ¡ foram processados, entÃ£o ele nÃ£o aplica a validaÃ§Ã£o RFID.
-            // Para LPR manual, enviamos 0 em ambos (o backend ignora para LPR).
-            // 
-            // NOTA: A forma RECOMENDADA de criar LPR Ã© usando lpr_ativo=true no cadastro
-            // da entidade (veÃ­culo), nÃ£o via POST /media manual.
-            if (tipoMidia == TipoMidia.Lpr)
+            // EXPLANATION: The backend validates the media format based on the content
+            // of the "description" field. For RFID, it accepts Wiegand/CODE/HEX formats.
+            // For LPR (plate), if we send only the description, the backend tries
+            // to validate it as RFID and returns "invalid RFID format" error.
+            //
+            // SOLUTION: Sending ns32_0 and ns32_1 tells the backend that the binary data
+            // has already been processed, so it does not apply RFID validation.
+            // For manual LPR, we send 0 in both (the backend ignores it for LPR).
+            //
+            // NOTE: The RECOMMENDED way to create LPR is using lpr_active=true on the
+            // vehicle entity registration, not via manual POST /media.
+            if (mediaType == MediaType.Lpr)
             {
                 request.Ns32_0 = 0;
                 request.Ns32_1 = 0;
             }
 
-            // Log do JSON para debug
+            // Log JSON for debug
             var jsonDebug = System.Text.Json.JsonSerializer.Serialize(request);
-            Log($"DEBUG JSON Midia: {jsonDebug}");
+            Log($"DEBUG JSON Media: {jsonDebug}");
 
-            var result = await _api.Midias.CriarAsync(request);
+            var result = await _api.Media.CreateAsync(request);
             if (result.Success && result.Data?.Ret == 0)
             {
-                Log($"MÃ­dia criada: {descricao} (ID: {result.Data.MediaId})");
-                await CarregarMidias(_entidadeSelecionada.EntityId);
+                Log($"Media created: {description} (ID: {result.Data.MediaId})");
+                await LoadMedia(_selectedEntity.EntityId);
             }
             else
             {
-                var msg = $"Erro ao criar mÃ­dia:\n{result.Message}\nJSON: {jsonDebug}";
+                var msg = $"Error creating media (HTTP {result.StatusCode}):\n{result.Message}\nJSON: {jsonDebug}";
                 Log(msg);
-                Aviso(msg);
+                Warning(msg);
             }
         }
 
         /// <summary>
-        /// Exclui a mÃ­dia selecionada.
+        /// Deletes the selected media.
         /// DELETE /media?id=X
         /// </summary>
         private async void btnExcluirMidia_Click(object? sender, EventArgs e)
         {
-            if (listMidias.SelectedItems.Count == 0) { Aviso("Selecione uma mÃ­dia"); return; }
+            if (listMidias.SelectedItems.Count == 0) { Warning("Select a media item"); return; }
 
-            var midia = listMidias.SelectedItems[0].Tag as MidiaAcesso;
-            if (midia == null) return;
+            var media = listMidias.SelectedItems[0].Tag as AccessMedia;
+            if (media == null) return;
 
-            // ConfirmaÃ§Ã£o antes de excluir
+            // Confirmation before deleting
             var confirm = MessageBox.Show(
-                $"Tem certeza que deseja excluir a mÃ­dia '{midia.Descricao}'?\n\nEsta aÃ§Ã£o nÃ£o pode ser desfeita.",
-                "Confirmar ExclusÃ£o",
+                $"Are you sure you want to delete the media '{media.DescriptionAlias}'?\n\nThis action cannot be undone.",
+                "Confirm Deletion",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
 
-            var result = await _api.Midias.ExcluirAsync(midia.MediaId);
+            var result = await _api.Media.DeleteAsync(media.MediaId);
             if (result.Success)
             {
-                Log($"MÃ­dia excluÃ­da: {midia.Descricao}");
-                if (_entidadeSelecionada != null)
-                    await CarregarMidias(_entidadeSelecionada.EntityId);
+                Log($"Media deleted: {media.DescriptionAlias}");
+                if (_selectedEntity != null)
+                    await LoadMedia(_selectedEntity.EntityId);
             }
             else
             {
-                var msg = $"Erro ao excluir mÃ­dia:\n{result.Message}";
+                var msg = $"Error deleting media (HTTP {result.StatusCode}):\n{result.Message}";
                 Log(msg);
-                Aviso(msg);
+                Warning(msg);
             }
         }
 
         private async void btnRefreshMidias_Click(object? sender, EventArgs e)
         {
-            if (_entidadeSelecionada != null)
-                await CarregarMidias(_entidadeSelecionada.EntityId);
+            if (_selectedEntity != null)
+                await LoadMedia(_selectedEntity.EntityId);
         }
 
         // =====================================================================
-        //  DETALHES DA MIDIA (Duplo clique)
+        //  MEDIA DETAILS (Double click)
         // =====================================================================
 
         /// <summary>
-        /// Abre o formulÃ¡rio de detalhes da mÃ­dia ao dar duplo clique.
+        /// Opens the media details form on double click.
         /// </summary>
         private async void listMidias_DoubleClick(object? sender, EventArgs e)
         {
             if (listMidias.SelectedItems.Count == 0) return;
 
-            var midia = listMidias.SelectedItems[0].Tag as MidiaAcesso;
-            if (midia == null) return;
+            var media = listMidias.SelectedItems[0].Tag as AccessMedia;
+            if (media == null) return;
 
-            using var form = new FormDetalheMidia(midia);
-            
+            using var form = new FormDetalheMidia(media);
+
             if (form.ShowDialog(this) == DialogResult.OK && form.FoiModificada)
             {
-                bool sucesso = true;
-                string mensagem = "";
+                bool success = true;
+                string message = "";
 
-                // Atualiza o estado de habilitaÃ§Ã£o se alterado
-                if (midia.Enabled != form.NovoEstadoEnabled)
+                // Update the enabled state if changed
+                if (media.Enabled != form.NovoEstadoEnabled)
                 {
-                    var result = await _api.Midias.AlterarStatusAsync(midia.MediaId, form.NovoEstadoEnabled);
+                    var result = await _api.Media.ChangeStatusAsync(media.MediaId, form.NovoEstadoEnabled);
                     if (!result.Success)
                     {
-                        sucesso = false;
-                        mensagem = result.Message ?? "Erro ao alterar status";
+                        success = false;
+                        message = result.Message ?? "Error changing status";
                     }
                     else
                     {
-                        var status = form.NovoEstadoEnabled ? "liberada" : "bloqueada";
-                        Log($"MÃ­dia {midia.Descricao} {status} com sucesso!");
+                        var status = form.NovoEstadoEnabled ? "enabled" : "blocked";
+                        Log($"Media {media.DescriptionAlias} {status} successfully!");
                     }
                 }
 
-                // Atualiza a data de permissao se alterada
-                if (sucesso && form.DataPermissaoAlterada)
+                // Update the permission date if changed
+                if (success && form.DataPermissaoAlterada)
                 {
-                    var result = await _api.Midias.AlterarExpiracaoAsync(midia.MediaId, form.NovaDataPermissao);
+                    var result = await _api.Media.ChangeExpirationAsync(media.MediaId, form.NovaDataPermissao);
                     if (!result.Success)
                     {
-                        sucesso = false;
-                        mensagem = result.Message ?? "Erro ao alterar data de permissao";
+                        success = false;
+                        message = result.Message ?? "Error changing permission date";
                     }
                     else
                     {
                         if (form.NovaDataPermissao > 0)
-                            Log($"MÃ­dia {midia.Descricao} permitida atÃ© {DateTimeOffset.FromUnixTimeSeconds(form.NovaDataPermissao).LocalDateTime:dd/MM/yyyy HH:mm}");
+                            Log($"Media {media.DescriptionAlias} permitted until {DateTimeOffset.FromUnixTimeSeconds(form.NovaDataPermissao).LocalDateTime:dd/MM/yyyy HH:mm}");
                         else
-                            Log($"Data limite removida da mÃ­dia {midia.Descricao}");
+                            Log($"Expiration date removed from media {media.DescriptionAlias}");
                     }
                 }
 
-                // Se houve erro, mostra mensagem
-                if (!sucesso)
+                // If there was an error, show the message
+                if (!success)
                 {
-                    var msg = $"Erro ao atualizar mÃ­dia:\n{mensagem}";
+                    var msg = $"Error updating media:\n{message}";
                     Log(msg);
-                    Aviso(msg);
+                    Warning(msg);
                 }
 
-                // Recarrega a lista em qualquer caso
-                if (_entidadeSelecionada != null)
-                    await CarregarMidias(_entidadeSelecionada.EntityId);
+                // Reload the list in any case
+                if (_selectedEntity != null)
+                    await LoadMedia(_selectedEntity.EntityId);
             }
         }
 
@@ -828,53 +862,48 @@ namespace SmartSdk
             txtLog.AppendText($"[{ts}] {msg}{Environment.NewLine}");
         }
 
-        private void Aviso(string msg) =>
-            MessageBox.Show(msg, "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        private void Warning(string msg) =>
+            MessageBox.Show(msg, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-        /// <summary>Exibe um InputBox simples (diÃ¡logo de texto)</summary>
-        private string? InputBox(string titulo, string prompt)
+        /// <summary>Displays a simple InputBox (text dialog)</summary>
+        private string? InputBox(string title, string prompt)
         {
-            var form = new Form { Text = titulo, Width = 400, Height = 150, StartPosition = FormStartPosition.CenterParent };
+            var form = new Form { Text = title, Width = 400, Height = 150, StartPosition = FormStartPosition.CenterParent };
             var lbl = new Label { Text = prompt, Left = 10, Top = 10, Width = 360 };
             var txt = new TextBox { Left = 10, Top = 35, Width = 360 };
             var btnOk = new Button { Text = "OK", Left = 220, Top = 70, Width = 75, DialogResult = DialogResult.OK };
-            var btnCancel = new Button { Text = "Cancelar", Left = 300, Top = 70, Width = 75, DialogResult = DialogResult.Cancel };
+            var btnCancel = new Button { Text = "Cancel", Left = 300, Top = 70, Width = 75, DialogResult = DialogResult.Cancel };
             form.Controls.AddRange(new Control[] { lbl, txt, btnOk, btnCancel });
             form.AcceptButton = btnOk;
             form.CancelButton = btnCancel;
             return form.ShowDialog() == DialogResult.OK ? txt.Text : null;
         }
 
-        /// <summary>Exibe um diÃ¡logo de seleÃ§Ã£o de opÃ§Ãµes</summary>
-        private int SelecionarOpcao(string titulo, string prompt, string[] opcoes)
+        /// <summary>Displays an option selection dialog</summary>
+        private int SelectOption(string title, string prompt, string[] options)
         {
-            var form = new Form { Text = titulo, Width = 350, Height = 200, StartPosition = FormStartPosition.CenterParent };
+            var form = new Form { Text = title, Width = 350, Height = 200, StartPosition = FormStartPosition.CenterParent };
             var lbl = new Label { Text = prompt, Left = 10, Top = 10, Width = 320 };
             var combo = new ComboBox { Left = 10, Top = 35, Width = 320, DropDownStyle = ComboBoxStyle.DropDownList };
-            combo.Items.AddRange(opcoes);
+            combo.Items.AddRange(options);
             combo.SelectedIndex = 0;
             var btnOk = new Button { Text = "OK", Left = 170, Top = 70, Width = 75, DialogResult = DialogResult.OK };
-            var btnCancel = new Button { Text = "Cancelar", Left = 250, Top = 70, Width = 75, DialogResult = DialogResult.Cancel };
+            var btnCancel = new Button { Text = "Cancel", Left = 250, Top = 70, Width = 75, DialogResult = DialogResult.Cancel };
             form.Controls.AddRange(new Control[] { lbl, combo, btnOk, btnCancel });
             form.AcceptButton = btnOk;
             form.CancelButton = btnCancel;
             return form.ShowDialog() == DialogResult.OK ? combo.SelectedIndex : -1;
         }
 
-        /// <summary>Pede um ID opcional (0 = automÃ¡tico) e valida entrada numÃ©rica.</summary>
-        private uint SolicitarIdOpcional(string titulo, string prompt)
+        /// <summary>Requests an optional ID (0 = automatic) and validates numeric input.</summary>
+        private uint RequestOptionalId(string title, string prompt)
         {
-            var valor = InputBox(titulo, prompt);
-            if (string.IsNullOrWhiteSpace(valor)) return 0;
-            if (uint.TryParse(valor.Trim(), out uint id)) return id;
-            Aviso("ID invÃ¡lido. SerÃ¡ usado 0 (automÃ¡tico).");
+            var value = InputBox(title, prompt);
+            if (string.IsNullOrWhiteSpace(value)) return 0;
+            if (uint.TryParse(value.Trim(), out uint id)) return id;
+            Warning("Invalid ID. Using 0 (automatic).");
             return 0;
         }
 
     }
 }
-
-
-
-
-

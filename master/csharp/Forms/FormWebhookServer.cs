@@ -5,8 +5,8 @@ using MobiCortex.Sdk.Services;
 namespace SmartSdk
 {
     /// <summary>
-    /// Formulário de teste do Servidor Webhook.
-    /// Recebe eventos HTTP POST de controladores MobiCortex.
+    /// Webhook Server test form.
+    /// Receives HTTP POST events from MobiCortex controllers.
     /// </summary>
     public partial class FormWebhookServer : Form
     {
@@ -20,23 +20,23 @@ namespace SmartSdk
 
         public FormWebhookServer(IMobiCortexClient api) : this()
         {
-            // Preenche informações se disponíveis
+            // Fill information if available
         }
 
         private void FormWebhookServer_Load(object? sender, EventArgs e)
         {
             txtPorta.Text = "8080";
             chkAuth.Checked = false;
-            AtualizarUrl();
-            
-            // Aviso importante
-            Log("⚠️ AVISO: Este é um servidor webhook de REFERÊNCIA para testes.");
-            Log("Não foi testado para alta carga (máx ~20 req/seg).");
-            Log("Para produção com muitos dispositivos, use ASP.NET Core, AWS API Gateway, etc.");
+            UpdateUrl();
+
+            // Important notice
+            Log("WARNING: This is a REFERENCE webhook server for testing.");
+            Log("Not tested for high load (max ~20 req/sec).");
+            Log("For production with many devices, use ASP.NET Core, AWS API Gateway, etc.");
             Log("");
         }
 
-        private void AtualizarUrl()
+        private void UpdateUrl()
         {
             var porta = txtPorta.Text;
             lblUrl.Text = $"http://localhost:{porta}/";
@@ -46,25 +46,25 @@ namespace SmartSdk
         {
             if (_server?.IsRunning == true)
             {
-                await PararServidor();
+                await StopServer();
                 return;
             }
 
-            await IniciarServidor();
+            await StartServer();
         }
 
-        private async Task IniciarServidor()
+        private async Task StartServer()
         {
             try
             {
                 if (!int.TryParse(txtPorta.Text, out var porta))
                 {
-                    MessageBox.Show("Porta inválida", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Invalid port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 btnIniciar.Enabled = false;
-                btnIniciar.Text = "Iniciando...";
+                btnIniciar.Text = "Starting...";
 
                 var authToken = chkAuth.Checked ? txtToken.Text.Trim() : null;
 
@@ -76,43 +76,43 @@ namespace SmartSdk
 
                 if (started)
                 {
-                    btnIniciar.Text = "Parar";
+                    btnIniciar.Text = "Stop";
                     btnIniciar.BackColor = Color.FromArgb(220, 53, 69);
-                    lblStatus.Text = $"Rodando na porta {porta}";
+                    lblStatus.Text = $"Running on port {porta}";
                     lblStatus.ForeColor = Color.DarkGreen;
 
-                    Log($"Servidor webhook iniciado em http://localhost:{porta}/");
-                    Log($"URL para configuração na controladora:");
-                    Log($"  http://SEU_IP:{porta}/webhook");
+                    Log($"Webhook server started at http://localhost:{porta}/");
+                    Log($"URL for controller configuration:");
+                    Log($"  http://YOUR_IP:{porta}/webhook");
                     Log("");
                     if (!string.IsNullOrEmpty(authToken))
                     {
-                        Log($"Autenticação Bearer habilitada");
+                        Log($"Bearer authentication enabled");
                         Log($"Token: {authToken}");
                     }
                     else
                     {
-                        Log("Acesso sem autenticação (atenção!)");
+                        Log("Access without authentication (caution!)");
                     }
                 }
                 else
                 {
-                    lblStatus.Text = "Falha ao iniciar";
+                    lblStatus.Text = "Failed to start";
                     lblStatus.ForeColor = Color.DarkRed;
-                    Log("Falha ao iniciar servidor.");
-                    Log("Dicas:");
-                    Log("  - Execute como Administrador");
-                    Log("  - Ou use: netsh http add urlacl url=http://+:{porta}/ user=SEU_USUARIO");
-                    Log("  - Ou use porta > 1024 sem necessidade de admin");
+                    Log("Failed to start server.");
+                    Log("Tips:");
+                    Log("  - Run as Administrator");
+                    Log($"  - Or use: netsh http add urlacl url=http://+:{porta}/ user=YOUR_USER");
+                    Log("  - Or use a port > 1024 without needing admin");
                     _server = null;
                 }
 
-                AtualizarStats();
+                UpdateStats();
             }
             catch (Exception ex)
             {
-                Log($"Erro: {ex.Message}");
-                lblStatus.Text = "Erro";
+                Log($"Error: {ex.Message}");
+                lblStatus.Text = "Error";
                 lblStatus.ForeColor = Color.DarkRed;
             }
             finally
@@ -121,7 +121,7 @@ namespace SmartSdk
             }
         }
 
-        private async Task PararServidor()
+        private async Task StopServer()
         {
             if (_server != null)
             {
@@ -130,12 +130,12 @@ namespace SmartSdk
                 _server = null;
             }
 
-            btnIniciar.Text = "Iniciar";
+            btnIniciar.Text = "Start";
             btnIniciar.BackColor = SystemColors.Control;
-            lblStatus.Text = "Parado";
+            lblStatus.Text = "Stopped";
             lblStatus.ForeColor = Color.Gray;
-            Log("Servidor parado");
-            AtualizarStats();
+            Log("Server stopped");
+            UpdateStats();
         }
 
         private void OnWebhookReceived(object? sender, WebhookReceivedEventArgs e)
@@ -154,30 +154,30 @@ namespace SmartSdk
                 : e.Body;
 
             Log($"[{timestamp}] {e.Method} {e.Path}");
-            Log($"  De: {e.RemoteIp}");
+            Log($"  From: {e.RemoteIp}");
             Log($"  Content-Type: {e.ContentType}");
             Log($"  Body: {shortBody}");
-            
-            // Tentar extrair informações relevantes do JSON
+
+            // Try to extract relevant information from JSON
             try
             {
                 using var doc = System.Text.Json.JsonDocument.Parse(e.Body);
                 if (doc.RootElement.TryGetProperty("event_type", out var eventType))
                 {
-                    Log($"  Evento: {eventType.GetString()}");
+                    Log($"  Event: {eventType.GetString()}");
                 }
                 if (doc.RootElement.TryGetProperty("device_id", out var deviceId))
                 {
                     Log($"  Device: {deviceId.GetString()}");
                 }
             }
-            catch { /* ignora erro de parse */ }
+            catch { /* ignore parse error */ }
 
             Log("");
 
-            // Atualizar grid
-            AtualizarGrid();
-            AtualizarStats();
+            // Update grid
+            UpdateGrid();
+            UpdateStats();
         }
 
         private void OnLogReceived(object? sender, WebhookLogEventArgs e)
@@ -190,8 +190,8 @@ namespace SmartSdk
 
             var prefix = e.Level switch
             {
-                LogLevel.Error => "[ERRO] ",
-                LogLevel.Warning => "[AVISO] ",
+                LogLevel.Error => "[ERROR] ",
+                LogLevel.Warning => "[WARNING] ",
                 LogLevel.Debug => "[DEBUG] ",
                 _ => "[INFO] "
             };
@@ -199,7 +199,7 @@ namespace SmartSdk
             Log(prefix + e.Message);
         }
 
-        private void AtualizarGrid()
+        private void UpdateGrid()
         {
             gridWebhooks.Rows.Clear();
             foreach (var w in _webhooks.OrderByDescending(w => w.ReceivedAt).Take(100))
@@ -214,20 +214,20 @@ namespace SmartSdk
             }
         }
 
-        private void AtualizarStats()
+        private void UpdateStats()
         {
             if (_server == null)
             {
                 lblTotal.Text = "Total: 0";
-                lblSucesso.Text = "Sucesso: 0";
-                lblErros.Text = "Erros: 0";
+                lblSucesso.Text = "Success: 0";
+                lblErros.Text = "Errors: 0";
                 return;
             }
 
             var stats = _server.GetStats();
             lblTotal.Text = $"Total: {stats.TotalRequestsReceived}";
-            lblSucesso.Text = $"Sucesso: {stats.TotalRequestsSuccess}";
-            lblErros.Text = $"Erros: {stats.TotalRequestsError}";
+            lblSucesso.Text = $"Success: {stats.TotalRequestsSuccess}";
+            lblErros.Text = $"Errors: {stats.TotalRequestsError}";
         }
 
         private void chkAuth_CheckedChanged(object? sender, EventArgs e)
@@ -237,7 +237,7 @@ namespace SmartSdk
 
         private void txtPorta_TextChanged(object? sender, EventArgs e)
         {
-            AtualizarUrl();
+            UpdateUrl();
         }
 
         private void btnLimpar_Click(object? sender, EventArgs e)
@@ -245,15 +245,15 @@ namespace SmartSdk
             txtLog.Clear();
             _webhooks.Clear();
             _server?.ClearHistory();
-            AtualizarGrid();
-            AtualizarStats();
+            UpdateGrid();
+            UpdateStats();
         }
 
         private void btnSalvar_Click(object? sender, EventArgs e)
         {
             if (_webhooks.Count == 0)
             {
-                MessageBox.Show("Nenhum webhook para salvar", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("No webhooks to save", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -270,7 +270,7 @@ namespace SmartSdk
                     WriteIndented = true
                 });
                 File.WriteAllText(dlg.FileName, json);
-                Log($"Webhooks salvos em: {dlg.FileName}");
+                Log($"Webhooks saved to: {dlg.FileName}");
             }
         }
 
@@ -280,7 +280,7 @@ namespace SmartSdk
 
             var index = gridWebhooks.SelectedRows[0].Index;
             var webhook = _webhooks.OrderByDescending(w => w.ReceivedAt).Skip(index).FirstOrDefault();
-            
+
             if (webhook == null) return;
 
             var sb = new System.Text.StringBuilder();
@@ -297,7 +297,7 @@ namespace SmartSdk
             }
             sb.AppendLine();
             sb.AppendLine("Body:");
-            
+
             // Format JSON if possible
             try
             {
@@ -309,7 +309,7 @@ namespace SmartSdk
                 sb.Append(webhook.Body);
             }
 
-            MessageBox.Show(sb.ToString(), "Detalhes do Webhook", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(sb.ToString(), "Webhook Details", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void Log(string message)
