@@ -32,7 +32,15 @@ namespace SmartSdk
             txtPass = new TextBox();
             lblExplicacao = new Label();
             txtLog = new TextBox();
+            gridEventos = new DataGridView();
+            ColHora = new DataGridViewTextBoxColumn();
+            ColEvento = new DataGridViewTextBoxColumn();
+            ColPlaca = new DataGridViewTextBoxColumn();
+            ColRegistered = new DataGridViewTextBoxColumn();
+            ColTopic = new DataGridViewTextBoxColumn();
+            ColPayload = new DataGridViewTextBoxColumn();
             panelTopo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)gridEventos).BeginInit();
             SuspendLayout();
             // 
             // lblExplicacao - Banner explicativo
@@ -215,23 +223,84 @@ namespace SmartSdk
             // txtLog - Log de mensagens recebidas
             // 
             txtLog.BackColor = Color.FromArgb(30, 30, 30);
-            txtLog.Dock = DockStyle.Fill;
+            txtLog.Dock = DockStyle.Bottom;
             txtLog.Font = new Font("Consolas", 9F);
             txtLog.ForeColor = Color.FromArgb(220, 220, 220);
-            txtLog.Location = new Point(0, 135);
+            txtLog.Location = new Point(0, 360);
             txtLog.Multiline = true;
             txtLog.Name = "txtLog";
             txtLog.ReadOnly = true;
             txtLog.ScrollBars = ScrollBars.Vertical;
-            txtLog.Size = new Size(800, 350);
+            txtLog.Size = new Size(800, 90);
             txtLog.TabIndex = 2;
             txtLog.WordWrap = true;
+            // 
+            // gridEventos
+            // 
+            gridEventos.AllowUserToAddRows = false;
+            gridEventos.AllowUserToDeleteRows = false;
+            gridEventos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            gridEventos.BackgroundColor = SystemColors.Window;
+            gridEventos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            gridEventos.Columns.AddRange(new DataGridViewColumn[] { ColHora, ColEvento, ColPlaca, ColRegistered, ColTopic, ColPayload });
+            gridEventos.Dock = DockStyle.Fill;
+            gridEventos.Location = new Point(0, 135);
+            gridEventos.MultiSelect = false;
+            gridEventos.Name = "gridEventos";
+            gridEventos.ReadOnly = true;
+            gridEventos.RowHeadersVisible = false;
+            gridEventos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            gridEventos.TabIndex = 3;
+            gridEventos.CellDoubleClick += gridEventos_CellDoubleClick;
+            // 
+            // ColHora
+            // 
+            ColHora.FillWeight = 70F;
+            ColHora.HeaderText = "Time";
+            ColHora.Name = "ColHora";
+            ColHora.ReadOnly = true;
+            // 
+            // ColEvento
+            // 
+            ColEvento.FillWeight = 70F;
+            ColEvento.HeaderText = "Event";
+            ColEvento.Name = "ColEvento";
+            ColEvento.ReadOnly = true;
+            // 
+            // ColPlaca
+            // 
+            ColPlaca.FillWeight = 80F;
+            ColPlaca.HeaderText = "Plate";
+            ColPlaca.Name = "ColPlaca";
+            ColPlaca.ReadOnly = true;
+            // 
+            // ColRegistered
+            // 
+            ColRegistered.FillWeight = 80F;
+            ColRegistered.HeaderText = "Registered";
+            ColRegistered.Name = "ColRegistered";
+            ColRegistered.ReadOnly = true;
+            // 
+            // ColTopic
+            // 
+            ColTopic.FillWeight = 140F;
+            ColTopic.HeaderText = "Topic";
+            ColTopic.Name = "ColTopic";
+            ColTopic.ReadOnly = true;
+            // 
+            // ColPayload
+            // 
+            ColPayload.FillWeight = 220F;
+            ColPayload.HeaderText = "Payload";
+            ColPayload.Name = "ColPayload";
+            ColPayload.ReadOnly = true;
             // 
             // FormMonitoramento
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(gridEventos);
             Controls.Add(txtLog);
             Controls.Add(panelTopo);
             Controls.Add(lblExplicacao);
@@ -241,6 +310,7 @@ namespace SmartSdk
             Text = "Monitoring — MQTT TCP 1884 (mbcortex/export/event)";
             panelTopo.ResumeLayout(false);
             panelTopo.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)gridEventos).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -257,6 +327,13 @@ namespace SmartSdk
         private Button btnSubscrever;
         private Button btnLimpar;
         private TextBox txtLog;
+        private DataGridView gridEventos;
+        private DataGridViewTextBoxColumn ColHora;
+        private DataGridViewTextBoxColumn ColEvento;
+        private DataGridViewTextBoxColumn ColPlaca;
+        private DataGridViewTextBoxColumn ColRegistered;
+        private DataGridViewTextBoxColumn ColTopic;
+        private DataGridViewTextBoxColumn ColPayload;
         private Label lblHost;
         private TextBox txtHost;
         private Label lblPort;

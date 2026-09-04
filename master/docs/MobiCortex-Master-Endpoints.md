@@ -946,6 +946,6 @@ Webhook:
 
 Exemplos:
 
-- C# WinForms: Monitoring (MQTT) e Webhook Server.
+- C# WinForms: Monitoring (MQTT) lista os eventos em grade; duplo clique abre o JSON. Webhook Server faz o mesmo para POSTs HTTP.
 - Node.js: `nodejs/examples/mqtt_subscribe.js`, `nodejs/examples/webhook_server.js`.
 - Python: `python/examples/mqtt_subscribe.py`, `python/examples/webhook_server.py`.

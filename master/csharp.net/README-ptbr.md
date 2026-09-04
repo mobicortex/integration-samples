@@ -35,7 +35,8 @@ Todos os formularios compartilham uma unica instancia de `MobiCortexApiService`.
 - Conexao MQTT TCP no listener de export da controladora (porta **1884**, mesmo usuario/senha da tela)
 - Topico `mbcortex/export/event` (acesso + LPR). A porta 1883 na controladora e IPC em loopback.
 - Credenciais de demo: `mqttuser` / `mqttpass`. **Subscribe** conecta e assina se ainda nao estiver conectado.
-- O log quebra linha e formata o JSON. O formulario de broker embutido e o caminho **outbound** (a controladora publica neste PC).
+- Eventos aparecem em grade (Hora, Evento, Placa, Registered, Topico, Payload). Duplo clique abre o JSON completo. O log embaixo fica para conexao/status.
+- O formulario de broker embutido e o caminho **outbound** (a controladora publica neste PC).
 
 ### Servidor de webhook
 - Escuta em `0.0.0.0` (LAN). Grave na controladora `http://<IP_LAN_DESTE_PC>:<porta>/webhook` — nao use localhost.

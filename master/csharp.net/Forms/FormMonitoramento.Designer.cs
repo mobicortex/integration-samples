@@ -32,7 +32,15 @@ namespace SmartSdk
             this.txtPass = new TextBox();
             this.lblExplicacao = new Label();
             this.txtLog = new TextBox();
+            this.gridEventos = new DataGridView();
+            this.ColHora = new DataGridViewTextBoxColumn();
+            this.ColEvento = new DataGridViewTextBoxColumn();
+            this.ColPlaca = new DataGridViewTextBoxColumn();
+            this.ColRegistered = new DataGridViewTextBoxColumn();
+            this.ColTopic = new DataGridViewTextBoxColumn();
+            this.ColPayload = new DataGridViewTextBoxColumn();
             this.panelTopo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)this.gridEventos).BeginInit();
             this.SuspendLayout();
             //
             // lblExplicacao - Banner explicativo
@@ -215,23 +223,84 @@ namespace SmartSdk
             // txtLog - Log de mensagens recebidas
             //
             this.txtLog.BackColor = Color.FromArgb(30, 30, 30);
-            this.txtLog.Dock = DockStyle.Fill;
+            this.txtLog.Dock = DockStyle.Bottom;
             this.txtLog.Font = new Font("Consolas", 9F);
             this.txtLog.ForeColor = Color.FromArgb(220, 220, 220);
-            this.txtLog.Location = new Point(0, 135);
+            this.txtLog.Location = new Point(0, 360);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = ScrollBars.Vertical;
-            this.txtLog.Size = new Size(800, 350);
+            this.txtLog.Size = new Size(800, 90);
             this.txtLog.TabIndex = 2;
             this.txtLog.WordWrap = true;
+            //
+            // gridEventos
+            //
+            this.gridEventos.AllowUserToAddRows = false;
+            this.gridEventos.AllowUserToDeleteRows = false;
+            this.gridEventos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.gridEventos.BackgroundColor = SystemColors.Window;
+            this.gridEventos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridEventos.Columns.AddRange(new DataGridViewColumn[] { this.ColHora, this.ColEvento, this.ColPlaca, this.ColRegistered, this.ColTopic, this.ColPayload });
+            this.gridEventos.Dock = DockStyle.Fill;
+            this.gridEventos.Location = new Point(0, 135);
+            this.gridEventos.MultiSelect = false;
+            this.gridEventos.Name = "gridEventos";
+            this.gridEventos.ReadOnly = true;
+            this.gridEventos.RowHeadersVisible = false;
+            this.gridEventos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            this.gridEventos.TabIndex = 3;
+            this.gridEventos.CellDoubleClick += new DataGridViewCellEventHandler(this.gridEventos_CellDoubleClick);
+            //
+            // ColHora
+            //
+            this.ColHora.FillWeight = 70F;
+            this.ColHora.HeaderText = "Time";
+            this.ColHora.Name = "ColHora";
+            this.ColHora.ReadOnly = true;
+            //
+            // ColEvento
+            //
+            this.ColEvento.FillWeight = 70F;
+            this.ColEvento.HeaderText = "Event";
+            this.ColEvento.Name = "ColEvento";
+            this.ColEvento.ReadOnly = true;
+            //
+            // ColPlaca
+            //
+            this.ColPlaca.FillWeight = 80F;
+            this.ColPlaca.HeaderText = "Plate";
+            this.ColPlaca.Name = "ColPlaca";
+            this.ColPlaca.ReadOnly = true;
+            //
+            // ColRegistered
+            //
+            this.ColRegistered.FillWeight = 80F;
+            this.ColRegistered.HeaderText = "Registered";
+            this.ColRegistered.Name = "ColRegistered";
+            this.ColRegistered.ReadOnly = true;
+            //
+            // ColTopic
+            //
+            this.ColTopic.FillWeight = 140F;
+            this.ColTopic.HeaderText = "Topic";
+            this.ColTopic.Name = "ColTopic";
+            this.ColTopic.ReadOnly = true;
+            //
+            // ColPayload
+            //
+            this.ColPayload.FillWeight = 220F;
+            this.ColPayload.HeaderText = "Payload";
+            this.ColPayload.Name = "ColPayload";
+            this.ColPayload.ReadOnly = true;
             //
             // FormMonitoramento
             //
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(800, 450);
+            this.Controls.Add(this.gridEventos);
             this.Controls.Add(this.txtLog);
             this.Controls.Add(this.panelTopo);
             this.Controls.Add(this.lblExplicacao);
@@ -241,6 +310,7 @@ namespace SmartSdk
             this.Text = "Monitoring — MQTT TCP 1884 (mbcortex/export/event)";
             this.panelTopo.ResumeLayout(false);
             this.panelTopo.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)this.gridEventos).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -257,6 +327,13 @@ namespace SmartSdk
         private Button btnSubscrever;
         private Button btnLimpar;
         private TextBox txtLog;
+        private DataGridView gridEventos;
+        private DataGridViewTextBoxColumn ColHora;
+        private DataGridViewTextBoxColumn ColEvento;
+        private DataGridViewTextBoxColumn ColPlaca;
+        private DataGridViewTextBoxColumn ColRegistered;
+        private DataGridViewTextBoxColumn ColTopic;
+        private DataGridViewTextBoxColumn ColPayload;
         private Label lblHost;
         private TextBox txtHost;
         private Label lblPort;

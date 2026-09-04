@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added REST `/mqtt-export` to the SDK and a "Create test user" action on the MQTT client form.
 - MQTT monitoring and MQTT client logs wrap long event lines and pretty-print JSON payloads (`&` stays as `&`, not `\u0026`).
 - Monitoring **Subscribe** connects and subscribes in one step if not already connected.
+- MQTT monitoring lists events in a grid (like the webhook form). Double-click a row to open the payload.
 - Default MQTT demo credentials: `mqttuser` / `mqttpass`.
 - Webhook form shows LAN URLs, exclusive bind on `0.0.0.0`, **Allow Windows Firewall** button, double-click a grid row to open the event.
 

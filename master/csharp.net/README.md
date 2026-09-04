@@ -35,7 +35,8 @@ All forms share a single `MobiCortexApiService` instance.
 - MQTT TCP connection to the controller export listener (port **1884**, same username/password as Settings)
 - Topic `mbcortex/export/event` (access + LPR). Port 1883 on the controller is loopback IPC only.
 - Demo credentials: `mqttuser` / `mqttpass`. **Subscribe** connects and subscribes if you are not already connected.
-- Event log wraps and pretty-prints JSON. Embedded broker form is the **outbound** path (controller publishes to this PC).
+- Events appear in a grid (Time, Event, Plate, Registered, Topic, Payload). Double-click a row to open the full JSON. Connection messages stay in the log at the bottom.
+- Embedded broker form is the **outbound** path (controller publishes to this PC).
 
 ### Webhook server
 - Listens on `0.0.0.0` (LAN). Save `http://<THIS_PC_LAN_IP>:<port>/webhook` on the controller — not localhost.
