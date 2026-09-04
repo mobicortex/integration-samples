@@ -36,6 +36,45 @@ namespace SmartSdk
             Log("");
         }
 
+        private void btnFirewall_Click(object? sender, EventArgs e) => OpenFirewallForCurrentPort();
+
+        private void OpenFirewallForCurrentPort()
+        {
+            if (!int.TryParse(txtPorta.Text.Trim(), out var port))
+            {
+                MessageBox.Show("Invalid port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (WebhookServerService.FirewallRuleExists(port))
+            {
+                Log($"Firewall inbound rule already present for TCP {port}.");
+                MessageBox.Show($"TCP {port} is already allowed in Windows Firewall.", "Firewall",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            Log($"Adding Windows Firewall inbound allow for TCP {port} (UAC)...");
+            if (WebhookServerService.TryAddFirewallRuleElevated(port) &&
+                WebhookServerService.FirewallRuleExists(port))
+            {
+                Log($"Firewall inbound rule added for TCP {port}.");
+                MessageBox.Show($"Windows Firewall now allows TCP {port} from the LAN.", "Firewall",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                Log("Could not add firewall rule (UAC cancelled or failed). Run as Administrator:");
+                Log("  " + WebhookServerService.FirewallNetshCommand(port));
+                MessageBox.Show(
+                    "Could not add the firewall rule.\nAccept the UAC prompt, or run as Administrator:\n\n" +
+                    WebhookServerService.FirewallNetshCommand(port),
+                    "Firewall",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+        }
+
         private void UpdateUrl()
         {
             if (!int.TryParse(txtPorta.Text.Trim(), out var porta))
@@ -95,6 +134,8 @@ namespace SmartSdk
                         Log($"  {url}");
                     Log("Do not use localhost/127.0.0.1 — the controller is another device on the network.");
                     Log("Enable registered + unregistered so access and LPR events are posted.");
+                    if (!WebhookServerService.FirewallRuleExists(porta))
+                        Log("If the controller gets Connection timed out, click Allow Windows Firewall.");
                     Log("");
                     if (!string.IsNullOrEmpty(authToken))
                     {
@@ -116,8 +157,9 @@ namespace SmartSdk
                     lblStatus.ForeColor = Color.DarkRed;
                     Log("Failed to start server.");
                     Log("Tips:");
-                    Log("  - Another process may already be using this port");
-                    Log("  - Try a different port (Windows Firewall may also block inbound LAN traffic)");
+                    Log("  - Another process may already be using this port (filesync-win64 often uses 8080)");
+                    Log("  - Try another port (e.g. 9099) and save that URL on the controller");
+                    Log("  - Windows Firewall (Private) drops LAN TCP if there is no inbound rule");
                 }
 
                 UpdateStats();
@@ -208,13 +250,14 @@ namespace SmartSdk
             gridWebhooks.Rows.Clear();
             foreach (var w in _webhooks.OrderByDescending(w => w.ReceivedAt).Take(100))
             {
-                gridWebhooks.Rows.Add(
+                var i = gridWebhooks.Rows.Add(
                     w.ReceivedAt.ToString("HH:mm:ss"),
                     w.Method,
                     w.Path,
                     w.RemoteIp,
                     w.Body.Length > 50 ? w.Body.Substring(0, 50) + "..." : w.Body
                 );
+                gridWebhooks.Rows[i].Tag = w;
             }
         }
 
@@ -278,14 +321,19 @@ namespace SmartSdk
             }
         }
 
-        private void btnVerDetalhes_Click(object? sender, EventArgs e)
+        private void btnVerDetalhes_Click(object? sender, EventArgs e) => ShowSelectedWebhook();
+
+        private void gridWebhooks_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+                ShowSelectedWebhook();
+        }
+
+        private void ShowSelectedWebhook()
         {
             if (gridWebhooks.SelectedRows.Count == 0) return;
-
-            var index = gridWebhooks.SelectedRows[0].Index;
-            var webhook = _webhooks.OrderByDescending(w => w.ReceivedAt).Skip(index).FirstOrDefault();
-
-            if (webhook == null) return;
+            if (gridWebhooks.SelectedRows[0].Tag is not WebhookReceivedEventArgs webhook)
+                return;
 
             var sb = new System.Text.StringBuilder();
             sb.AppendLine($"Timestamp: {webhook.ReceivedAt:yyyy-MM-dd HH:mm:ss.fff}");
@@ -296,24 +344,29 @@ namespace SmartSdk
             sb.AppendLine();
             sb.AppendLine("Headers:");
             foreach (var h in webhook.Headers)
-            {
                 sb.AppendLine($"  {h.Key}: {h.Value}");
-            }
             sb.AppendLine();
             sb.AppendLine("Body:");
+            sb.Append(MobiCortex.Sdk.Models.MqttExportContract.PrettyJson(webhook.Body));
 
-            // Format JSON if possible
-            try
+            using var dlg = new Form
             {
-                using var doc = System.Text.Json.JsonDocument.Parse(webhook.Body);
-                sb.Append(System.Text.Json.JsonSerializer.Serialize(doc, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
-            }
-            catch
+                Text = $"Webhook {webhook.ReceivedAt:HH:mm:ss}  {webhook.RemoteIp}",
+                StartPosition = FormStartPosition.CenterParent,
+                Size = new Size(780, 580),
+                MinimumSize = new Size(480, 320)
+            };
+            dlg.Controls.Add(new TextBox
             {
-                sb.Append(webhook.Body);
-            }
-
-            MessageBox.Show(sb.ToString(), "Webhook Details", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Multiline = true,
+                ReadOnly = true,
+                Dock = DockStyle.Fill,
+                ScrollBars = ScrollBars.Both,
+                WordWrap = true,
+                Font = new Font("Consolas", 9F),
+                Text = sb.ToString()
+            });
+            dlg.ShowDialog(this);
         }
 
         private void Log(string message)

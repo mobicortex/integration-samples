@@ -259,11 +259,17 @@ Arquivos importantes de exemplo:
 - [`/master/nodejs/examples/cli-config.json`](./master/nodejs/examples/cli-config.json)
   Arquivo de configuracao salvo pelo CLI.
 
+- [`/master/nodejs/examples/mqtt_subscribe.js`](./master/nodejs/examples/mqtt_subscribe.js)
+  Assinante MQTT TCP 1884 (`mbcortex/export/event`).
+
+- [`/master/nodejs/examples/webhook_server.js`](./master/nodejs/examples/webhook_server.js)
+  Receptor HTTP de webhook em `0.0.0.0`.
+
 Resumo da tecnologia:
 
 - Linguagem: JavaScript
 - Runtime: Node.js
-- Integracoes: REST API, fluxo de testes via CLI
+- Integracoes: REST API, MQTT TCP 1884 (`examples/mqtt_subscribe.js`), webhook em `0.0.0.0` (`examples/webhook_server.js`)
 
 ### 5. Exemplo em Python
 
@@ -285,6 +291,12 @@ Arquivos principais:
 - [`/master/python/pyproject.toml`](./master/python/pyproject.toml)
   Metadados do projeto.
 
+- [`/master/python/examples/mqtt_subscribe.py`](./master/python/examples/mqtt_subscribe.py)
+  Assinante MQTT TCP 1884 (`mbcortex/export/event`).
+
+- [`/master/python/examples/webhook_server.py`](./master/python/examples/webhook_server.py)
+  Receptor HTTP de webhook em `0.0.0.0`.
+
 Subpastas importantes:
 
 - [`/master/python/src`](./master/python/src)
@@ -302,7 +314,7 @@ Resumo da tecnologia:
 
 - Linguagem: Python
 - Runtime: Python 3
-- Integracoes: REST API, demo interativa em terminal
+- Integracoes: REST API, MQTT TCP 1884 (`examples/mqtt_subscribe.py`), webhook em `0.0.0.0` (`examples/webhook_server.py`)
 
 ## Mapa da Documentacao
 

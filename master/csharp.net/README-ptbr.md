@@ -32,9 +32,15 @@ Todos os formularios compartilham uma unica instancia de `MobiCortexApiService`.
 - Busca por `entity_id` ou por nome, com paginacao
 
 ### Monitoramento (MQTT)
-- Conexao MQTT TCP no listener de export da controladora (porta **1884**, mesmo usuario da tela)
+- Conexao MQTT TCP no listener de export da controladora (porta **1884**, mesmo usuario/senha da tela)
 - Topico `mbcortex/export/event` (acesso + LPR). A porta 1883 na controladora e IPC em loopback.
-- O formulario de broker embutido e o caminho **outbound**: a controladora publica neste PC.
+- Credenciais de demo: `mqttuser` / `mqttpass`. **Subscribe** conecta e assina se ainda nao estiver conectado.
+- O log quebra linha e formata o JSON. O formulario de broker embutido e o caminho **outbound** (a controladora publica neste PC).
+
+### Servidor de webhook
+- Escuta em `0.0.0.0` (LAN). Grave na controladora `http://<IP_LAN_DESTE_PC>:<porta>/webhook` — nao use localhost.
+- Prefira a porta **9099** se a **8080** estiver ocupada (`filesync-win64`). Use **Allow Windows Firewall** se a placa der `Connection timed out`.
+- Duplo clique na linha (ou View Details) abre o JSON completo do evento.
 
 ### Dashboard
 - Informacoes do dispositivo (modelo, versao de firmware, MAC)

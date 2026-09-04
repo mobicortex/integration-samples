@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -1442,7 +1443,11 @@ namespace MobiCortex.Sdk.Models
             return string.IsNullOrEmpty(trimmed) ? "192.168.0.180" : trimmed;
         }
 
-        private static readonly JsonSerializerOptions PrettyJsonOptions = new() { WriteIndented = true };
+        private static readonly JsonSerializerOptions PrettyJsonOptions = new()
+        {
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
 
         /// <summary>
         /// Indents JSON for log display. Returns the original string if it is not valid JSON.

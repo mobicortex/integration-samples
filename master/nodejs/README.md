@@ -53,7 +53,9 @@ nodejs/
 │
 └── examples/                 # 📋 EXEMPLOS DE USO
     ├── cli.js                # CLI interativo completo
-    └── basic_usage.js        # Exemplo básico como biblioteca
+    ├── basic_usage.js        # Exemplo básico como biblioteca
+    ├── mqtt_subscribe.js     # MQTT TCP 1884 (mbcortex/export/event)
+    └── webhook_server.js     # Receptor HTTP em 0.0.0.0 (LAN)
 ```
 
 ---
@@ -176,6 +178,32 @@ console.log(`Veículo criado: ${vehicleId}`);
 npm run basic
 # ou  
 node examples/basic_usage.js
+```
+
+### 5. MQTT export (TCP 1884) e webhook na LAN
+
+A controladora **não** expõe MQTT via WebSocket. A porta **1883** no equipamento é IPC em loopback.
+
+```bash
+# Assina mbcortex/export/event (zero dependências extras)
+node examples/mqtt_subscribe.js 192.168.0.180 1884 mqttuser mqttpass
+# ou
+npm run mqtt
+
+# Recebe POST da placa em 0.0.0.0:9099
+node examples/webhook_server.js 9099
+# ou
+npm run webhook
+```
+
+Grave na controladora `http://<IP_LAN_DESTE_PC>:9099/webhook` — **não** use localhost. Ative registered + unregistered. Se o TCP der timeout, libere o firewall do Windows. Evite a porta 8080 se o `filesync-win64` já estiver nela.
+
+REST no cliente (`login` primeiro):
+
+```javascript
+await client.getMqttExport();
+await client.saveMqttExportUser(1, { name: 'SDK test', username: 'mqttuser', password: 'mqttpass', active: 1 });
+await client.saveWebhook(1, { url: 'http://192.168.0.3:9099/webhook', registered: 1, unregistered: 1, sensors: 0, logs: 0 });
 ```
 
 ---

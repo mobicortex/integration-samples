@@ -928,3 +928,24 @@ Senha vazia na criação gera uma (volta no JSON uma vez). Senha vazia na ediç�
 ```
 
 `pass` vazio mantém a senha já gravada. A controladora publica o mesmo JSON do webhook neste tópico.
+
+### Como receber os eventos neste PC
+
+Dois caminhos, mesmo payload JSON (acesso + LPR):
+
+1. **MQTT inbound** — cliente TCP na porta **1884**, tópico `mbcortex/export/event`, usuário/senha iguais aos de Settings > MQTT (ex.: `mqttuser` / `mqttpass`). Sem WebSocket. A 1883 no equipamento é IPC em loopback.
+2. **Webhook HTTP** — a controladora faz POST para uma URL **na LAN deste PC**. `localhost` / `127.0.0.1` não funcionam: a placa é outro host.
+
+Webhook:
+
+- Escute em `0.0.0.0:<porta>` (todas as interfaces IPv4).
+- Grave na placa: `http://<IP_LAN_DESTE_PC>:<porta>/webhook` (slots 1..4).
+- Ative `registered` + `unregistered` para acesso e LPR.
+- No Windows, ping pode passar e o TCP dar `Connection timed out` se o firewall Private não tiver regra de entrada. No exemplo C# use **Allow Windows Firewall**.
+- A porta **8080** neste PC MCU costuma estar ocupada pelo `filesync-win64.exe`. Prefira **9099** (ou outra livre).
+
+Exemplos:
+
+- C# WinForms: Monitoring (MQTT) e Webhook Server.
+- Node.js: `nodejs/examples/mqtt_subscribe.js`, `nodejs/examples/webhook_server.js`.
+- Python: `python/examples/mqtt_subscribe.py`, `python/examples/webhook_server.py`.

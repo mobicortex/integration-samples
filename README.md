@@ -259,11 +259,17 @@ Important example files:
 - [`/master/nodejs/examples/cli-config.json`](./master/nodejs/examples/cli-config.json)
   Saved CLI configuration example file.
 
+- [`/master/nodejs/examples/mqtt_subscribe.js`](./master/nodejs/examples/mqtt_subscribe.js)
+  MQTT TCP 1884 subscriber (`mbcortex/export/event`).
+
+- [`/master/nodejs/examples/webhook_server.js`](./master/nodejs/examples/webhook_server.js)
+  HTTP webhook receiver on `0.0.0.0`.
+
 Technology summary:
 
 - Language: JavaScript
 - Runtime: Node.js
-- Integration types: REST API, CLI-based test flow
+- Integration types: REST API, MQTT TCP 1884 (`examples/mqtt_subscribe.js`), webhook on `0.0.0.0` (`examples/webhook_server.js`)
 
 ### 5. Python example
 
@@ -285,6 +291,12 @@ Main files:
 - [`/master/python/pyproject.toml`](./master/python/pyproject.toml)
   Project metadata.
 
+- [`/master/python/examples/mqtt_subscribe.py`](./master/python/examples/mqtt_subscribe.py)
+  MQTT TCP 1884 subscriber (`mbcortex/export/event`).
+
+- [`/master/python/examples/webhook_server.py`](./master/python/examples/webhook_server.py)
+  HTTP webhook receiver on `0.0.0.0`.
+
 Important subfolders:
 
 - [`/master/python/src`](./master/python/src)
@@ -302,7 +314,7 @@ Technology summary:
 
 - Language: Python
 - Runtime: Python 3
-- Integration types: REST API, interactive terminal demo
+- Integration types: REST API, MQTT TCP 1884 (`examples/mqtt_subscribe.py`), webhook on `0.0.0.0` (`examples/webhook_server.py`)
 
 ## Documentation Map
 

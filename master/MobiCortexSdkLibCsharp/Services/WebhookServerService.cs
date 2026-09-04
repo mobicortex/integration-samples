@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -82,6 +83,7 @@ namespace MobiCortex.Sdk.Services
 
                 // 0.0.0.0 = all IPv4 interfaces (LAN). Sockets, not HTTP.sys: no admin / urlacl.
                 _listener = new TcpListener(IPAddress.Any, port);
+                _listener.ExclusiveAddressUse = true;
                 _listener.Start();
                 _running = true;
                 _startedAt = DateTime.Now;
@@ -102,7 +104,9 @@ namespace MobiCortex.Sdk.Services
             catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
             {
                 CleanupFailedStart();
-                Log(LogLevel.Error, $"Error: port {port} is already in use.");
+                Log(LogLevel.Error, $"Error: port {port} is already in use by another process.");
+                if (port == 8080)
+                    Log(LogLevel.Error, "On MCU Windows PCs, filesync-win64.exe often occupies 8080. Use 9099 (or another free port) and save that URL on the controller.");
                 return false;
             }
             catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AccessDenied)
@@ -447,6 +451,82 @@ namespace MobiCortex.Sdk.Services
 #else
             return await stream.ReadAsync(buffer, offset, count);
 #endif
+        }
+
+        public static string FirewallRuleName(int port) => $"SmartSdk webhook TCP {port}";
+
+        public static string FirewallNetshArguments(int port) =>
+            $"advfirewall firewall add rule name=\"{FirewallRuleName(port)}\" dir=in action=allow protocol=TCP localport={port} profile=private,domain";
+
+        public static string FirewallNetshCommand(int port) => "netsh " + FirewallNetshArguments(port);
+
+        public static bool FirewallRuleExists(int port)
+        {
+            try
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName = "netsh",
+                    Arguments = $"advfirewall firewall show rule name=\"{FirewallRuleName(port)}\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+                using var p = Process.Start(psi);
+                if (p == null)
+                    return false;
+                var output = p.StandardOutput.ReadToEnd();
+                p.WaitForExit(8000);
+                return p.ExitCode == 0 &&
+                       output.IndexOf(FirewallRuleName(port), StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Adds inbound allow rules for the TCP port and this executable (one UAC prompt).
+        /// </summary>
+        public static bool TryAddFirewallRuleElevated(int port)
+        {
+            var commands = FirewallNetshCommand(port);
+            try
+            {
+                var exe = Process.GetCurrentProcess().MainModule?.FileName;
+                if (!string.IsNullOrEmpty(exe))
+                {
+                    commands +=
+                        $" & netsh advfirewall firewall add rule name=\"SmartSdk.exe inbound\" dir=in action=allow program=\"{exe}\" enable=yes profile=private,domain";
+                }
+            }
+            catch
+            {
+                /* port rule is enough */
+            }
+
+            var psi = new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                Arguments = "/c " + commands,
+                UseShellExecute = true,
+                Verb = "runas",
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+            try
+            {
+                using var p = Process.Start(psi);
+                if (p == null)
+                    return false;
+                p.WaitForExit(30000);
+                return p.ExitCode == 0;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public static IReadOnlyList<string> GetLanIpv4Addresses()

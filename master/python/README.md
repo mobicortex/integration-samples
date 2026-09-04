@@ -57,6 +57,8 @@ O script demonstra:
 - ✅ Criar **veículos** (entities tipo 2) com LPR
 - ✅ **Apagar** registros
 - ✅ Tratamento de erros completo
+- ✅ REST `/mqtt-export` e `/webhook` no cliente
+- ✅ Exemplos de **MQTT TCP 1884** e **servidor webhook** na LAN (`examples/`)
 
 ---
 
@@ -261,6 +263,28 @@ client.delete_unit(unit_id)
 
 ---
 
+## MQTT export e webhook
+
+A controladora **não** expõe MQTT via WebSocket. Porta **1884** (usuário/senha de Settings > MQTT), tópico `mbcortex/export/event`. Porta **1883** no equipamento é IPC em loopback.
+
+```bash
+# Assina o tópico de export (apenas biblioteca padrão)
+python examples/mqtt_subscribe.py 192.168.0.180 1884 mqttuser mqttpass
+
+# Recebe POST da placa em 0.0.0.0:9099
+python examples/webhook_server.py 9099
+```
+
+Grave na controladora `http://<IP_LAN_DESTE_PC>:9099/webhook` — **não** use localhost. Ative registered + unregistered. No Windows, libere o firewall se a placa der `Connection timed out`. Evite a porta 8080 se o `filesync-win64` já estiver nela.
+
+REST no cliente (`login()` primeiro):
+
+```python
+client.get_mqtt_export()
+client.save_mqtt_export_user(1, "SDK test", "mqttuser", "mqttpass")
+client.save_webhook(1, "http://192.168.0.3:9099/webhook", registered=1, unregistered=1)
+```
+
 ## 🔌 Endpoints da API
 
 | Operação | Método | Endpoint |
@@ -270,6 +294,8 @@ client.delete_unit(unit_id)
 | Apagar Unidade | DELETE | `/mbcortex/master/api/v1/central-registry?id=X` |
 | Criar Veículo | POST | `/mbcortex/master/api/v1/entities` |
 | Apagar Veículo | DELETE | `/mbcortex/master/api/v1/entities?id=X` |
+| MQTT export | GET/POST | `/mbcortex/master/api/v1/mqtt-export` |
+| Webhook | GET/POST/DELETE | `/mbcortex/master/api/v1/webhook?id=1..4` |
 
 ---
 

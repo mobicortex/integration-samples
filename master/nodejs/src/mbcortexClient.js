@@ -476,6 +476,38 @@ class MbcortexClient {
     await this.request('DELETE', `entities?id=${personId}`);
     console.log(`✓ Pessoa ${personId} removida`);
   }
+
+  /**
+   * MQTT export (Linux). Port 1884 inbound; 1883 on the device is loopback IPC.
+   * Does not exist on ESP32/M3127.
+   */
+  async getMqttExport() {
+    return this.request('GET', 'mqtt-export');
+  }
+
+  async saveMqttExportUser(id, body) {
+    return this.request('POST', `mqtt-export/user?id=${id}`, { body });
+  }
+
+  async deleteMqttExportUser(id) {
+    return this.request('DELETE', `mqtt-export/user?id=${id}`);
+  }
+
+  async saveMqttExportClient(body) {
+    return this.request('POST', 'mqtt-export/client', { body });
+  }
+
+  async listWebhooks() {
+    return this.request('GET', 'webhook');
+  }
+
+  async saveWebhook(id, body) {
+    return this.request('POST', `webhook?id=${id}`, { body });
+  }
+
+  async deleteWebhook(id) {
+    return this.request('DELETE', `webhook?id=${id}`);
+  }
 }
 
 module.exports = MbcortexClient;

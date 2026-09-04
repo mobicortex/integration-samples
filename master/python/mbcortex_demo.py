@@ -262,6 +262,46 @@ class MbcortexClient:
         if status == 200 and isinstance(data, dict) and data.get("ret") == 0:
             return
         raise MbcortexError(f"Falha ao apagar veiculo: {data}")
+
+    def get_mqtt_export(self):
+        """GET /mqtt-export — Linux only. Port 1884 inbound; 1883 is loopback IPC."""
+        _status, data = self._request("GET", "/mbcortex/master/api/v1/mqtt-export")
+        return data
+
+    def save_mqtt_export_user(self, user_id: int, name: str, username: str, password: str = "", active: int = 1):
+        _status, data = self._request(
+            "POST", "/mbcortex/master/api/v1/mqtt-export/user",
+            params={"id": user_id},
+            json_data={"name": name, "username": username, "password": password, "active": active},
+        )
+        return data
+
+    def delete_mqtt_export_user(self, user_id: int) -> None:
+        self._request("DELETE", "/mbcortex/master/api/v1/mqtt-export/user", params={"id": user_id})
+
+    def save_mqtt_export_client(self, host: str, port: int = 1883, user: str = "", password: str = "",
+                                topic: str = "mbcortex/export/event", active: int = 1, tls: int = 0):
+        _status, data = self._request(
+            "POST", "/mbcortex/master/api/v1/mqtt-export/client",
+            json_data={"active": active, "host": host, "port": port, "user": user, "pass": password, "topic": topic, "tls": tls},
+        )
+        return data
+
+    def list_webhooks(self):
+        _status, data = self._request("GET", "/mbcortex/master/api/v1/webhook")
+        return data
+
+    def save_webhook(self, slot_id: int, url: str, registered: int = 1, unregistered: int = 1,
+                     sensors: int = 0, logs: int = 0):
+        _status, data = self._request(
+            "POST", "/mbcortex/master/api/v1/webhook",
+            params={"id": slot_id},
+            json_data={"url": url, "registered": registered, "unregistered": unregistered, "sensors": sensors, "logs": logs},
+        )
+        return data
+
+    def delete_webhook(self, slot_id: int) -> None:
+        self._request("DELETE", "/mbcortex/master/api/v1/webhook", params={"id": slot_id})
     
     # ============================================================================
     # METODOS DE CONSULTA E PAGINACAO  

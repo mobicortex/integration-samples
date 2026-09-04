@@ -38,6 +38,34 @@ namespace SmartSdk
                 return;
             }
 
+            await ConnectAndSubscribe();
+        }
+
+        private async void btnSubscrever_Click(object? sender, EventArgs e)
+        {
+            if (_mqttClient?.IsConnected != true)
+            {
+                await ConnectAndSubscribe();
+                return;
+            }
+
+            try
+            {
+                var topic = txtTopico.Text.Trim();
+                if (string.IsNullOrEmpty(topic))
+                    topic = MqttExportContract.EventTopic;
+
+                await _mqttClient.SubscribeAsync(topic);
+                Log($"Subscribed to topic: {topic}");
+            }
+            catch (Exception ex)
+            {
+                Log($"Error subscribing: {ex.Message}");
+            }
+        }
+
+        private async Task ConnectAndSubscribe()
+        {
             var host = txtHost.Text.Trim();
             var user = MqttExportContract.NormalizeUsername(txtUser.Text);
             var password = txtPass.Text;
@@ -53,6 +81,7 @@ namespace SmartSdk
             try
             {
                 btnConectar.Enabled = false;
+                btnSubscrever.Enabled = false;
                 Log($"Connecting mqtt://{host}:{port} as {user}");
 
                 _mqttClient = new MqttClientService();
@@ -87,29 +116,7 @@ namespace SmartSdk
             finally
             {
                 btnConectar.Enabled = true;
-            }
-        }
-
-        private async void btnSubscrever_Click(object? sender, EventArgs e)
-        {
-            if (_mqttClient?.IsConnected != true)
-            {
-                Warning("Connect to MQTT first");
-                return;
-            }
-
-            try
-            {
-                var topic = txtTopico.Text.Trim();
-                if (string.IsNullOrEmpty(topic))
-                    topic = MqttExportContract.EventTopic;
-
-                await _mqttClient.SubscribeAsync(topic);
-                Log($"Subscribed to topic: {topic}");
-            }
-            catch (Exception ex)
-            {
-                Log($"Error subscribing: {ex.Message}");
+                btnSubscrever.Enabled = true;
             }
         }
 

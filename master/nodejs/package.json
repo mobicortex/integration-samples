@@ -7,6 +7,8 @@
   "scripts": {
     "cli": "node examples/cli.js",
     "basic": "node examples/basic_usage.js",
+    "mqtt": "node examples/mqtt_subscribe.js",
+    "webhook": "node examples/webhook_server.js",
     "start": "node examples/cli.js",
     "legacy": "node main.js"
   },

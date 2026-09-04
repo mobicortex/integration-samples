@@ -24,6 +24,7 @@ namespace SmartSdk
             this.txtPorta = new TextBox();
             this.label1 = new Label();
             this.btnIniciar = new Button();
+            this.btnFirewall = new Button();
             this.lblStatus = new Label();
             this.txtLog = new TextBox();
             this.btnLimpar = new Button();
@@ -128,11 +129,21 @@ namespace SmartSdk
             this.btnIniciar.UseVisualStyleBackColor = true;
             this.btnIniciar.Click += this.btnIniciar_Click;
             // 
+            // btnFirewall
+            // 
+            this.btnFirewall.Location = new Point(130, 125);
+            this.btnFirewall.Name = "btnFirewall";
+            this.btnFirewall.Size = new Size(170, 40);
+            this.btnFirewall.TabIndex = 2;
+            this.btnFirewall.Text = "Allow Windows Firewall";
+            this.btnFirewall.UseVisualStyleBackColor = true;
+            this.btnFirewall.Click += this.btnFirewall_Click;
+            // 
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
             this.lblStatus.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            this.lblStatus.Location = new Point(140, 137);
+            this.lblStatus.Location = new Point(310, 137);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new Size(51, 15);
             this.lblStatus.TabIndex = 2;
@@ -210,6 +221,7 @@ namespace SmartSdk
             this.gridWebhooks.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             this.gridWebhooks.Size = new Size(370, 270);
             this.gridWebhooks.TabIndex = 0;
+            this.gridWebhooks.CellDoubleClick += this.gridWebhooks_CellDoubleClick;
             // 
             // ColTimestamp
             // 
@@ -301,6 +313,7 @@ namespace SmartSdk
             this.Controls.Add(this.btnLimpar);
             this.Controls.Add(this.txtLog);
             this.Controls.Add(this.lblStatus);
+            this.Controls.Add(this.btnFirewall);
             this.Controls.Add(this.btnIniciar);
             this.Controls.Add(this.groupBox1);
             this.MinimumSize = new Size(800, 540);
@@ -324,6 +337,7 @@ namespace SmartSdk
         private Label label3;
         private Label lblUrl;
         private Button btnIniciar;
+        private Button btnFirewall;
         private Label lblStatus;
         private TextBox txtLog;
         private Button btnLimpar;
