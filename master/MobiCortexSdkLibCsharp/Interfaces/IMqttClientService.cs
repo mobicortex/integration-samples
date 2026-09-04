@@ -21,12 +21,16 @@ namespace MobiCortex.Sdk.Interfaces
         event EventHandler? Disconnected;
 
         /// <summary>
-        /// Connects to the controller's MQTT broker via WebSocket.
+        /// Connects to the controller export broker over TCP (port 1884).
+        /// Username is the export credential saved in Settings (same string).
+        /// Subscribe to mbcortex/export/event — ACL blocks mcu/# and SMART topics.
         /// </summary>
-        /// <param name="wsUrl">WebSocket URL (e.g.: wss://192.168.0.100:4449/mbcortex/master/api/v1/mqtt)</param>
-        /// <param name="sessionKey">Session key obtained at login</param>
-        /// <param name="topics">Topics to subscribe to (e.g.: "mbcortex/master/events/#")</param>
-        /// <returns>True if connected successfully</returns>
+        Task<bool> ConnectTcpAsync(string host, int port, string username, string password, IEnumerable<string> topics);
+
+        /// <summary>
+        /// Legacy WebSocket connect. The Master does not expose MQTT over WebSocket;
+        /// use <see cref="ConnectTcpAsync"/> against port 1884.
+        /// </summary>
         Task<bool> ConnectAsync(string wsUrl, string sessionKey, IEnumerable<string> topics);
 
         /// <summary>

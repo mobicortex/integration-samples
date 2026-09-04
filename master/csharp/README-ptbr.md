@@ -32,9 +32,9 @@ Todos os formularios compartilham uma unica instancia de `MobiCortexApiService`.
 - Busca por `entity_id` ou por nome, com paginacao
 
 ### Monitoramento (MQTT)
-- Conexao MQTT ao controlador (porta 1883)
-- Recebimento de eventos de acesso em tempo real
-- Exibicao formatada de eventos no console
+- Conexao MQTT TCP no listener de export da controladora (porta **1884**, mesmo usuario da tela)
+- Topico `mbcortex/export/event` (acesso + LPR). A porta 1883 na controladora e IPC em loopback.
+- O formulario de broker embutido e o caminho **outbound**: a controladora publica neste PC.
 
 ### Dashboard
 - Informacoes do dispositivo (modelo, versao de firmware, MAC)

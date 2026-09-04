@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using System.Text;
 using MQTTnet;
 #if NETFRAMEWORK
@@ -31,6 +33,60 @@ namespace MobiCortex.Sdk.Services
         /// </summary>
         public MqttClientService()
         {
+        }
+
+        /// <inheritdoc/>
+        public async Task<bool> ConnectTcpAsync(string host, int port, string username, string password, IEnumerable<string> topics)
+        {
+            if (_client != null && _client.IsConnected)
+            {
+                await DisconnectAsync();
+            }
+
+            try
+            {
+#if NET8_0_OR_GREATER
+                var factory = new MqttClientFactory();
+#else
+                var factory = new MqttFactory();
+#endif
+                _client = factory.CreateMqttClient();
+
+                _client.ApplicationMessageReceivedAsync += OnMessageReceived;
+                _client.DisconnectedAsync += OnDisconnected;
+
+                var login = MobiCortex.Sdk.Models.MqttExportContract.NormalizeUsername(username);
+                var options = new MqttClientOptionsBuilder()
+                    .WithTcpServer(host, port)
+                    .WithCredentials(login, password)
+                    .WithProtocolVersion(MqttProtocolVersion.V311)
+                    .WithCleanSession()
+                    .Build();
+
+                var result = await _client.ConnectAsync(options, CancellationToken.None);
+
+                if (result.ResultCode != MqttClientConnectResultCode.Success)
+                {
+                    var reason = string.IsNullOrEmpty(result.ReasonString)
+                        ? result.ResultCode.ToString()
+                        : $"{result.ResultCode}: {result.ReasonString}";
+                    Debug.WriteLine($"[MQTT] TCP connect failed as {login}: {reason}");
+                    throw new InvalidOperationException(
+                        $"MQTT refused login '{login}' on {host}:{port} ({reason}). Use the same username/password saved in Settings > MQTT.");
+                }
+
+                foreach (var topic in topics)
+                {
+                    await SubscribeAsync(topic);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[MQTT] TCP connect error: {ex.Message}");
+                return false;
+            }
         }
 
         /// <inheritdoc/>

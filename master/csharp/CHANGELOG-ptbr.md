@@ -7,6 +7,14 @@ e este projeto segue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Não Lançado]
 
+### Alterado
+- Cliente MQTT e monitoramento passam a usar TCP 1884 e o tópico `mbcortex/export/event` (sem MQTT via WebSocket).
+- SDK com REST `/mqtt-export` e botão para criar usuário de teste no formulário MQTT.
+- Logs de monitoramento MQTT e do cliente MQTT quebram linhas longas e formatam o JSON do payload.
+
+### Corrigido
+- Servidor HTTP de webhook do exemplo não exige mais Administrador nem `netsh http add urlacl` (usa TcpListener em vez de HttpListener/HTTP.sys).
+
 ## [2026-03-09]
 
 ### Adicionado

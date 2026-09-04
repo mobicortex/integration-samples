@@ -6,7 +6,7 @@ namespace MobiCortex.Sdk.Interfaces
     /// <remarks>
     /// WARNING: This implementation is provided as a reference/example.
     /// <para>
-    /// This embedded HTTP server uses HttpListener and was designed for demonstration,
+    /// This embedded HTTP server uses TcpListener (sockets, no HTTP.sys) and was designed for demonstration,
     /// development and testing with few devices (up to 10-20 requests/second).
     /// </para>
     /// <para>
@@ -42,7 +42,7 @@ namespace MobiCortex.Sdk.Interfaces
         int Port { get; }
 
         /// <summary>
-        /// Server base URL (e.g.: http://localhost:8080).
+        /// Server base URL on the LAN (e.g.: http://192.168.0.10:8080). Not localhost.
         /// </summary>
         string BaseUrl { get; }
 

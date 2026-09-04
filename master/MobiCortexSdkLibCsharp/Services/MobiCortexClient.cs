@@ -11,7 +11,7 @@ namespace MobiCortex.Sdk.Services
     /// <summary>
     /// Main client for integration with MobiCortex controllers.
     /// </summary>
-    public class MobiCortexClient : IMobiCortexClient, IRegistryService, IEntityService, IMediaService, ISystemService, IAccessService, IWebhookConfigService, IVideoSourceService
+    public class MobiCortexClient : IMobiCortexClient, IRegistryService, IEntityService, IMediaService, ISystemService, IAccessService, IWebhookConfigService, IVideoSourceService, IMqttExportService
     {
         private const string API = "/mbcortex/master/api/v1";
         private readonly HttpClient _http;
@@ -50,6 +50,9 @@ namespace MobiCortex.Sdk.Services
 
         /// <inheritdoc/>
         public IVideoSourceService VideoSources => this;
+
+        /// <inheritdoc/>
+        public IMqttExportService MqttExport => this;
 
         /// <summary>
         /// Creates a new instance of the MobiCortex client.
@@ -322,6 +325,28 @@ namespace MobiCortex.Sdk.Services
         async Task<ApiResult<ApiRetResponse>> IWebhookConfigService.TestAsync(int id)
         {
             return await GetAsync<ApiRetResponse>($"/webhook/test?id={id}");
+        }
+        #endregion
+
+        #region IMqttExportService
+        async Task<ApiResult<MqttExportStatus>> IMqttExportService.GetAsync()
+        {
+            return await GetAsync<MqttExportStatus>("/mqtt-export");
+        }
+
+        async Task<ApiResult<MqttExportUser>> IMqttExportService.SaveUserAsync(int id, MqttExportUserRequest request)
+        {
+            return await PostAsync<MqttExportUser>($"/mqtt-export/user?id={id}", request);
+        }
+
+        async Task<ApiResult<ApiRetResponse>> IMqttExportService.DeleteUserAsync(int id)
+        {
+            return await DeleteAsync<ApiRetResponse>($"/mqtt-export/user?id={id}");
+        }
+
+        async Task<ApiResult<MqttExportClientConfig>> IMqttExportService.SaveClientAsync(MqttExportClientRequest request)
+        {
+            return await PostAsync<MqttExportClientConfig>("/mqtt-export/client", request);
         }
         #endregion
 

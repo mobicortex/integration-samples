@@ -534,6 +534,49 @@
           }
         }
       ]
+    },
+    {
+      "name": "MQTT Export",
+      "item": [
+        {
+          "name": "Status",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/mqtt-export"
+          }
+        },
+        {
+          "name": "Salvar Usuario",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SDK test\",\n  \"username\": \"sdktest\",\n  \"password\": \"\",\n  \"active\": 1\n}"
+            },
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/mqtt-export/user?id=1"
+          }
+        },
+        {
+          "name": "Remover Usuario",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/mqtt-export/user?id=1"
+          }
+        },
+        {
+          "name": "Salvar Cliente Outbound",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"active\": 1,\n  \"host\": \"192.168.0.10\",\n  \"port\": 1883,\n  \"user\": \"mcu\",\n  \"pass\": \"\",\n  \"topic\": \"mbcortex/export/event\",\n  \"tls\": 0\n}"
+            },
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/mqtt-export/client"
+          }
+        }
+      ]
     }
   ]
 }

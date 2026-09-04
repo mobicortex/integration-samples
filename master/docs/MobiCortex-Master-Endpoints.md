@@ -889,14 +889,42 @@ Response `200`:
 }
 ```
 
-## MQTT via WebSocket
+## MQTT export (Linux)
 
-Endpoint:
+O Master **não** expõe MQTT via WebSocket. A porta `1883` no equipamento é IPC em loopback.
 
-```text
-wss://<host>/mbcortex/master/api/v1/mqtt
+Integração pública:
+
+- listener TCP **1884** (`allow_anonymous false`, ACL só em `mbcortex/export/#`)
+- tópico `mbcortex/export/event`
+- usuário = o mesmo nome salvo em Configurações (sem prefixo interno)
+
+### GET `/mqtt-export`
+
+```json
+{
+  "ret": 0,
+  "listen_port": 1884,
+  "topic": "mbcortex/export/event",
+  "users": [{ "id": 1, "name": "", "username": "app", "active": 1, "has_pass": 1 }],
+  "client": { "active": 0, "host": "", "port": 1883, "user": "", "topic": "mbcortex/export/event", "tls": 0, "has_pass": 0 }
+}
 ```
 
-Notas:
-- a autenticação usa a mesma `session_key` do login HTTP
-- use este endpoint para integrações nativas via WebSocket/MQTT
+### POST `/mqtt-export/user` (uma credencial; `id=1` se informado)
+
+```json
+{ "name": "App condominio", "username": "integrador", "password": "", "active": 1 }
+```
+
+Senha vazia na criação gera uma (volta no JSON uma vez). Senha vazia na edição mantém a atual.
+
+### DELETE `/mqtt-export/user?id=1`
+
+### POST `/mqtt-export/client`
+
+```json
+{ "active": 1, "host": "broker.cliente.local", "port": 1883, "user": "mcu", "pass": "", "topic": "mbcortex/export/event", "tls": 0 }
+```
+
+`pass` vazio mantém a senha já gravada. A controladora publica o mesmo JSON do webhook neste tópico.

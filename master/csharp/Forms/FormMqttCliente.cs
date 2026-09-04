@@ -1,17 +1,16 @@
-using MobiCortex.Sdk;
 using MobiCortex.Sdk.Interfaces;
+using MobiCortex.Sdk.Models;
 using MobiCortex.Sdk.Services;
-using MQTTnet.Protocol;
 
 namespace SmartSdk
 {
     /// <summary>
-    /// MQTT Client test form.
-    /// Connects to the MobiCortex controller MQTT broker.
+    /// MQTT client: TCP 1884 on the controller, topic mbcortex/export/event.
     /// </summary>
     public partial class FormMqttCliente : Form
     {
         private IMqttClientService? _mqttClient;
+        private readonly IMobiCortexClient? _api;
         private readonly List<MqttMessageReceivedEventArgs> _messages = new();
 
         public FormMqttCliente()
@@ -21,18 +20,23 @@ namespace SmartSdk
 
         public FormMqttCliente(IMobiCortexClient api) : this()
         {
-            txtWsUrl.Text = api.BaseUrl
-                .Replace("https://", "wss://")
-                .Replace("http://", "ws://") + "/mbcortex/master/api/v1/mqtt";
-            txtSessionKey.Text = api.SessionKey ?? "";
+            _api = api;
+            txtWsUrl.Text = MqttExportContract.HostFromBaseUrl(api.BaseUrl);
         }
 
         private void FormMqttCliente_Load(object? sender, EventArgs e)
         {
-            // Default pre-selected topics
             chkEvents.Checked = true;
             chkLogs.Checked = false;
             chkSensors.Checked = false;
+            chkStatus.Checked = false;
+            txtTopicoCustom.Text = MqttExportContract.EventTopic;
+            txtPort.Text = MqttExportContract.ListenPort.ToString();
+            if (string.IsNullOrWhiteSpace(txtUser.Text))
+                txtUser.Text = "mqttuser";
+            if (string.IsNullOrWhiteSpace(txtSessionKey.Text))
+                txtSessionKey.Text = "mqttpass";
+            btnCreateUser.Enabled = _api?.IsAuthenticated == true;
         }
 
         private async void btnConectar_Click(object? sender, EventArgs e)
@@ -50,26 +54,31 @@ namespace SmartSdk
         {
             try
             {
-                var wsUrl = txtWsUrl.Text.Trim();
-                var sessionKey = txtSessionKey.Text.Trim();
+                var host = txtWsUrl.Text.Trim();
+                if (!int.TryParse(txtPort.Text.Trim(), out var port))
+                    port = MqttExportContract.ListenPort;
+                var user = MqttExportContract.NormalizeUsername(txtUser.Text);
+                var password = txtSessionKey.Text;
 
-                if (string.IsNullOrEmpty(wsUrl) || string.IsNullOrEmpty(sessionKey))
+                if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(password))
                 {
-                    MessageBox.Show("Enter the WebSocket URL and Session Key", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Enter host, username and password (create a credential in Settings > MQTT, or use Create test user).",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 btnConectar.Enabled = false;
                 btnConectar.Text = "Connecting...";
 
-                // Collect topics
                 var topics = new List<string>();
-                if (chkEvents.Checked) topics.Add("mbcortex/master/events/#");
-                if (chkLogs.Checked) topics.Add("mbcortex/master/logs/#");
-                if (chkSensors.Checked) topics.Add("mbcortex/master/sensors/#");
-                if (chkStatus.Checked) topics.Add("mbcortex/master/status/#");
+                if (chkEvents.Checked)
+                    topics.Add(MqttExportContract.EventTopic);
                 if (!string.IsNullOrEmpty(txtTopicoCustom.Text))
-                    topics.Add(txtTopicoCustom.Text.Trim());
+                {
+                    var custom = txtTopicoCustom.Text.Trim();
+                    if (!topics.Contains(custom))
+                        topics.Add(custom);
+                }
 
                 if (!topics.Any())
                 {
@@ -83,7 +92,8 @@ namespace SmartSdk
                 _mqttClient.MessageReceived += OnMqttMessageReceived;
                 _mqttClient.Disconnected += OnMqttDisconnected;
 
-                var connected = await _mqttClient.ConnectAsync(wsUrl, sessionKey, topics);
+                Log($"Connecting mqtt://{host}:{port} as {user}");
+                var connected = await _mqttClient.ConnectTcpAsync(host, port, user, password, topics);
 
                 if (connected)
                 {
@@ -91,14 +101,15 @@ namespace SmartSdk
                     btnConectar.BackColor = Color.FromArgb(220, 53, 69);
                     lblStatus.Text = "Connected";
                     lblStatus.ForeColor = Color.DarkGreen;
-                    Log("Connected to MQTT broker");
+                    Log("Connected to export broker");
                     Log($"Subscribed to: {string.Join(", ", topics)}");
+                    Log("ACL is read-only on mbcortex/export/# — publish to this topic will fail.");
                 }
                 else
                 {
                     lblStatus.Text = "Connection failed";
                     lblStatus.ForeColor = Color.DarkRed;
-                    Log("Failed to connect to MQTT broker");
+                    Log("Failed to connect. Check port 1884, username, password, and that mqtt-server was reloaded after creating the user.");
                     _mqttClient = null;
                 }
             }
@@ -130,6 +141,58 @@ namespace SmartSdk
             Log("Disconnected from MQTT broker");
         }
 
+        private async void btnCreateUser_Click(object? sender, EventArgs e)
+        {
+            if (_api == null || !_api.IsAuthenticated)
+            {
+                MessageBox.Show("Log in on MainForm first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                btnCreateUser.Enabled = false;
+                var username = txtUser.Text.Trim();
+                if (username.StartsWith("ext_", StringComparison.OrdinalIgnoreCase))
+                    username = username.Substring(4);
+                if (string.IsNullOrEmpty(username))
+                    username = "sdktest";
+
+                var result = await _api.MqttExport.SaveUserAsync(1, new MqttExportUserRequest
+                {
+                    Name = "SDK test",
+                    Username = username,
+                    Password = "",
+                    Active = 1
+                });
+
+                if (!result.Success || result.Data == null)
+                {
+                    Log($"Create user failed: {result.Message} {result.RawResponse}");
+                    return;
+                }
+
+                txtUser.Text = result.Data.Username;
+                if (!string.IsNullOrEmpty(result.Data.Password))
+                {
+                    txtSessionKey.Text = result.Data.Password;
+                    Log($"Created {result.Data.Username} — password shown once: {result.Data.Password}");
+                }
+                else
+                {
+                    Log($"Updated {result.Data.Username} (password kept). Enter the existing password to connect.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"Create user error: {ex.Message}");
+            }
+            finally
+            {
+                btnCreateUser.Enabled = true;
+            }
+        }
+
         private void OnMqttMessageReceived(object? sender, MqttMessageReceivedEventArgs e)
         {
             if (InvokeRequired)
@@ -140,18 +203,14 @@ namespace SmartSdk
 
             _messages.Add(e);
 
-            // Format for display
             var timestamp = e.ReceivedAt.ToString("HH:mm:ss.fff");
-            var shortPayload = e.Payload.Length > 100
-                ? e.Payload.Substring(0, 100) + "..."
-                : e.Payload;
 
             Log($"[{timestamp}] {e.Topic}");
             Log($"  QoS: {e.QosLevel} | Retain: {e.Retain}");
-            Log($"  Payload: {shortPayload}");
+            Log(MqttExportContract.PrettyJson(e.Payload));
+            MqttExportContract.LogPayloadHints(e.Payload, Log);
             Log("");
 
-            // Update counter
             lblMensagens.Text = $"Messages: {_messages.Count}";
         }
 
@@ -189,7 +248,7 @@ namespace SmartSdk
             }
 
             var result = await _mqttClient.PublishAsync(topic, payload, qos);
-            Log(result ? $"Published to {topic}" : "Failed to publish");
+            Log(result ? $"Published to {topic}" : "Failed to publish (export ACL is read-only)");
         }
 
         private void btnLimpar_Click(object? sender, EventArgs e)

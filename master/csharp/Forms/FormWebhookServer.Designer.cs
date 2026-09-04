@@ -61,14 +61,15 @@ namespace SmartSdk
             // 
             // lblUrl
             // 
-            this.lblUrl.AutoSize = true;
+            this.lblUrl.AutoEllipsis = true;
+            this.lblUrl.AutoSize = false;
             this.lblUrl.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             this.lblUrl.ForeColor = Color.DarkBlue;
-            this.lblUrl.Location = new Point(400, 28);
+            this.lblUrl.Location = new Point(380, 22);
             this.lblUrl.Name = "lblUrl";
-            this.lblUrl.Size = new Size(127, 15);
+            this.lblUrl.Size = new Size(370, 36);
             this.lblUrl.TabIndex = 5;
-            this.lblUrl.Text = "http://localhost:8080/";
+            this.lblUrl.Text = "http://0.0.0.0:8080/webhook";
             // 
             // label3
             // 
@@ -77,7 +78,7 @@ namespace SmartSdk
             this.label3.Name = "label3";
             this.label3.Size = new Size(74, 15);
             this.label3.TabIndex = 4;
-            this.label3.Text = "URL Base:";
+            this.label3.Text = "LAN URL:";
             // 
             // txtToken
             // 

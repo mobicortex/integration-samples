@@ -265,8 +265,7 @@ namespace SmartSdk
             this.lblDescMonitoramento.Name = "lblDescMonitoramento";
             this.lblDescMonitoramento.Size = new System.Drawing.Size(420, 35);
             this.lblDescMonitoramento.TabIndex = 6;
-            this.lblDescMonitoramento.Text = "Receives real-time events via MQTT over WebSocket. Monitors access, sensors " +
-    "and controller status.";
+            this.lblDescMonitoramento.Text = "Receives real-time events via MQTT TCP 1884 (topic mbcortex/export/event).";
             // 
             // btnDashboard
             // 
@@ -315,8 +314,7 @@ namespace SmartSdk
             this.lblDescMqttCliente.Name = "lblDescMqttCliente";
             this.lblDescMqttCliente.Size = new System.Drawing.Size(420, 35);
             this.lblDescMqttCliente.TabIndex = 10;
-            this.lblDescMqttCliente.Text = "Connects as MQTT client to the controller broker. Receives real-time events" +
-    " via WebSocket.";
+            this.lblDescMqttCliente.Text = "Connects as MQTT client to the controller export broker (TCP 1884).";
             // 
             // btnMqttBroker
             // 
@@ -339,8 +337,7 @@ namespace SmartSdk
             this.lblDescMqttBroker.Name = "lblDescMqttBroker";
             this.lblDescMqttBroker.Size = new System.Drawing.Size(420, 35);
             this.lblDescMqttBroker.TabIndex = 12;
-            this.lblDescMqttBroker.Text = "Starts an embedded MQTT broker. The controller can connect directly to this" +
-    " server.";
+            this.lblDescMqttBroker.Text = "Starts an embedded MQTT broker so the controller outbound client can publish here.";
             // 
             // btnWebhookServer
             // 

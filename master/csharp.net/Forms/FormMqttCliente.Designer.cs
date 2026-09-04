@@ -18,6 +18,11 @@ namespace SmartSdk
         private void InitializeComponent()
         {
             this.groupBox1 = new GroupBox();
+            this.btnCreateUser = new Button();
+            this.txtUser = new TextBox();
+            this.labelUser = new Label();
+            this.txtPort = new TextBox();
+            this.labelPort = new Label();
             this.txtSessionKey = new TextBox();
             this.label2 = new Label();
             this.txtWsUrl = new TextBox();
@@ -50,49 +55,100 @@ namespace SmartSdk
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.btnCreateUser);
+            this.groupBox1.Controls.Add(this.txtUser);
+            this.groupBox1.Controls.Add(this.labelUser);
+            this.groupBox1.Controls.Add(this.txtPort);
+            this.groupBox1.Controls.Add(this.labelPort);
             this.groupBox1.Controls.Add(this.txtSessionKey);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.txtWsUrl);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new Size(560, 100);
+            this.groupBox1.Size = new Size(560, 155);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Connection";
+            this.groupBox1.Text = "Controller export broker (TCP 1884)";
             // 
             // txtSessionKey
             // 
-            this.txtSessionKey.Location = new Point(100, 60);
+            this.txtSessionKey.Location = new Point(330, 88);
             this.txtSessionKey.Name = "txtSessionKey";
-            this.txtSessionKey.Size = new Size(440, 23);
-            this.txtSessionKey.TabIndex = 3;
+            this.txtSessionKey.Size = new Size(210, 23);
+            this.txtSessionKey.TabIndex = 7;
+            this.txtSessionKey.Text = "mqttpass";
+            this.txtSessionKey.UseSystemPasswordChar = true;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new Point(15, 63);
+            this.label2.Location = new Point(260, 91);
             this.label2.Name = "label2";
-            this.label2.Size = new Size(70, 15);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Session Key:";
+            this.label2.Size = new Size(60, 15);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Password:";
             // 
             // txtWsUrl
             // 
             this.txtWsUrl.Location = new Point(100, 25);
             this.txtWsUrl.Name = "txtWsUrl";
-            this.txtWsUrl.Size = new Size(440, 23);
+            this.txtWsUrl.Size = new Size(280, 23);
             this.txtWsUrl.TabIndex = 1;
-            this.txtWsUrl.Text = "wss://192.168.0.100:4449/mbcortex/master/api/v1/mqtt";
+            this.txtWsUrl.Text = "192.168.0.180";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Location = new Point(15, 28);
             this.label1.Name = "label1";
-            this.label1.Size = new Size(74, 15);
+            this.label1.Size = new Size(35, 15);
             this.label1.TabIndex = 0;
-            this.label1.Text = "WebSocket URL:";
+            this.label1.Text = "Host:";
+            // 
+            // labelPort
+            // 
+            this.labelPort.AutoSize = true;
+            this.labelPort.Location = new Point(400, 28);
+            this.labelPort.Name = "labelPort";
+            this.labelPort.Size = new Size(32, 15);
+            this.labelPort.TabIndex = 2;
+            this.labelPort.Text = "Port:";
+            // 
+            // txtPort
+            // 
+            this.txtPort.Location = new Point(440, 25);
+            this.txtPort.Name = "txtPort";
+            this.txtPort.Size = new Size(100, 23);
+            this.txtPort.TabIndex = 3;
+            this.txtPort.Text = "1884";
+            // 
+            // labelUser
+            // 
+            this.labelUser.AutoSize = true;
+            this.labelUser.Location = new Point(15, 60);
+            this.labelUser.Name = "labelUser";
+            this.labelUser.Size = new Size(33, 15);
+            this.labelUser.TabIndex = 4;
+            this.labelUser.Text = "User:";
+            // 
+            // txtUser
+            // 
+            this.txtUser.Location = new Point(100, 57);
+            this.txtUser.Name = "txtUser";
+            this.txtUser.Size = new Size(150, 23);
+            this.txtUser.TabIndex = 5;
+            this.txtUser.Text = "mqttuser";
+            // 
+            // btnCreateUser
+            // 
+            this.btnCreateUser.Location = new Point(15, 118);
+            this.btnCreateUser.Name = "btnCreateUser";
+            this.btnCreateUser.Size = new Size(200, 28);
+            this.btnCreateUser.TabIndex = 8;
+            this.btnCreateUser.Text = "Create test user (API)";
+            this.btnCreateUser.UseVisualStyleBackColor = true;
+            this.btnCreateUser.Click += new System.EventHandler(this.btnCreateUser_Click);
             // 
             // groupBox2
             // 
@@ -102,25 +158,25 @@ namespace SmartSdk
             this.groupBox2.Controls.Add(this.chkSensors);
             this.groupBox2.Controls.Add(this.chkLogs);
             this.groupBox2.Controls.Add(this.chkEvents);
-            this.groupBox2.Location = new Point(12, 125);
+            this.groupBox2.Location = new Point(12, 180);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new Size(300, 150);
+            this.groupBox2.Size = new Size(300, 120);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Topics to Subscribe";
             // 
             // txtTopicoCustom
             // 
-            this.txtTopicoCustom.Location = new Point(100, 110);
+            this.txtTopicoCustom.Location = new Point(100, 80);
             this.txtTopicoCustom.Name = "txtTopicoCustom";
             this.txtTopicoCustom.Size = new Size(185, 23);
             this.txtTopicoCustom.TabIndex = 5;
-            this.txtTopicoCustom.Text = "#";
+            this.txtTopicoCustom.Text = "mbcortex/export/event";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new Point(15, 113);
+            this.label3.Location = new Point(15, 83);
             this.label3.Name = "label3";
             this.label3.Size = new Size(55, 15);
             this.label3.TabIndex = 4;
@@ -135,6 +191,7 @@ namespace SmartSdk
             this.chkStatus.TabIndex = 3;
             this.chkStatus.Text = "Status";
             this.chkStatus.UseVisualStyleBackColor = true;
+            this.chkStatus.Visible = false;
             // 
             // chkSensors
             // 
@@ -145,6 +202,7 @@ namespace SmartSdk
             this.chkSensors.TabIndex = 2;
             this.chkSensors.Text = "Sensors";
             this.chkSensors.UseVisualStyleBackColor = true;
+            this.chkSensors.Visible = false;
             // 
             // chkLogs
             // 
@@ -155,6 +213,7 @@ namespace SmartSdk
             this.chkLogs.TabIndex = 1;
             this.chkLogs.Text = "Logs";
             this.chkLogs.UseVisualStyleBackColor = true;
+            this.chkLogs.Visible = false;
             // 
             // chkEvents
             // 
@@ -163,12 +222,12 @@ namespace SmartSdk
             this.chkEvents.Name = "chkEvents";
             this.chkEvents.Size = new Size(61, 19);
             this.chkEvents.TabIndex = 0;
-            this.chkEvents.Text = "Events";
+            this.chkEvents.Text = "export/event";
             this.chkEvents.UseVisualStyleBackColor = true;
             // 
             // btnConectar
             // 
-            this.btnConectar.Location = new Point(330, 130);
+            this.btnConectar.Location = new Point(330, 185);
             this.btnConectar.Name = "btnConectar";
             this.btnConectar.Size = new Size(110, 40);
             this.btnConectar.TabIndex = 2;
@@ -180,7 +239,7 @@ namespace SmartSdk
             // 
             this.lblStatus.AutoSize = true;
             this.lblStatus.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            this.lblStatus.Location = new Point(330, 180);
+            this.lblStatus.Location = new Point(330, 235);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new Size(85, 15);
             this.lblStatus.TabIndex = 3;
@@ -196,7 +255,7 @@ namespace SmartSdk
             this.groupBox3.Controls.Add(this.label6);
             this.groupBox3.Controls.Add(this.txtPubTopico);
             this.groupBox3.Controls.Add(this.label4);
-            this.groupBox3.Location = new Point(12, 290);
+            this.groupBox3.Location = new Point(12, 315);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new Size(560, 130);
             this.groupBox3.TabIndex = 4;
@@ -270,18 +329,19 @@ namespace SmartSdk
             // 
             this.txtLog.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             this.txtLog.Font = new Font("Consolas", 9F);
-            this.txtLog.Location = new Point(12, 430);
+            this.txtLog.Location = new Point(12, 455);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = ScrollBars.Vertical;
+            this.txtLog.WordWrap = true;
             this.txtLog.Size = new Size(560, 150);
             this.txtLog.TabIndex = 5;
             // 
             // btnLimpar
             // 
             this.btnLimpar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            this.btnLimpar.Location = new Point(12, 590);
+            this.btnLimpar.Location = new Point(12, 615);
             this.btnLimpar.Name = "btnLimpar";
             this.btnLimpar.Size = new Size(75, 25);
             this.btnLimpar.TabIndex = 6;
@@ -292,7 +352,7 @@ namespace SmartSdk
             // btnSalvar
             // 
             this.btnSalvar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            this.btnSalvar.Location = new Point(100, 590);
+            this.btnSalvar.Location = new Point(100, 615);
             this.btnSalvar.Name = "btnSalvar";
             this.btnSalvar.Size = new Size(100, 25);
             this.btnSalvar.TabIndex = 7;
@@ -304,7 +364,7 @@ namespace SmartSdk
             // 
             this.lblMensagens.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             this.lblMensagens.AutoSize = true;
-            this.lblMensagens.Location = new Point(220, 595);
+            this.lblMensagens.Location = new Point(220, 620);
             this.lblMensagens.Name = "lblMensagens";
             this.lblMensagens.Size = new Size(80, 15);
             this.lblMensagens.TabIndex = 8;
@@ -314,7 +374,7 @@ namespace SmartSdk
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(584, 621);
+            this.ClientSize = new Size(584, 650);
             this.Controls.Add(this.lblMensagens);
             this.Controls.Add(this.btnSalvar);
             this.Controls.Add(this.btnLimpar);
@@ -324,10 +384,10 @@ namespace SmartSdk
             this.Controls.Add(this.btnConectar);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.MinimumSize = new Size(600, 660);
+            this.MinimumSize = new Size(600, 690);
             this.Name = "FormMqttCliente";
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.Text = "MQTT Client Test";
+            this.Text = "MQTT Client — TCP 1884 / mbcortex/export/event";
             this.Load += new System.EventHandler(this.FormMqttCliente_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -346,6 +406,11 @@ namespace SmartSdk
         private Label label1;
         private TextBox txtSessionKey;
         private Label label2;
+        private TextBox txtPort;
+        private Label labelPort;
+        private TextBox txtUser;
+        private Label labelUser;
+        private Button btnCreateUser;
         private GroupBox groupBox2;
         private CheckBox chkEvents;
         private CheckBox chkLogs;

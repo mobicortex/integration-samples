@@ -38,8 +38,12 @@ namespace SmartSdk
 
         private void UpdateUrl()
         {
-            var port = txtPorta.Text;
-            lblUrl.Text = $"http://localhost:{port}/";
+            if (!int.TryParse(txtPorta.Text.Trim(), out var port))
+                port = 8080;
+            var urls = WebhookServerService.GetLanWebhookUrls(port);
+            lblUrl.Text = urls.Count > 0
+                ? string.Join("  |  ", urls)
+                : $"http://0.0.0.0:{port}/webhook";
         }
 
         private async void btnIniciar_Click(object sender, EventArgs e)
@@ -78,12 +82,19 @@ namespace SmartSdk
                 {
                     btnIniciar.Text = "Stop";
                     btnIniciar.BackColor = Color.FromArgb(220, 53, 69);
-                    lblStatus.Text = $"Running on port {port}";
+                    lblStatus.Text = $"Listening on 0.0.0.0:{port} (LAN)";
                     lblStatus.ForeColor = Color.DarkGreen;
+                    UpdateUrl();
 
-                    Log($"Webhook server started at http://localhost:{port}/");
-                    Log($"URL for controller configuration:");
-                    Log($"  http://YOUR_IP:{port}/webhook");
+                    Log($"Listening on all interfaces (0.0.0.0:{port}) — reachable from the LAN.");
+                    Log("URL for controller configuration (Settings > Webhooks, id 1..4):");
+                    var urls = WebhookServerService.GetLanWebhookUrls(port);
+                    if (urls.Count == 0)
+                        Log($"  http://<THIS_PC_LAN_IP>:{port}/webhook");
+                    foreach (var url in urls)
+                        Log($"  {url}");
+                    Log("Do not use localhost/127.0.0.1 — the controller is another device on the network.");
+                    Log("Enable registered + unregistered so access and LPR events are posted.");
                     Log("");
                     if (!string.IsNullOrEmpty(authToken))
                     {
@@ -97,20 +108,26 @@ namespace SmartSdk
                 }
                 else
                 {
+                    (_server as IDisposable)?.Dispose();
+                    _server = null;
+                    btnIniciar.Text = "Start";
+                    btnIniciar.BackColor = SystemColors.Control;
                     lblStatus.Text = "Failed to start";
                     lblStatus.ForeColor = Color.DarkRed;
                     Log("Failed to start server.");
                     Log("Tips:");
-                    Log("  - Run as Administrator");
-                    Log($"  - Or use: netsh http add urlacl url=http://+:{port}/ user=YOUR_USER");
-                    Log("  - Or use a port > 1024 without needing admin");
-                    _server = null;
+                    Log("  - Another process may already be using this port");
+                    Log("  - Try a different port (Windows Firewall may also block inbound LAN traffic)");
                 }
 
                 UpdateStats();
             }
             catch (Exception ex)
             {
+                (_server as IDisposable)?.Dispose();
+                _server = null;
+                btnIniciar.Text = "Start";
+                btnIniciar.BackColor = SystemColors.Control;
                 Log($"Error: {ex.Message}");
                 lblStatus.Text = "Error";
                 lblStatus.ForeColor = Color.DarkRed;
@@ -158,22 +175,7 @@ namespace SmartSdk
             Log($"  Content-Type: {e.ContentType}");
             Log($"  Body: {shortBody}");
 
-            // Try to extract relevant information from the JSON
-            try
-            {
-                using (var doc = System.Text.Json.JsonDocument.Parse(e.Body))
-                {
-                    if (doc.RootElement.TryGetProperty("event_type", out var eventType))
-                    {
-                        Log($"  Event: {eventType.GetString()}");
-                    }
-                    if (doc.RootElement.TryGetProperty("device_id", out var deviceId))
-                    {
-                        Log($"  Device: {deviceId.GetString()}");
-                    }
-                }
-            }
-            catch { /* ignore parse error */ }
+            MobiCortex.Sdk.Models.MqttExportContract.LogPayloadHints(e.Body, Log);
 
             Log("");
 

@@ -22,6 +22,14 @@ namespace SmartSdk
             this.lblTopico = new Label();
             this.txtTopico = new TextBox();
             this.btnSubscrever = new Button();
+            this.lblHost = new Label();
+            this.txtHost = new TextBox();
+            this.lblPort = new Label();
+            this.txtPort = new TextBox();
+            this.lblUser = new Label();
+            this.txtUser = new TextBox();
+            this.lblPass = new Label();
+            this.txtPass = new TextBox();
             this.lblExplicacao = new Label();
             this.txtLog = new TextBox();
             this.panelTopo.SuspendLayout();
@@ -38,12 +46,20 @@ namespace SmartSdk
             this.lblExplicacao.Padding = new Padding(8, 4, 8, 4);
             this.lblExplicacao.Size = new Size(800, 55);
             this.lblExplicacao.TabIndex = 0;
-            this.lblExplicacao.Text = "MQTT over WebSocket: Receive real-time events from the controller.\r\n" +
-                "URL: wss://<host>/mbcortex/master/api/v1/mqtt  |  MQTT Password = session_key from HTTP login\r\n" +
-                "Topics: mbcortex/master/events/#  |  mbcortex/master/logs/#  |  #  (all)";
+            this.lblExplicacao.Text = "MQTT TCP on the controller export listener (port 1884).\r\n" +
+                "User/password = credential from Settings > MQTT (same username and password).\r\n" +
+                "Topic: mbcortex/export/event   |   1883 on the controller is loopback IPC only.";
             //
             // panelTopo - Controles de conexão
             //
+            this.panelTopo.Controls.Add(this.txtPass);
+            this.panelTopo.Controls.Add(this.lblPass);
+            this.panelTopo.Controls.Add(this.txtUser);
+            this.panelTopo.Controls.Add(this.lblUser);
+            this.panelTopo.Controls.Add(this.txtPort);
+            this.panelTopo.Controls.Add(this.lblPort);
+            this.panelTopo.Controls.Add(this.txtHost);
+            this.panelTopo.Controls.Add(this.lblHost);
             this.panelTopo.Controls.Add(this.btnSubscrever);
             this.panelTopo.Controls.Add(this.txtTopico);
             this.panelTopo.Controls.Add(this.lblTopico);
@@ -55,7 +71,7 @@ namespace SmartSdk
             this.panelTopo.Location = new Point(0, 55);
             this.panelTopo.Name = "panelTopo";
             this.panelTopo.Padding = new Padding(8);
-            this.panelTopo.Size = new Size(800, 45);
+            this.panelTopo.Size = new Size(800, 80);
             this.panelTopo.TabIndex = 1;
             //
             // btnConectar
@@ -107,7 +123,76 @@ namespace SmartSdk
             this.txtTopico.Name = "txtTopico";
             this.txtTopico.Size = new Size(220, 23);
             this.txtTopico.TabIndex = 4;
-            this.txtTopico.Text = "#";
+            this.txtTopico.Text = "mbcortex/export/event";
+            //
+            // lblHost
+            //
+            this.lblHost.AutoSize = true;
+            this.lblHost.Location = new Point(8, 50);
+            this.lblHost.Name = "lblHost";
+            this.lblHost.Size = new Size(35, 15);
+            this.lblHost.TabIndex = 7;
+            this.lblHost.Text = "Host:";
+            //
+            // txtHost
+            //
+            this.txtHost.Location = new Point(48, 47);
+            this.txtHost.Name = "txtHost";
+            this.txtHost.Size = new Size(140, 23);
+            this.txtHost.TabIndex = 8;
+            this.txtHost.Text = "192.168.0.180";
+            //
+            // lblPort
+            //
+            this.lblPort.AutoSize = true;
+            this.lblPort.Location = new Point(194, 50);
+            this.lblPort.Name = "lblPort";
+            this.lblPort.Size = new Size(32, 15);
+            this.lblPort.TabIndex = 9;
+            this.lblPort.Text = "Port:";
+            //
+            // txtPort
+            //
+            this.txtPort.Location = new Point(228, 47);
+            this.txtPort.Name = "txtPort";
+            this.txtPort.Size = new Size(50, 23);
+            this.txtPort.TabIndex = 10;
+            this.txtPort.Text = "1884";
+            //
+            // lblUser
+            //
+            this.lblUser.AutoSize = true;
+            this.lblUser.Location = new Point(286, 50);
+            this.lblUser.Name = "lblUser";
+            this.lblUser.Size = new Size(33, 15);
+            this.lblUser.TabIndex = 11;
+            this.lblUser.Text = "User:";
+            //
+            // txtUser
+            //
+            this.txtUser.Location = new Point(322, 47);
+            this.txtUser.Name = "txtUser";
+            this.txtUser.Size = new Size(120, 23);
+            this.txtUser.TabIndex = 12;
+            this.txtUser.Text = "mqttuser";
+            //
+            // lblPass
+            //
+            this.lblPass.AutoSize = true;
+            this.lblPass.Location = new Point(450, 50);
+            this.lblPass.Name = "lblPass";
+            this.lblPass.Size = new Size(60, 15);
+            this.lblPass.TabIndex = 13;
+            this.lblPass.Text = "Password:";
+            //
+            // txtPass
+            //
+            this.txtPass.Location = new Point(512, 47);
+            this.txtPass.Name = "txtPass";
+            this.txtPass.Size = new Size(140, 23);
+            this.txtPass.TabIndex = 14;
+            this.txtPass.Text = "mqttpass";
+            this.txtPass.UseSystemPasswordChar = true;
             //
             // btnSubscrever
             //
@@ -133,14 +218,14 @@ namespace SmartSdk
             this.txtLog.Dock = DockStyle.Fill;
             this.txtLog.Font = new Font("Consolas", 9F);
             this.txtLog.ForeColor = Color.FromArgb(220, 220, 220);
-            this.txtLog.Location = new Point(0, 100);
+            this.txtLog.Location = new Point(0, 135);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
-            this.txtLog.ScrollBars = ScrollBars.Both;
+            this.txtLog.ScrollBars = ScrollBars.Vertical;
             this.txtLog.Size = new Size(800, 350);
             this.txtLog.TabIndex = 2;
-            this.txtLog.WordWrap = false;
+            this.txtLog.WordWrap = true;
             //
             // FormMonitoramento
             //
@@ -150,10 +235,10 @@ namespace SmartSdk
             this.Controls.Add(this.txtLog);
             this.Controls.Add(this.panelTopo);
             this.Controls.Add(this.lblExplicacao);
-            this.MinimumSize = new Size(600, 350);
+            this.MinimumSize = new Size(820, 350);
             this.Name = "FormMonitoramento";
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.Text = "Monitoring - MQTT over WebSocket (Real-Time Events)";
+            this.Text = "Monitoring — MQTT TCP 1884 (mbcortex/export/event)";
             this.panelTopo.ResumeLayout(false);
             this.panelTopo.PerformLayout();
             this.ResumeLayout(false);
@@ -172,5 +257,13 @@ namespace SmartSdk
         private Button btnSubscrever;
         private Button btnLimpar;
         private TextBox txtLog;
+        private Label lblHost;
+        private TextBox txtHost;
+        private Label lblPort;
+        private TextBox txtPort;
+        private Label lblUser;
+        private TextBox txtUser;
+        private Label lblPass;
+        private TextBox txtPass;
     }
 }

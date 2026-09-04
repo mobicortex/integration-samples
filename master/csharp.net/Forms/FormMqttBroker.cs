@@ -41,6 +41,10 @@ namespace SmartSdk
             Log("Not tested for high load (max ~20 devices).");
             Log("For production with many devices, use Mosquitto, EMQX or HiveMQ.");
             Log("");
+            Log("Outbound path: start this broker, then on the controller Settings > MQTT");
+            Log("set Client host = this PC LAN IP, port = 1883, topic = mbcortex/export/event.");
+            Log("This is NOT the inbound listener (that one is 1884 on the controller).");
+            Log("");
         }
 
         private async void btnIniciar_Click(object sender, EventArgs e)
@@ -89,7 +93,7 @@ namespace SmartSdk
                     info += anonymous ? " (anonymous access)" : $" (authentication: {username})";
                     Log(info);
                     Log($"Address: mqtt://{Environment.MachineName}:{port}");
-                    Log("Configure the controller to send MQTT events to this address");
+                    Log("On the controller MQTT client: host = this PC IP, topic = mbcortex/export/event");
                 }
                 else
                 {

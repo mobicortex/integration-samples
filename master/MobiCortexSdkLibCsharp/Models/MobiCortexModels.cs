@@ -1401,4 +1401,207 @@ namespace MobiCortex.Sdk.Models
     }
 
     #endregion
+
+    #region MQTT export - GET/POST /mqtt-export
+
+    /// <summary>
+    /// Public MQTT export contract (Linux). Port 1883 on the controller is loopback IPC only.
+    /// </summary>
+    public static class MqttExportContract
+    {
+        public const int ListenPort = 1884;
+        public const string EventTopic = "mbcortex/export/event";
+        public const string EventTopicFilter = "mbcortex/export/#";
+
+        /// <summary>
+        /// Broker login name — same string saved in Settings (no ext_ prefix).
+        /// </summary>
+        public static string NormalizeUsername(string? username)
+        {
+            return (username ?? string.Empty).Trim();
+        }
+
+        public static string HostFromBaseUrl(string? baseUrl)
+        {
+            if (string.IsNullOrWhiteSpace(baseUrl))
+                return "192.168.0.180";
+            if (Uri.TryCreate(baseUrl.Trim(), UriKind.Absolute, out var uri) && !string.IsNullOrEmpty(uri.Host))
+                return uri.Host;
+            var trimmed = baseUrl.Trim();
+            foreach (var prefix in new[] { "https://", "http://", "wss://", "ws://" })
+            {
+                if (trimmed.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    trimmed = trimmed.Substring(prefix.Length);
+            }
+            var slash = trimmed.IndexOf('/');
+            if (slash >= 0)
+                trimmed = trimmed.Substring(0, slash);
+            var colon = trimmed.IndexOf(':');
+            if (colon >= 0)
+                trimmed = trimmed.Substring(0, colon);
+            return string.IsNullOrEmpty(trimmed) ? "192.168.0.180" : trimmed;
+        }
+
+        private static readonly JsonSerializerOptions PrettyJsonOptions = new() { WriteIndented = true };
+
+        /// <summary>
+        /// Indents JSON for log display. Returns the original string if it is not valid JSON.
+        /// </summary>
+        public static string PrettyJson(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                return json ?? string.Empty;
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+                return JsonSerializer.Serialize(doc.RootElement, PrettyJsonOptions);
+            }
+            catch
+            {
+                return json;
+            }
+        }
+
+        public static void LogPayloadHints(string json, Action<string> log)
+        {
+            if (string.IsNullOrWhiteSpace(json) || log == null)
+                return;
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+                if (root.TryGetProperty("event", out var ev))
+                {
+                    if (ev.ValueKind == JsonValueKind.String)
+                        log($"  Event: {ev.GetString()}");
+                    else if (ev.ValueKind == JsonValueKind.Object && ev.TryGetProperty("event_type", out var nested))
+                        log($"  Event: {nested.GetString()}");
+                }
+                if (root.TryGetProperty("event_type", out var eventType))
+                    log($"  Event: {eventType.GetString()}");
+                if (root.TryGetProperty("plate", out var plate))
+                    log($"  Plate: {plate.GetString()}");
+                if (root.TryGetProperty("registered", out var registered))
+                    log($"  Registered: {registered}");
+                if (root.TryGetProperty("source", out var source))
+                    log($"  Source: {source.GetString()}");
+                if (root.TryGetProperty("controller", out var controller) &&
+                    controller.ValueKind == JsonValueKind.Object &&
+                    controller.TryGetProperty("serial", out var serial))
+                    log($"  Controller: {serial.GetString()}");
+            }
+            catch
+            {
+                /* raw body is already logged */
+            }
+        }
+    }
+
+    public class MqttExportUser
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = string.Empty;
+
+        [JsonPropertyName("username")]
+        public string Username { get; set; } = string.Empty;
+
+        [JsonPropertyName("active")]
+        public int Active { get; set; }
+
+        [JsonPropertyName("has_pass")]
+        public int HasPass { get; set; }
+
+        /// <summary>Returned once when the controller generates a password.</summary>
+        [JsonPropertyName("password")]
+        public string? Password { get; set; }
+    }
+
+    public class MqttExportUserRequest
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = string.Empty;
+
+        [JsonPropertyName("username")]
+        public string Username { get; set; } = string.Empty;
+
+        [JsonPropertyName("password")]
+        public string Password { get; set; } = string.Empty;
+
+        [JsonPropertyName("active")]
+        public int Active { get; set; } = 1;
+    }
+
+    public class MqttExportClientConfig
+    {
+        [JsonPropertyName("active")]
+        public int Active { get; set; }
+
+        [JsonPropertyName("host")]
+        public string Host { get; set; } = string.Empty;
+
+        [JsonPropertyName("port")]
+        public int Port { get; set; } = 1883;
+
+        [JsonPropertyName("user")]
+        public string User { get; set; } = string.Empty;
+
+        [JsonPropertyName("topic")]
+        public string Topic { get; set; } = MqttExportContract.EventTopic;
+
+        [JsonPropertyName("tls")]
+        public int Tls { get; set; }
+
+        [JsonPropertyName("has_pass")]
+        public int HasPass { get; set; }
+    }
+
+    public class MqttExportClientRequest
+    {
+        [JsonPropertyName("active")]
+        public int Active { get; set; }
+
+        [JsonPropertyName("host")]
+        public string Host { get; set; } = string.Empty;
+
+        [JsonPropertyName("port")]
+        public int Port { get; set; } = 1883;
+
+        [JsonPropertyName("user")]
+        public string User { get; set; } = string.Empty;
+
+        [JsonPropertyName("pass")]
+        public string Pass { get; set; } = string.Empty;
+
+        [JsonPropertyName("topic")]
+        public string Topic { get; set; } = MqttExportContract.EventTopic;
+
+        [JsonPropertyName("tls")]
+        public int Tls { get; set; }
+    }
+
+    public class MqttExportStatus
+    {
+        [JsonPropertyName("ret")]
+        public int Ret { get; set; }
+
+        [JsonPropertyName("listen_port")]
+        public int ListenPort { get; set; } = MqttExportContract.ListenPort;
+
+        [JsonPropertyName("topic")]
+        public string Topic { get; set; } = MqttExportContract.EventTopic;
+
+        [JsonPropertyName("users")]
+        public List<MqttExportUser> Users { get; set; } = new();
+
+        [JsonPropertyName("client")]
+        public MqttExportClientConfig? Client { get; set; }
+
+        [JsonPropertyName("password")]
+        public string? Password { get; set; }
+    }
+
+    #endregion
 }

@@ -32,9 +32,9 @@ All forms share a single `MobiCortexApiService` instance.
 - Search by `entity_id` or by name, with pagination
 
 ### Monitoring (MQTT)
-- MQTT connection to the controller (port 1883)
-- Real-time access events
-- Formatted event output in the console
+- MQTT TCP connection to the controller export listener (port **1884**, same username as Settings)
+- Topic `mbcortex/export/event` (access + LPR). Port 1883 on the controller is loopback IPC only.
+- Embedded broker form is the **outbound** path: the controller publishes to this PC.
 
 ### Dashboard
 - Device information (model, firmware version, MAC)

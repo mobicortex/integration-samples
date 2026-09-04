@@ -64,6 +64,11 @@ namespace MobiCortex.Sdk.Interfaces
         IVideoSourceService VideoSources { get; }
 
         /// <summary>
+        /// MQTT export: inbound credentials (1884) and outbound client.
+        /// </summary>
+        IMqttExportService MqttExport { get; }
+
+        /// <summary>
         /// Logs in to the controller.
         /// </summary>
         /// <param name="password">Administrator password</param>
