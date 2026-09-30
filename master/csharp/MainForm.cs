@@ -131,6 +131,7 @@ namespace SmartSdk
             btnMonitoramento.Enabled = enabled;
             btnDashboard.Enabled = enabled;
             btnMqttCliente.Enabled = enabled; // Requires prior connection to obtain session key
+            btnSaidas.Enabled = enabled;
             // btnMqttBroker and btnWebhookServer do not require connection - they work standalone
         }
 
@@ -179,6 +180,12 @@ namespace SmartSdk
         {
             // Opens the Webhook Server test form (receives HTTP events)
             new FormWebhookServer(_api).Show();
+        }
+
+        private void btnSaidas_Click(object? sender, EventArgs e)
+        {
+            // Lists devices and commands relays / DOUT
+            new FormSaidas(_api).Show();
         }
 
         private void btnAbrirInterfaceWeb_Click(object? sender, EventArgs e)

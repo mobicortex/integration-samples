@@ -40,6 +40,8 @@ namespace SmartSdk
             lblDescMqttBroker = new Label();
             btnWebhookServer = new Button();
             lblDescWebhookServer = new Label();
+            btnSaidas = new Button();
+            lblDescSaidas = new Label();
             panelLog = new Panel();
             txtLog = new TextBox();
             btnLimparLog = new Button();
@@ -177,11 +179,13 @@ namespace SmartSdk
             panelBotoes.Controls.Add(lblDescMqttBroker);
             panelBotoes.Controls.Add(btnWebhookServer);
             panelBotoes.Controls.Add(lblDescWebhookServer);
+            panelBotoes.Controls.Add(btnSaidas);
+            panelBotoes.Controls.Add(lblDescSaidas);
             panelBotoes.Dock = DockStyle.Fill;
             panelBotoes.Location = new Point(0, 70);
             panelBotoes.Name = "panelBotoes";
             panelBotoes.Padding = new Padding(15);
-            panelBotoes.Size = new Size(784, 520);
+            panelBotoes.Size = new Size(784, 575);
             panelBotoes.TabIndex = 1;
             // 
             // lblTituloDemos
@@ -360,13 +364,37 @@ namespace SmartSdk
             lblDescWebhookServer.TabIndex = 14;
             lblDescWebhookServer.Text = "Starts an HTTP server to receive events via webhook. The controller sends POST with JSON events.";
             // 
+            // btnSaidas
+            // 
+            btnSaidas.BackColor = Color.FromArgb(73, 80, 87);
+            btnSaidas.Enabled = false;
+            btnSaidas.FlatStyle = FlatStyle.Flat;
+            btnSaidas.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnSaidas.ForeColor = Color.White;
+            btnSaidas.Location = new Point(15, 440);
+            btnSaidas.Name = "btnSaidas";
+            btnSaidas.Size = new Size(250, 40);
+            btnSaidas.TabIndex = 15;
+            btnSaidas.Text = "Outputs (DOUT / Relays)";
+            btnSaidas.UseVisualStyleBackColor = false;
+            btnSaidas.Click += btnSaidas_Click;
+            // 
+            // lblDescSaidas
+            // 
+            lblDescSaidas.ForeColor = Color.Gray;
+            lblDescSaidas.Location = new Point(275, 440);
+            lblDescSaidas.Name = "lblDescSaidas";
+            lblDescSaidas.Size = new Size(490, 40);
+            lblDescSaidas.TabIndex = 16;
+            lblDescSaidas.Text = "Lists devices (GET /devices) and commands relays/DOUT (POST /devices/relay): pulse, on, off, toggle.";
+            // 
             // panelLog
             // 
             panelLog.Controls.Add(txtLog);
             panelLog.Controls.Add(btnLimparLog);
             panelLog.Controls.Add(lblLog);
             panelLog.Dock = DockStyle.Bottom;
-            panelLog.Location = new Point(0, 590);
+            panelLog.Location = new Point(0, 645);
             panelLog.Name = "panelLog";
             panelLog.Padding = new Padding(5);
             panelLog.Size = new Size(784, 110);
@@ -409,7 +437,7 @@ namespace SmartSdk
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(784, 700);
+            ClientSize = new Size(784, 755);
             Controls.Add(panelBotoes);
             Controls.Add(panelLog);
             Controls.Add(panelTop);
@@ -454,6 +482,8 @@ namespace SmartSdk
         private Label lblDescMqttBroker;
         private Button btnWebhookServer;
         private Label lblDescWebhookServer;
+        private Button btnSaidas;
+        private Label lblDescSaidas;
         private Panel panelLog;
         private Label lblLog;
         private TextBox txtLog;

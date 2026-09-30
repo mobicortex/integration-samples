@@ -190,6 +190,95 @@ Response `200`:
 }
 ```
 
+## Dispositivos e saídas (relé / DOUT)
+
+Disponível no Master Linux (não no M3127). Mesmo caminho das Regras na UI.
+
+### GET `/devices`
+
+Lista dispositivos locais e federados com as saídas acionáveis.
+
+Response `200` (resumo):
+
+```json
+{
+  "ret": 0,
+  "items": [
+    {
+      "id": "42",
+      "nome": "FACIAL ENTRADA",
+      "tipo": "SMART",
+      "modelo": "M2962",
+      "online": true,
+      "master": { "gid": "100011526", "nome": "Portaria", "local": true },
+      "saidas": [
+        { "relay": 1, "cmd": ["pulse", "on", "off", "toggle"], "estado": "off" },
+        { "dout": 3, "nome": "Fechadura", "cmd": ["pulse"], "estado": "off" }
+      ]
+    },
+    {
+      "id": "ctrl",
+      "nome": "Portaria",
+      "tipo": "Controladora",
+      "online": true,
+      "saidas": [
+        { "relay": 1, "cmd": ["pulse"] },
+        { "relay": 2, "cmd": ["pulse"] }
+      ]
+    }
+  ]
+}
+```
+
+Notas:
+- trate `id` como texto opaco (`"42"`, `"rs485:5"`, `"ext:..."`, `"ctrl"`, `"<gid>:42"`)
+- `online` pode ser `null` quando o hardware não informa
+- `cmd` indica o que aquela saída aceita; pedir outra coisa retorna erro
+
+### POST `/devices/relay`
+
+```json
+{ "id": "42", "relay": 1, "time": 1000 }
+{ "id": "42", "relay": 1, "cmd": "on" }
+{ "id": "42", "dout": 3, "time": 500 }
+{ "nome": "FACIAL ENTRADA", "relay": 1, "time": 1000 }
+{ "id": "42", "saidas": [ { "relay": 1, "time": 1000 }, { "dout": 3, "time": 500 } ] }
+```
+
+- uma saída: `relay:N` **ou** `dout:N`; várias: `saidas: [...]` (executadas na ordem)
+- `time` (ms, 50..30000) = pulso; sem `time` e sem `cmd` = pulso de 1000 ms
+- `cmd`: `pulse` | `on` | `off` | `toggle`. Liga/desliga só existe em SMART `relay:1` (também `toggle`) e `dout:1`; RS485, controladora e outras marcas só pulso
+- `cmd: "on"` com `time` = pulso daquele tempo
+- por `nome`: ignora maiúsculas, acentos e espaços extras; aciona **todos** com aquele nome, inclusive em outros masters (útil como grupo)
+- o comando é entregue, não conferido no hardware: `executed:false` + `msg` quando aquele alvo recusou; confira o `estado` no próximo `GET /devices`
+
+Response `200`:
+
+```json
+{
+  "ret": 0,
+  "acionados": [
+    {
+      "id": "42",
+      "nome": "FACIAL ENTRADA",
+      "relay": 1,
+      "cmd": "pulse",
+      "time": 1000,
+      "executed": true,
+      "msg": "saida acionada: rele"
+    }
+  ]
+}
+```
+
+Erros comuns: `400` corpo inválido, `404` nome inexistente (`{error, sugestoes:[...]}`), `403` token sem permissão para aquele dispositivo (ou login barrado pela política).
+
+Token de API: permissão `outputs` (opcionalmente `outputs_ids`, lista de `id`) libera só essas rotas. `GET /devices` vale para qualquer usuário logado; quem aciona pelo login é a política `GET/PUT /token/policy` com `{"outputs_login": ...}`:
+
+- `master` (padrão): só o usuário master
+- `operator`: master e cadastrador
+- `token_only`: ninguém pelo login; só token com `outputs` ou `all`
+
 ## Cadastro Central
 
 Contrato público:
@@ -366,9 +455,10 @@ Tipos principais:
 - `2`: veículo
 
 Campos principais de integração:
-- `id`: `0` para auto-ID
+- `id`: obrigatório no POST, **exceto** com `createid: true` (aí omita ou use `0`). `id: 0` sem `createid` retorna `400 "id is required when createid!=true"`
+- `createid`: `true` = o backend gera o ID
 - `type`
-- `name`
+- `name` (só pessoa; veículo **não** aceita `name` — retorna `400`)
 - `doc`
 - `central_registry_id`
 - `enabled`
@@ -484,11 +574,11 @@ Response `200`:
 
 ### POST `/entities`
 
-Pessoa:
+Pessoa (ID gerado pelo backend):
 
 ```json
 {
-  "id": 0,
+  "createid": true,
   "type": 1,
   "name": "Maria Oliveira",
   "doc": "12345678900",
@@ -497,13 +587,12 @@ Pessoa:
 }
 ```
 
-Veículo:
+Veículo (ID gerado pelo backend; placa em `doc`, sem `name`):
 
 ```json
 {
-  "id": 0,
+  "createid": true,
   "type": 2,
-  "name": "João Silva Santos",
   "doc": "ABC1D23",
   "central_registry_id": 123,
   "lpr_enabled": true,
@@ -514,11 +603,10 @@ Veículo:
 }
 ```
 
-Auto-ID com criação automática:
+Auto-ID sem `central_registry_id` (o backend cria o cadastro central automaticamente):
 
 ```json
 {
-  "id": 0,
   "createid": true,
   "type": 1,
   "name": "Cadastro automático",
@@ -547,13 +635,12 @@ Erros comuns:
 
 ### PUT `/entities?id=456`
 
-Atualização parcial.
+Atualização parcial. Envie só os campos do tipo da entidade (veículo não aceita `name`).
 
-Request:
+Request (veículo):
 
 ```json
 {
-  "name": "João Silva Santos",
   "brand": "Toyota",
   "model": "Corolla XEI",
   "color": "Prata",
@@ -578,6 +665,40 @@ Response `200`:
 ```json
 {
   "ret": 0
+}
+```
+
+### DELETE `/entities?plate=ABC1D23`
+
+Apaga o veículo pela placa. Mesma resposta do delete por `id`.
+
+### DELETE `/entities/cleanup-orphans`
+
+Manutenção: remove cadastros centrais que ficaram sem nenhuma entidade (ex.: auto-criados por `createid` sem `central_registry_id` e depois apagados). Sem body; pode demorar em bases grandes.
+
+Response `200`:
+
+```json
+{
+  "ret": 0,
+  "scanned": 1500,
+  "orphans_deleted": 23
+}
+```
+
+### GET `/vehicle-catalogs`
+
+Listas de sugestão para o cadastro de veículo. A marca continua livre; a cor é normalizada pelo backend.
+
+Response `200`:
+
+```json
+{
+  "ret": 0,
+  "colors": [ { "code": 1, "label": "Amarela" }, { "code": 10, "label": "Prata" } ],
+  "brands": [ { "name": "Fiat" }, { "name": "Volkswagen" } ],
+  "colors_count": 16,
+  "brands_count": 21
 }
 ```
 
@@ -864,12 +985,19 @@ Request:
 ```json
 {
   "url": "https://example.com/webhook",
+  "name": "ERP",
+  "active": 1,
   "registered": 1,
   "unregistered": 1,
   "sensors": 0,
-  "logs": 0
+  "logs": 0,
+  "auth_type": "none"
 }
 ```
+
+- `url` (`http://` ou `https://`) é obrigatória; informe ao menos `registered` ou `unregistered`
+- `name`, `active` e `sensors`/`logs` são opcionais
+- `auth_type`: `none` | `basic` (usa `auth_user` + `auth_pass`) | `bearer` (usa `auth_token`)
 
 Response `200`:
 
@@ -878,6 +1006,12 @@ Response `200`:
   "ret": 0
 }
 ```
+
+### POST `/webhook/test?id=1`
+
+Dispara um evento de teste para a URL gravada no slot. **POST** com corpo JSON objeto (não vazio, ex.: `{}`); o backend monta o payload. Erros: `400` sem `id`, corpo vazio/inválido ou slot sem URL.
+
+Response `200` (resultado do envio): `ret`, `id`, `webhook_url`, `webhook_httpcode`, `webhook_ok` (0/1), `webhook_response` e, em falha, `webhook_error`.
 
 ### DELETE `/webhook?id=1`
 
@@ -949,3 +1083,9 @@ Exemplos:
 - C# WinForms: Monitoring (MQTT) lista os eventos em grade; duplo clique abre o JSON. Webhook Server faz o mesmo para POSTs HTTP.
 - Node.js: `nodejs/examples/mqtt_subscribe.js`, `nodejs/examples/webhook_server.js`.
 - Python: `python/examples/mqtt_subscribe.py`, `python/examples/webhook_server.py`.
+
+Saídas (`/devices` + `/devices/relay`):
+
+- C# WinForms: botão **Outputs (DOUT / Relays)** (`Forms/FormSaidas.cs`).
+- Node.js: `nodejs/examples/devices_outputs.js` e opção `[O]` do `examples/cli.js`.
+- Python: `python/examples/devices_outputs.py` e opção `[O]` do `mbcortex_demo.py`.

@@ -11,7 +11,7 @@ namespace MobiCortex.Sdk.Services
     /// <summary>
     /// Main client for integration with MobiCortex controllers.
     /// </summary>
-    public class MobiCortexClient : IMobiCortexClient, IRegistryService, IEntityService, IMediaService, ISystemService, IAccessService, IWebhookConfigService, IVideoSourceService, IMqttExportService
+    public class MobiCortexClient : IMobiCortexClient, IRegistryService, IEntityService, IMediaService, ISystemService, IAccessService, IWebhookConfigService, IVideoSourceService, IMqttExportService, IDevicesService
     {
         private const string API = "/mbcortex/master/api/v1";
         private readonly HttpClient _http;
@@ -53,6 +53,9 @@ namespace MobiCortex.Sdk.Services
 
         /// <inheritdoc/>
         public IMqttExportService MqttExport => this;
+
+        /// <inheritdoc/>
+        public IDevicesService Devices => this;
 
         /// <summary>
         /// Creates a new instance of the MobiCortex client.
@@ -324,7 +327,8 @@ namespace MobiCortex.Sdk.Services
 
         async Task<ApiResult<ApiRetResponse>> IWebhookConfigService.TestAsync(int id)
         {
-            return await GetAsync<ApiRetResponse>($"/webhook/test?id={id}");
+            // Firmware only accepts POST with a non-empty JSON object; the payload is built by the controller.
+            return await PostAsync<ApiRetResponse>($"/webhook/test?id={id}", new { });
         }
         #endregion
 
@@ -347,6 +351,18 @@ namespace MobiCortex.Sdk.Services
         async Task<ApiResult<MqttExportClientConfig>> IMqttExportService.SaveClientAsync(MqttExportClientRequest request)
         {
             return await PostAsync<MqttExportClientConfig>("/mqtt-export/client", request);
+        }
+        #endregion
+
+        #region IDevicesService
+        async Task<ApiResult<DeviceListResponse>> IDevicesService.ListAsync()
+        {
+            return await GetAsync<DeviceListResponse>("/devices");
+        }
+
+        async Task<ApiResult<DeviceRelayResponse>> IDevicesService.TriggerAsync(DeviceRelayRequest request)
+        {
+            return await PostAsync<DeviceRelayResponse>("/devices/relay", request);
         }
         #endregion
 

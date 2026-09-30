@@ -14,8 +14,9 @@ The application uses a multi-form launcher architecture:
 - FormCadastroSimples - Simplified 2-level model: Entity -> Media (`createid=true`).
 - FormMonitoramento - Real-time event monitoring through MQTT.
 - FormDashboard - Device information, uptime, and statistics.
+- FormSaidas - List devices and command relays / DOUT.
 
-All forms share a single `MobiCortexApiService` instance.
+All forms share a single `MobiCortexClient` instance (`IMobiCortexClient`, from `../MobiCortexSdkLibCsharp`).
 
 ## Features
 
@@ -47,10 +48,15 @@ All forms share a single `MobiCortexApiService` instance.
 - Device information (model, firmware version, MAC)
 - Registry and entity statistics
 
+### Outputs (DOUT / relays)
+- Lists devices via `GET /devices` (SMART, RS485, controller, external)
+- Commands outputs via `POST /devices/relay`: pulse, on, off, toggle
+- Enables only the `cmd` values each output accepts (e.g. DOUT3 is pulse-only)
+
 ## Requirements
 
 - Windows 10 or later
-- .NET 8.0 SDK/Runtime
+- .NET Framework 4.7.2 (Visual Studio or MSBuild; `build.bat`)
 - Network access to the MobiCortex controller
 
 ## How To Use
@@ -66,19 +72,19 @@ All forms share a single `MobiCortexApiService` instance.
 ```text
 SmartSdk/
 |-- Forms/
-|   |-- FormCadastroCompleto.cs/.Designer.cs
-|   |-- FormCadastroSimples.cs/.Designer.cs
-|   |-- FormMonitoramento.cs/.Designer.cs
-|   `-- FormDashboard.cs/.Designer.cs
-|-- Models/
-|   `-- MobiCortexModels.cs
-|-- Services/
-|   `-- MobiCortexApiService.cs
-|-- MobiCortexSdkLib/
-|   `-- MobiCortex.Sdk.csproj
+|   |-- FormCadastroCompleto.cs      # full registry: central registry + people + vehicles + media
+|   |-- FormCadastroSimples.cs       # simplified flow (createid=true)
+|   |-- FormCadastroCentral/Entidade/Pessoa/PessoaEdit/Veiculo/Midia.cs, FormDetalheMidia.cs,
+|   |   FormSelecionarTipoEntidade.cs  # dialogs used by the registry screens
+|   |-- FormDashboard.cs             # /dashboard + /device-info
+|   |-- FormMonitoramento.cs         # MQTT TCP 1884 events in a grid
+|   |-- FormMqttCliente.cs           # MQTT client + /mqtt-export/user
+|   |-- FormMqttBroker.cs            # local MQTT broker
+|   |-- FormWebhookServer.cs         # LAN webhook receiver
+|   `-- FormSaidas.cs                # /devices + /devices/relay
 |-- MainForm.cs / .Designer.cs
 |-- Program.cs
-|-- SmartSdk.csproj
+|-- SmartSdk.csproj                  # references ../MobiCortexSdkLibCsharp/MobiCortex.Sdk.csproj
 `-- README.md
 ```
 
@@ -92,8 +98,8 @@ Base route prefix: `/mbcortex/master/api/v1`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/login` | Login with password and receive `session_key` (Bearer token, 900s TTL) |
-| POST | `/logout` | End the current session |
-| PUT | `/password` | Change the device password |
+| DELETE | `/login` | End the current session |
+| PUT | `/login` | Change the password (`pass_atual`, `pass_nova`, `pass_nova2`) |
 
 ### Central Registry
 | Method | Endpoint | Description |
@@ -127,33 +133,39 @@ Base route prefix: `/mbcortex/master/api/v1`
 | GET | `/dashboard` | Device statistics |
 | GET | `/device-info` | Hardware and firmware information |
 
+### Devices / outputs (relay and DOUT)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/devices` | List devices and commandable outputs |
+| POST | `/devices/relay` | Pulse or latch relay/DOUT (by `id` or `nome`) |
+
 ## Code Examples
 
 ### Create an entity in the simplified flow (`createid=true`)
 
 ```csharp
-var request = new CriarEntidadeRequest
+var request = new CreateEntityRequest
 {
     CreateId = true,
-    Type = (int)TipoEntidade.Pessoa,
+    Type = (int)EntityType.Person,
     Name = "John Doe",
     Doc = "123.456.789-00"
 };
 
-var result = await client.Entidades.CriarAsync(request);
+var result = await client.Entities.CreateAsync(request);
 if (result.Success && result.Data?.Ret == 0)
 {
-    Console.WriteLine($"entity_id={result.Data.EntityId}, central_registry_id={result.Data.CadastroId}");
+    Console.WriteLine($"entity_id={result.Data.EntityId}, central_registry_id={result.Data.CentralRegistryId}");
 }
 ```
 
 ### Create an entity in the complete flow (informing `central_registry_id`)
 
 ```csharp
-var request = new CriarEntidadeRequest
+var request = new CreateEntityRequest
 {
     CentralRegistryId = 42,
-    Type = (int)TipoEntidade.Veiculo,
+    Type = (int)EntityType.Vehicle,
     Brand = "Honda",
     Model = "Civic",
     Color = "Black",
@@ -161,34 +173,55 @@ var request = new CriarEntidadeRequest
     LprEnabled = true
 };
 
-var result = await client.Entidades.CriarAsync(request);
+var result = await client.Entities.CreateAsync(request);
 ```
 
 ### List entities with pagination
 
 ```csharp
-var cadastros = await client.Cadastros.ListarAsync(offset: 0, count: 20, nameFilter: "John");
+var cadastros = await client.Registries.ListAsync(offset: 0, count: 20, nameFilter: "John");
 
 foreach (var cad in cadastros.Data.Items)
 {
-    var entidades = await client.Entidades.ListarPorCadastroAsync(cad.Id);
+    var entidades = await client.Entities.ListByRegistryAsync(cad.Id);
     foreach (var ent in entidades.Data.Items)
         Console.WriteLine($"  {ent.EntityId} - {ent.Name} ({ent.Doc})");
 }
 ```
 
+### Command relay / DOUT
+
+```csharp
+// List devices and outputs
+var devices = await client.Devices.ListAsync();
+foreach (var d in devices.Data!.Items)
+    Console.WriteLine($"{d.Id} {d.Nome} ({d.Tipo}) — {d.Saidas.Count} output(s)");
+
+// 1 s pulse on relay 1 of device "42"
+var pulse = await client.Devices.TriggerAsync(
+    DeviceRelayRequest.PulseRelay("42", relay: 1, timeMs: 1000));
+
+// Pulse DOUT 3 (lock) on the same SMART
+var dout = await client.Devices.TriggerAsync(
+    DeviceRelayRequest.PulseDout("42", dout: 3, timeMs: 500));
+
+// Latch on/off (when the output accepts on/off)
+var on = await client.Devices.TriggerAsync(
+    DeviceRelayRequest.Latch("42", relay: 1, dout: null, cmd: "on"));
+```
+
 ### Create RFID media
 
 ```csharp
-var request = new CriarMidiaRequest
+var request = new CreateMediaRequest
 {
     EntityId = 4294000123,
     CentralRegistryId = 42,
-    Type = TipoMidia.Wiegand26,
+    Type = MediaType.Wiegand26,
     Description = "123,45678"
 };
 
-var result = await client.Midias.CriarAsync(request);
+var result = await client.Media.CreateAsync(request);
 ```
 
 ### Create LPR media (vehicle plate)
@@ -196,26 +229,26 @@ var result = await client.Midias.CriarAsync(request);
 Important: the backend validates the media format automatically. For LPR media, send `ns32_0` and `ns32_1` so the backend does not try to validate the plate as RFID data.
 
 ```csharp
-var request = new CriarMidiaRequest
+var request = new CreateMediaRequest
 {
     EntityId = 4294000123,
     CentralRegistryId = 42,
-    Type = TipoMidia.Lpr,
+    Type = MediaType.Lpr,
     Description = "ABC1D23",
     Ns32_0 = 0,
     Ns32_1 = 0
 };
 
-var result = await client.Midias.CriarAsync(request);
+var result = await client.Media.CreateAsync(request);
 ```
 
 Recommended approach: use `lpr_enabled=true` when creating or updating the vehicle entity. The backend then creates or updates the LPR media automatically.
 
 ```csharp
-var request = new CriarEntidadeRequest
+var request = new CreateEntityRequest
 {
     CentralRegistryId = 42,
-    Type = (int)TipoEntidade.Veiculo,
+    Type = (int)EntityType.Vehicle,
     Brand = "Honda",
     Model = "Civic",
     Color = "Black",

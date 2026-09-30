@@ -155,6 +155,10 @@ class InteractiveCLI {
     console.log('  [9] Busca Avançada de Entidades');
     console.log('');
     
+    console.log('  🔌 **SAÍDAS**');
+    console.log('  [O] Dispositivos / Relés / DOUT (GET /devices + POST /devices/relay)');
+    console.log('');
+    
     console.log('  ℹ️  **INFORMAÇÕES**');
     console.log('  [I] Sobre o Sistema');
     console.log('  [0] Sair');
@@ -277,7 +281,6 @@ class InteractiveCLI {
       vehicleId = parseInt((await this.question('ID do veículo [2000002]: ')).trim()) || 2000002;
     }
     
-    const vehicleName = (await this.question('Nome do veículo [Demo Veículo]: ')).trim() || 'Demo Veículo';
     const plate = (await this.question('Placa [ABC1234]: ')).trim() || 'ABC1234';
     
     // Se unitId for 0, usar placa como nome da unidade
@@ -326,9 +329,9 @@ class InteractiveCLI {
         if (color) options.color = color;
         
         if (mode === 'auto') {
-          createdVehicleId = await client.createVehicleAuto(createdUnitId, vehicleName, plate, 1, options);
+          createdVehicleId = await client.createVehicleAuto(createdUnitId, '', plate, 1, options);
         } else {
-          createdVehicleId = await client.createVehicleFixed(vehicleId, createdUnitId, vehicleName, plate, 1, options);
+          createdVehicleId = await client.createVehicleFixed(vehicleId, createdUnitId, '', plate, 1, options);
         }
         
         console.log(`   ✅ Veículo criado: ID=${createdVehicleId}`);
@@ -479,13 +482,6 @@ class InteractiveCLI {
     console.log('\n  (digite 0 para criar cadastro automático com nome da placa)');
     let unitId = parseInt((await this.question('ID do Cadastro Central [0]: ')).trim()) || 0;
     
-    const ownerName = (await this.question('Nome do Proprietário: ')).trim();
-    if (!ownerName) {
-      console.log('❌ Nome do proprietário é obrigatório');
-      await this.question('\nPressione ENTER para continuar...');
-      return;
-    }
-    
     const plate = (await this.question('Placa: ')).trim().toUpperCase();
     if (!plate) {
       console.log('❌ Placa é obrigatória');
@@ -526,9 +522,9 @@ class InteractiveCLI {
       
       let createdVehicleId;
       if (vehicleId === 0) {
-        createdVehicleId = await client.createVehicleAuto(unitId, ownerName, plate, lprAtivo, options);
+        createdVehicleId = await client.createVehicleAuto(unitId, '', plate, lprAtivo, options);
       } else {
-        createdVehicleId = await client.createVehicleFixed(vehicleId, unitId, ownerName, plate, lprAtivo, options);
+        createdVehicleId = await client.createVehicleFixed(vehicleId, unitId, '', plate, lprAtivo, options);
       }
       
       console.log(`   ✅ Veículo criado: ID=${createdVehicleId}`);
@@ -574,8 +570,8 @@ class InteractiveCLI {
       
       console.log(`\n🔍 Buscando entidades do cadastro ${unitId}...`);
       
-      // Usa o endpoint de entities com filtro por cadastro_id
-      const result = await client.request('GET', `entities?cadastro_id=${unitId}`);
+      // Usa o endpoint de entities com filtro por central_registry_id
+      const result = await client.request('GET', `entities?central_registry_id=${unitId}`);
       
       if (result.ret === 0 && result.items) {
         console.log(`\n📋 ${result.items.length} entidade(s) encontrada(s):\n`);
@@ -583,7 +579,7 @@ class InteractiveCLI {
         console.log('───────────┼─────────┼──────────────────────────────');
         
         for (const item of result.items) {
-          const tipo = item.tipo === 1 ? 'Pessoa' : item.tipo === 2 ? 'Veículo' : '?';
+          const tipo = item.type === 1 ? 'Pessoa' : item.type === 2 ? 'Veículo' : '?';
           console.log(`${item.entity_id?.toString().padEnd(10)} | ${tipo.padEnd(7)} | ${item.name}`);
         }
       } else {
@@ -635,7 +631,7 @@ class InteractiveCLI {
         console.log('───────────┼─────────┼──────────────────────────────┼────────────────');
         
         for (const item of result.items) {
-          const tipo = item.tipo === 1 ? 'Pessoa' : item.tipo === 2 ? 'Veículo' : '?';
+          const tipo = item.type === 1 ? 'Pessoa' : item.type === 2 ? 'Veículo' : '?';
           const nome = item.name?.substring(0, 28).padEnd(28) || '';
           const doc = item.doc || '';
           console.log(`${item.entity_id?.toString().padEnd(10)} | ${tipo.padEnd(7)} | ${nome} | ${doc}`);
@@ -896,6 +892,69 @@ class InteractiveCLI {
     
     await this.question('\nPressione ENTER para continuar...');
   }
+
+  /**
+   * Lista dispositivos e aciona relé/DOUT
+   */
+  async devicesOutputs() {
+    this.showHeader('SAÍDAS (DOUT / RELÉS)');
+
+    if (!this.config.baseUrl) {
+      console.log('❌ Configure a conexão primeiro (opção C)');
+      await this.question('\nPressione ENTER para continuar...');
+      return;
+    }
+
+    try {
+      const client = new MbcortexClient(this.config.baseUrl, this.config.password);
+      await client.login();
+
+      const list = await client.listDevices();
+      const items = list.items || [];
+      console.log(`\n  ${items.length} dispositivo(s):\n`);
+
+      for (const d of items) {
+        const online = d.online == null ? '—' : (d.online ? 'online' : 'offline');
+        console.log(`  [${d.id}] ${d.nome}  ${d.tipo}  ${d.modelo || ''}  ${online}`);
+        for (const o of d.saidas || []) {
+          const label = o.relay != null
+            ? `relay:${o.relay}`
+            : `dout:${o.dout}${o.nome ? ` (${o.nome})` : ''}`;
+          console.log(`      ${label}  cmd=[${(o.cmd || []).join(',')}]  estado=${o.estado || '—'}`);
+        }
+      }
+
+      const acionar = (await this.question('\nAcionar uma saída? (s/N): ')).trim().toLowerCase();
+      if (acionar !== 's' && acionar !== 'sim' && acionar !== 'y') {
+        await this.question('\nPressione ENTER para continuar...');
+        return;
+      }
+
+      const id = (await this.question('ID do dispositivo: ')).trim();
+      const kind = (await this.question('Tipo (relay/dout) [relay]: ')).trim().toLowerCase() || 'relay';
+      const n = parseInt(await this.question('Número da saída [1]: ') || '1', 10);
+      const action = (await this.question('Ação (pulse ms / on / off / toggle) [1000]: ')).trim() || '1000';
+
+      const body = { id };
+      if (kind === 'dout') body.dout = n;
+      else body.relay = n;
+
+      if (['on', 'off', 'toggle', 'pulse'].includes(action)) body.cmd = action;
+      else body.time = parseInt(action, 10) || 1000;
+
+      console.log(`\n  POST /devices/relay ${JSON.stringify(body)}`);
+      const result = await client.triggerRelay(body);
+      for (const a of result.acionados || []) {
+        const out = a.relay != null ? `relay:${a.relay}` : `dout:${a.dout}`;
+        console.log(`  ${a.executed ? '✓' : '✗'} ${a.id} ${out} — ${a.msg}`);
+      }
+      if (result.error) console.log(`  Erro: ${result.error}`);
+    } catch (error) {
+      console.log(`\n❌ ${error.message}`);
+    }
+
+    await this.question('\nPressione ENTER para continuar...');
+  }
   
   /**
    * Mostra informações sobre o sistema
@@ -987,6 +1046,10 @@ class InteractiveCLI {
             
           case '9':
             await this.searchEntities();
+            break;
+
+          case 'O':
+            await this.devicesOutputs();
             break;
             
           case 'I':

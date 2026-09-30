@@ -15,7 +15,8 @@
     { "key": "driverIdsJson", "value": "[111,222]", "type": "string" },
     { "key": "mediaId", "value": "0", "type": "string" },
     { "key": "webhookId", "value": "1", "type": "string" },
-    { "key": "devgid", "value": "123456", "type": "string" }
+    { "key": "devgid", "value": "123456", "type": "string" },
+    { "key": "deviceId", "value": "42", "type": "string" }
   ],
   "auth": {
     "type": "bearer",
@@ -137,6 +138,109 @@
               "raw": "{\n  \"token\": \"{{apiToken}}\"\n}"
             },
             "url": "{{baseUrl}}/mbcortex/master/api/v1/token"
+          }
+        },
+        {
+          "name": "Politica de Saidas (GET)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/token/policy"
+          }
+        },
+        {
+          "name": "Politica de Saidas (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outputs_login\": \"master\"\n}"
+            },
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/token/policy"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dispositivos e Saidas",
+      "item": [
+        {
+          "name": "Listar Dispositivos",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/devices"
+          }
+        },
+        {
+          "name": "Pulso no Rele",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{deviceId}}\",\n  \"relay\": 1,\n  \"time\": 1000\n}"
+            },
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/devices/relay"
+          }
+        },
+        {
+          "name": "Ligar Rele (latch)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{deviceId}}\",\n  \"relay\": 1,\n  \"cmd\": \"on\"\n}"
+            },
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/devices/relay"
+          }
+        },
+        {
+          "name": "Desligar Rele (latch)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{deviceId}}\",\n  \"relay\": 1,\n  \"cmd\": \"off\"\n}"
+            },
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/devices/relay"
+          }
+        },
+        {
+          "name": "Pulso no DOUT",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{deviceId}}\",\n  \"dout\": 3,\n  \"time\": 500\n}"
+            },
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/devices/relay"
+          }
+        },
+        {
+          "name": "Acionar por Nome",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"FACIAL ENTRADA\",\n  \"relay\": 1,\n  \"time\": 1000\n}"
+            },
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/devices/relay"
+          }
+        },
+        {
+          "name": "Varias Saidas",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{deviceId}}\",\n  \"saidas\": [\n    {\n      \"relay\": 1,\n      \"time\": 1000\n    },\n    {\n      \"dout\": 3,\n      \"time\": 500\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/devices/relay"
           }
         }
       ]
@@ -275,7 +379,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 0,\n  \"type\": 1,\n  \"name\": \"Maria Oliveira\",\n  \"doc\": \"12345678900\",\n  \"central_registry_id\": {{centralRegistryId}},\n  \"enabled\": true\n}"
+              "raw": "{\n  \"createid\": true,\n  \"type\": 1,\n  \"name\": \"Maria Oliveira\",\n  \"doc\": \"12345678900\",\n  \"central_registry_id\": {{centralRegistryId}},\n  \"enabled\": true\n}"
             },
             "url": "{{baseUrl}}/mbcortex/master/api/v1/entities"
           }
@@ -306,7 +410,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 0,\n  \"type\": 2,\n  \"name\": \"Joao Silva Santos\",\n  \"doc\": \"ABC1D23\",\n  \"central_registry_id\": {{centralRegistryId}},\n  \"lpr_enabled\": true,\n  \"brand\": \"Toyota\",\n  \"model\": \"Corolla\",\n  \"color\": \"Branco\",\n  \"enabled\": true\n}"
+              "raw": "{\n  \"createid\": true,\n  \"type\": 2,\n  \"doc\": \"ABC1D23\",\n  \"central_registry_id\": {{centralRegistryId}},\n  \"lpr_enabled\": true,\n  \"brand\": \"Toyota\",\n  \"model\": \"Corolla\",\n  \"color\": \"Branco\",\n  \"enabled\": true\n}"
             },
             "url": "{{baseUrl}}/mbcortex/master/api/v1/entities"
           }
@@ -318,7 +422,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 0,\n  \"createid\": true,\n  \"type\": 1,\n  \"name\": \"Cadastro automatico\",\n  \"doc\": \"\",\n  \"enabled\": true\n}"
+              "raw": "{\n  \"createid\": true,\n  \"type\": 1,\n  \"name\": \"Cadastro automatico\",\n  \"doc\": \"\",\n  \"enabled\": true\n}"
             },
             "url": "{{baseUrl}}/mbcortex/master/api/v1/entities"
           }
@@ -352,6 +456,27 @@
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/mbcortex/master/api/v1/entities?id={{entityId}}"
+          }
+        },
+        {
+          "name": "Remover Veiculo por Placa",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/entities?plate=ABC1D23"
+          }
+        },
+        {
+          "name": "Limpar Cadastros Orfaos",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/entities/cleanup-orphans"
+          }
+        },
+        {
+          "name": "Catalogos de Veiculo",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/vehicle-catalogs"
           }
         }
       ]
@@ -521,9 +646,21 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"url\": \"https://example.com/webhook\",\n  \"registered\": 1,\n  \"unregistered\": 1,\n  \"sensors\": 0,\n  \"logs\": 0\n}"
+              "raw": "{\n  \"url\": \"https://example.com/webhook\",\n  \"name\": \"ERP\",\n  \"active\": 1,\n  \"registered\": 1,\n  \"unregistered\": 1,\n  \"sensors\": 0,\n  \"logs\": 0,\n  \"auth_type\": \"none\"\n}"
             },
             "url": "{{baseUrl}}/mbcortex/master/api/v1/webhook?id={{webhookId}}"
+          }
+        },
+        {
+          "name": "Testar Slot",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": "{{baseUrl}}/mbcortex/master/api/v1/webhook/test?id={{webhookId}}"
           }
         },
         {

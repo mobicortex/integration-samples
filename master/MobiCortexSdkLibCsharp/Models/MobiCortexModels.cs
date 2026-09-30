@@ -1609,4 +1609,228 @@ namespace MobiCortex.Sdk.Models
     }
 
     #endregion
+
+    #region Devices / Outputs (relay + DOUT)
+
+    /// <summary>
+    /// Response of GET /devices — devices with commandable outputs.
+    /// </summary>
+    public class DeviceListResponse : ApiRetResponse
+    {
+        [JsonPropertyName("items")]
+        public List<DeviceEntry> Items { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Master ownership of a device (local or federated).
+    /// </summary>
+    public class DeviceMasterInfo
+    {
+        [JsonPropertyName("gid")]
+        public string? Gid { get; set; }
+
+        [JsonPropertyName("nome")]
+        public string? Nome { get; set; }
+
+        [JsonPropertyName("local")]
+        public bool Local { get; set; }
+    }
+
+    /// <summary>
+    /// One output on a device: either relay:N or dout:N (never both).
+    /// </summary>
+    public class DeviceOutput
+    {
+        [JsonPropertyName("relay")]
+        public int? Relay { get; set; }
+
+        [JsonPropertyName("dout")]
+        public int? Dout { get; set; }
+
+        [JsonPropertyName("nome")]
+        public string? Nome { get; set; }
+
+        /// <summary>Commands accepted by this output (pulse, on, off, toggle).</summary>
+        [JsonPropertyName("cmd")]
+        public List<string> Cmd { get; set; } = new();
+
+        /// <summary>Last known state when the hardware reports it (SMART).</summary>
+        [JsonPropertyName("estado")]
+        public string? Estado { get; set; }
+
+        /// <summary>Display label, e.g. "Relé 1" or "DOUT 3 (Fechadura)".</summary>
+        [JsonIgnore]
+        public string Label
+        {
+            get
+            {
+                if (Relay.HasValue)
+                    return string.IsNullOrEmpty(Nome) ? $"Relé {Relay}" : $"Relé {Relay} ({Nome})";
+                if (Dout.HasValue)
+                    return string.IsNullOrEmpty(Nome) ? $"DOUT {Dout}" : $"DOUT {Dout} ({Nome})";
+                return Nome ?? "?";
+            }
+        }
+
+        [JsonIgnore]
+        public bool IsRelay => Relay.HasValue;
+
+        [JsonIgnore]
+        public bool IsDout => Dout.HasValue;
+
+        public bool Supports(string command) =>
+            Cmd.Exists(c => string.Equals(c, command, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Device entry from GET /devices. Treat <see cref="Id"/> as an opaque string.
+    /// Not the same as <see cref="DeviceInfo"/> (GET /device-info).
+    /// </summary>
+    public class DeviceEntry
+    {
+        [JsonPropertyName("id")]
+        public string Id { get; set; } = string.Empty;
+
+        [JsonPropertyName("nome")]
+        public string Nome { get; set; } = string.Empty;
+
+        [JsonPropertyName("tipo")]
+        public string Tipo { get; set; } = string.Empty;
+
+        [JsonPropertyName("modelo")]
+        public string? Modelo { get; set; }
+
+        /// <summary>null = hardware does not report online state.</summary>
+        [JsonPropertyName("online")]
+        [JsonConverter(typeof(BoolIntNullableConverter))]
+        public bool? Online { get; set; }
+
+        [JsonPropertyName("master")]
+        public DeviceMasterInfo? Master { get; set; }
+
+        [JsonPropertyName("saidas")]
+        public List<DeviceOutput> Saidas { get; set; } = new();
+    }
+
+    /// <summary>
+    /// One output action inside POST /devices/relay (single or in saidas[]).
+    /// </summary>
+    public class DeviceOutputAction
+    {
+        [JsonPropertyName("relay")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? Relay { get; set; }
+
+        [JsonPropertyName("dout")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? Dout { get; set; }
+
+        /// <summary>pulse | on | off | toggle. Omit with Time for default 1000 ms pulse.</summary>
+        [JsonPropertyName("cmd")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Cmd { get; set; }
+
+        /// <summary>Pulse duration in ms (50..30000).</summary>
+        [JsonPropertyName("time")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? Time { get; set; }
+    }
+
+    /// <summary>
+    /// Body of POST /devices/relay. Use Id or Nome; one of Relay/Dout or Saidas.
+    /// </summary>
+    public class DeviceRelayRequest
+    {
+        [JsonPropertyName("id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Id { get; set; }
+
+        [JsonPropertyName("nome")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Nome { get; set; }
+
+        [JsonPropertyName("relay")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? Relay { get; set; }
+
+        [JsonPropertyName("dout")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? Dout { get; set; }
+
+        [JsonPropertyName("cmd")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Cmd { get; set; }
+
+        [JsonPropertyName("time")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? Time { get; set; }
+
+        [JsonPropertyName("saidas")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<DeviceOutputAction>? Saidas { get; set; }
+
+        public static DeviceRelayRequest PulseRelay(string id, int relay, int timeMs = 1000) =>
+            new() { Id = id, Relay = relay, Time = timeMs };
+
+        public static DeviceRelayRequest PulseDout(string id, int dout, int timeMs = 1000) =>
+            new() { Id = id, Dout = dout, Time = timeMs };
+
+        public static DeviceRelayRequest Latch(string id, int? relay, int? dout, string cmd) =>
+            new() { Id = id, Relay = relay, Dout = dout, Cmd = cmd };
+    }
+
+    /// <summary>
+    /// One result line from POST /devices/relay.
+    /// </summary>
+    public class DeviceRelayResultItem
+    {
+        [JsonPropertyName("id")]
+        public string Id { get; set; } = string.Empty;
+
+        [JsonPropertyName("nome")]
+        public string? Nome { get; set; }
+
+        [JsonPropertyName("tipo")]
+        public string? Tipo { get; set; }
+
+        [JsonPropertyName("master")]
+        public DeviceMasterInfo? Master { get; set; }
+
+        [JsonPropertyName("relay")]
+        public int? Relay { get; set; }
+
+        [JsonPropertyName("dout")]
+        public int? Dout { get; set; }
+
+        [JsonPropertyName("cmd")]
+        public string? Cmd { get; set; }
+
+        [JsonPropertyName("time")]
+        public int? Time { get; set; }
+
+        [JsonPropertyName("executed")]
+        public bool Executed { get; set; }
+
+        [JsonPropertyName("msg")]
+        public string? Msg { get; set; }
+    }
+
+    /// <summary>
+    /// Response of POST /devices/relay.
+    /// </summary>
+    public class DeviceRelayResponse : ApiRetResponse
+    {
+        [JsonPropertyName("acionados")]
+        public List<DeviceRelayResultItem> Acionados { get; set; } = new();
+
+        /// <summary>Suggested names when a name lookup returns 404.</summary>
+        [JsonPropertyName("sugestoes")]
+        public List<string>? Sugestoes { get; set; }
+
+        [JsonPropertyName("error")]
+        public string? Error { get; set; }
+    }
+
+    #endregion
 }
+

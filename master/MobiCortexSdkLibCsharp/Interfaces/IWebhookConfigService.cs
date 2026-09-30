@@ -29,7 +29,7 @@ namespace MobiCortex.Sdk.Interfaces
 
         /// <summary>
         /// Fires a test event on the webhook.
-        /// GET /webhook/test?id=X
+        /// POST /webhook/test?id=X (body: {})
         /// </summary>
         Task<ApiResult<ApiRetResponse>> TestAsync(int id);
     }

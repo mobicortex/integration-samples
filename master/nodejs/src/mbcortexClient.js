@@ -237,7 +237,7 @@ class MbcortexClient {
    */
   async getCentralRegistry(unitId) {
     try {
-      const response = await this.request('GET', `central-registry/${unitId}`);
+      const response = await this.request('GET', `central-registry?id=${unitId}`);
       return response;
     } catch (error) {
       if (error instanceof NotFoundError) {
@@ -255,7 +255,7 @@ class MbcortexClient {
    * @returns {Object} Lista paginada de entidades
    */
   async listEntitiesByUnit(unitId, offset = 0, count = 10) {
-    const response = await this.request('GET', `entities?cadastro_id=${unitId}&offset=${offset}&count=${count}`);
+    const response = await this.request('GET', `entities?central_registry_id=${unitId}&offset=${offset}&count=${count}`);
     
     const items = response.items || response.data || [];
     const total = response.total || items.length;
@@ -272,7 +272,7 @@ class MbcortexClient {
 
   /**
    * Busca avançada de entidades com filtros
-   * @param {Object} filters - {type, name, doc, cadastro_id}
+   * @param {Object} filters - {type, name, doc, central_registry_id}
    * @param {number} offset - Posição inicial
    * @param {number} count - Quantidade por página
    * @returns {Object} Resultados da busca
@@ -284,7 +284,7 @@ class MbcortexClient {
     if (filters.type) params.append('type', filters.type);
     if (filters.name) params.append('name', filters.name);
     if (filters.doc) params.append('doc', filters.doc);
-    if (filters.cadastro_id) params.append('cadastro_id', filters.cadastro_id);
+    if (filters.central_registry_id) params.append('central_registry_id', filters.central_registry_id);
     
     // Adiciona paginação
     params.append('offset', offset);
@@ -310,28 +310,28 @@ class MbcortexClient {
    * Cria veículo (entidade tipo 2) com configurações de LPR
    * @param {number} id - 0 para createid=true, >0 para ID específico
    * @param {number} unitId - ID da unidade à qual o veículo pertence
-   * @param {string} name - Nome/descrição do veículo
+   * @param {string} name - Ignorado: a API recusa `name` em veículo (400). Use options.brand/model/color
    * @param {string} plate - Placa do veículo (será normalizada: maiúscula, sem espaços)
    * @param {number} lprAtivo - 1 = LPR ativo, 0 = inativo (padrão: 1)
-   * @param {Object} options - Campos opcionais (brand, model, color, obs)
+   * @param {Object} options - Campos opcionais (brand, model, color, enabled)
    * @returns {number} ID do veículo criado
    */
   async createVehicle(id, unitId, name, plate, lprAtivo = 1, options = {}) {
     // Normaliza placa: maiúscula, sem espaços nem hífens
     const normalizedPlate = plate.toUpperCase().replace(/[\s-]/g, '');
     
+    // Veículo aceita só campos do contrato público: sem `name`/`obs` (400 "field not allowed")
     const payload = {
-      tipo: 2,              // Tipo 2 = veículo
-      name: name,
-      doc: normalizedPlate, // Campo "doc" armazena a placa
-      cadastro_id: unitId,  // Vincula à unidade criada
-      lpr_ativo: lprAtivo   // Habilita/desabilita LPR para este veículo
+      type: 2,                      // Tipo 2 = veículo
+      doc: normalizedPlate,         // Campo "doc" armazena a placa
+      lpr_enabled: !!lprAtivo       // Habilita/desabilita LPR para este veículo
     };
+    if (unitId) payload.central_registry_id = unitId;  // Vincula à unidade criada
     
     // Adiciona campos opcionais se fornecidos
-    const optionalFields = ['brand', 'model', 'color', 'obs'];
+    const optionalFields = ['brand', 'model', 'color', 'enabled'];
     optionalFields.forEach(field => {
-      if (options[field]) {
+      if (options[field] !== undefined && options[field] !== '') {
         payload[field] = options[field];
       }
     });
@@ -355,10 +355,10 @@ class MbcortexClient {
   /**
    * Cria veículo com ID automático (controladora gera)
    * @param {number} unitId ID da unidade
-   * @param {string} name Nome do veículo
+   * @param {string} name Ignorado (veículo não aceita name)
    * @param {string} plate Placa do veículo
    * @param {number} lprAtivo 1 = LPR ativo, 0 = inativo (padrão: 1)
-   * @param {Object} options Campos opcionais: {brand, model, color, obs}
+   * @param {Object} options Campos opcionais: {brand, model, color, enabled}
    * @returns {number} ID gerado pela controladora
    */
   async createVehicleAuto(unitId, name, plate, lprAtivo = 1, options = {}) {
@@ -370,10 +370,10 @@ class MbcortexClient {
    * Cria veículo com ID específico (para testes)
    * @param {number} vehicleId ID desejado (use faixa 2000000+ para teste)
    * @param {number} unitId ID da unidade
-   * @param {string} name Nome do veículo  
+   * @param {string} name Ignorado (veículo não aceita name)
    * @param {string} plate Placa do veículo
    * @param {number} lprAtivo 1 = LPR ativo, 0 = inativo (padrão: 1)
-   * @param {Object} options Campos opcionais: {brand, model, color, obs}
+   * @param {Object} options Campos opcionais: {brand, model, color, enabled}
    * @returns {number} ID confirmado pela controladora
    */
   async createVehicleFixed(vehicleId, unitId, name, plate, lprAtivo = 1, options = {}) {
@@ -400,7 +400,7 @@ class MbcortexClient {
    * @param {number} unitId - ID da unidade à qual a pessoa pertence
    * @param {string} name - Nome da pessoa
    * @param {string} doc - CPF/Documento da pessoa (será normalizado: apenas números)
-   * @param {Object} options - Campos opcionais (obs, email, telefone)
+   * @param {Object} options - Campos opcionais (enabled)
    * @returns {number} ID da pessoa criada
    */
   async createPerson(id, unitId, name, doc = "", options = {}) {
@@ -408,20 +408,14 @@ class MbcortexClient {
     const normalizedDoc = doc.replace(/[^\d]/g, '');
     
     const payload = {
-      tipo: 1,              // Tipo 1 = pessoa
+      type: 1,              // Tipo 1 = pessoa
       name: name,
-      doc: normalizedDoc,   // Campo "doc" armazena CPF/documento
-      cadastro_id: unitId,  // Vincula à unidade
-      lpr_ativo: 0          // Pessoas não usam LPR
+      doc: normalizedDoc    // Campo "doc" armazena CPF/documento
     };
+    if (unitId) payload.central_registry_id = unitId;  // Vincula à unidade
     
     // Adiciona campos opcionais se fornecidos
-    const optionalFields = ['obs', 'email', 'telefone'];
-    optionalFields.forEach(field => {
-      if (options[field]) {
-        payload[field] = options[field];
-      }
-    });
+    if (options.enabled !== undefined) payload.enabled = options.enabled;
     
     if (id === 0) {
       // Usa createid=true para ID automático
@@ -442,7 +436,7 @@ class MbcortexClient {
    * @param {number} unitId ID da unidade
    * @param {string} name Nome da pessoa
    * @param {string} doc CPF/Documento da pessoa
-   * @param {Object} options Campos opcionais: {obs, email, telefone}
+   * @param {Object} options Campos opcionais: {enabled}
    * @returns {number} ID gerado pela controladora
    */
   async createPersonAuto(unitId, name, doc = "", options = {}) {
@@ -456,7 +450,7 @@ class MbcortexClient {
    * @param {number} unitId ID da unidade
    * @param {string} name Nome da pessoa
    * @param {string} doc CPF/Documento da pessoa
-   * @param {Object} options Campos opcionais: {obs, email, telefone}
+   * @param {Object} options Campos opcionais: {enabled}
    * @returns {number} ID confirmado pela controladora
    */
   async createPersonFixed(personId, unitId, name, doc = "", options = {}) {
@@ -507,6 +501,26 @@ class MbcortexClient {
 
   async deleteWebhook(id) {
     return this.request('DELETE', `webhook?id=${id}`);
+  }
+
+  /**
+   * Lista dispositivos e saídas acionáveis (relé / DOUT).
+   * GET /devices — Master Linux only (não M3127).
+   */
+  async listDevices() {
+    return this.request('GET', 'devices');
+  }
+
+  /**
+   * Aciona relé ou DOUT.
+   * POST /devices/relay
+   * @param {object} body - { id|nome, relay|dout, time?, cmd?, saidas? }
+   * @example await client.triggerRelay({ id: '42', relay: 1, time: 1000 })
+   * @example await client.triggerRelay({ id: '42', dout: 3, time: 500 })
+   * @example await client.triggerRelay({ id: '42', relay: 1, cmd: 'on' })
+   */
+  async triggerRelay(body) {
+    return this.request('POST', 'devices/relay', { body });
   }
 }
 

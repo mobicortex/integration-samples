@@ -69,6 +69,11 @@ namespace MobiCortex.Sdk.Interfaces
         IMqttExportService MqttExport { get; }
 
         /// <summary>
+        /// Devices and outputs (relays / DOUT) — GET /devices, POST /devices/relay.
+        /// </summary>
+        IDevicesService Devices { get; }
+
+        /// <summary>
         /// Logs in to the controller.
         /// </summary>
         /// <param name="password">Administrator password</param>

@@ -24,7 +24,7 @@ Main subdirectories:
   - [`README-ptbr.md`](./master/csharp/README-ptbr.md): documentation in Brazilian Portuguese.
   - [`CHANGELOG.md`](./master/csharp/CHANGELOG.md): changelog in English.
   - [`CHANGELOG-ptbr.md`](./master/csharp/CHANGELOG-ptbr.md): changelog in Brazilian Portuguese.
-  - [`/master/csharp/MobiCortexSdkLib/README.md`](./master/csharp/MobiCortexSdkLib/README.md): SDK library details.
+  - [`/master/MobiCortexSdkLibCsharp`](./master/MobiCortexSdkLibCsharp): shared SDK library (used by `csharp` and `csharp.net`).
 
 - [`/master/csharp.net`](./master/csharp.net)
   **C# / .NET** integration example with WinForms application and reusable SDK library.
@@ -113,29 +113,26 @@ Main files:
 Important subfolders:
 
 - [`/master/csharp/Forms`](./master/csharp/Forms)
-  WinForms screens for registry, entity, media, dashboard, MQTT, webhook, and monitoring flows.
+  WinForms screens for registry, entity, media, dashboard, MQTT, webhook, monitoring, and outputs (relays / DOUT) flows.
 
-- [`/master/csharp/MobiCortexSdkLib`](./master/csharp/MobiCortexSdkLib)
-  Reusable .NET SDK library used by the sample app.
+- [`/master/MobiCortexSdkLibCsharp`](./master/MobiCortexSdkLibCsharp)
+  Shared .NET SDK library (net472 + net8.0) used by both C# sample apps.
 
 Important SDK files:
 
-- [`/master/csharp/MobiCortexSdkLib/README.md`](./master/csharp/MobiCortexSdkLib/README.md)
-  SDK-specific documentation.
-
-- [`/master/csharp/MobiCortexSdkLib/MobiCortex.Sdk.csproj`](./master/csharp/MobiCortexSdkLib/MobiCortex.Sdk.csproj)
+- [`/master/MobiCortexSdkLibCsharp/MobiCortex.Sdk.csproj`](./master/MobiCortexSdkLibCsharp/MobiCortex.Sdk.csproj)
   SDK project file.
 
-- [`/master/csharp/MobiCortexSdkLib/Services/MobiCortexClient.cs`](./master/csharp/MobiCortexSdkLib/Services/MobiCortexClient.cs)
+- [`/master/MobiCortexSdkLibCsharp/Services/MobiCortexClient.cs`](./master/MobiCortexSdkLibCsharp/Services/MobiCortexClient.cs)
   Main HTTP/API client implementation.
 
-- [`/master/csharp/MobiCortexSdkLib/Models/MobiCortexModels.cs`](./master/csharp/MobiCortexSdkLib/Models/MobiCortexModels.cs)
+- [`/master/MobiCortexSdkLibCsharp/Models/MobiCortexModels.cs`](./master/MobiCortexSdkLibCsharp/Models/MobiCortexModels.cs)
   DTOs and models used by the SDK.
 
-- [`/master/csharp/MobiCortexSdkLib/Interfaces`](./master/csharp/MobiCortexSdkLib/Interfaces)
+- [`/master/MobiCortexSdkLibCsharp/Interfaces`](./master/MobiCortexSdkLibCsharp/Interfaces)
   Service interfaces.
 
-- [`/master/csharp/MobiCortexSdkLib/Exceptions`](./master/csharp/MobiCortexSdkLib/Exceptions)
+- [`/master/MobiCortexSdkLibCsharp/Exceptions`](./master/MobiCortexSdkLibCsharp/Exceptions)
   Custom exception types.
 
 Technology summary:
@@ -180,29 +177,26 @@ Main files:
 Important subfolders:
 
 - [`/master/csharp.net/Forms`](./master/csharp.net/Forms)
-  WinForms screens for registry, entity, media, dashboard, MQTT, webhook, and monitoring flows.
+  WinForms screens for registry, entity, media, dashboard, MQTT, webhook, monitoring, and outputs (relays / DOUT) flows.
 
-- [`/master/csharp.net/MobiCortexSdkLib`](./master/csharp.net/MobiCortexSdkLib)
-  Reusable .NET SDK library used by the sample app.
+- [`/master/MobiCortexSdkLibCsharp`](./master/MobiCortexSdkLibCsharp)
+  Shared .NET SDK library (net472 + net8.0) used by both C# sample apps.
 
 Important SDK files:
 
-- [`/master/csharp.net/MobiCortexSdkLib/README.md`](./master/csharp.net/MobiCortexSdkLib/README.md)
-  SDK-specific documentation.
-
-- [`/master/csharp.net/MobiCortexSdkLib/MobiCortex.Sdk.csproj`](./master/csharp.net/MobiCortexSdkLib/MobiCortex.Sdk.csproj)
+- [`/master/MobiCortexSdkLibCsharp/MobiCortex.Sdk.csproj`](./master/MobiCortexSdkLibCsharp/MobiCortex.Sdk.csproj)
   SDK project file.
 
-- [`/master/csharp.net/MobiCortexSdkLib/Services/MobiCortexClient.cs`](./master/csharp.net/MobiCortexSdkLib/Services/MobiCortexClient.cs)
+- [`/master/MobiCortexSdkLibCsharp/Services/MobiCortexClient.cs`](./master/MobiCortexSdkLibCsharp/Services/MobiCortexClient.cs)
   Main HTTP/API client implementation.
 
-- [`/master/csharp.net/MobiCortexSdkLib/Models/MobiCortexModels.cs`](./master/csharp.net/MobiCortexSdkLib/Models/MobiCortexModels.cs)
+- [`/master/MobiCortexSdkLibCsharp/Models/MobiCortexModels.cs`](./master/MobiCortexSdkLibCsharp/Models/MobiCortexModels.cs)
   DTOs and models used by the SDK.
 
 Technology summary:
 
 - Language: C#
-- Runtime: .NET 8
+- Runtime: .NET Framework 4.7.2
 - UI: Windows Forms
 - Integration types: REST API, MQTT, webhook/server helpers
 
@@ -265,6 +259,9 @@ Important example files:
 - [`/master/nodejs/examples/webhook_server.js`](./master/nodejs/examples/webhook_server.js)
   HTTP webhook receiver on `0.0.0.0`.
 
+- [`/master/nodejs/examples/devices_outputs.js`](./master/nodejs/examples/devices_outputs.js)
+  List devices and command relays/DOUT (`GET /devices` + `POST /devices/relay`).
+
 Technology summary:
 
 - Language: JavaScript
@@ -297,6 +294,9 @@ Main files:
 - [`/master/python/examples/webhook_server.py`](./master/python/examples/webhook_server.py)
   HTTP webhook receiver on `0.0.0.0`.
 
+- [`/master/python/examples/devices_outputs.py`](./master/python/examples/devices_outputs.py)
+  List devices and command relays/DOUT (`GET /devices` + `POST /devices/relay`).
+
 Important subfolders:
 
 - [`/master/python/src`](./master/python/src)
@@ -327,12 +327,10 @@ Technology summary:
 - C# documentation:
   [`/master/csharp/README.md`](./master/csharp/README.md)
   [`/master/csharp/README-ptbr.md`](./master/csharp/README-ptbr.md)
-  [`/master/csharp/MobiCortexSdkLib/README.md`](./master/csharp/MobiCortexSdkLib/README.md)
 
 - C# / .NET (csharp.net) documentation:
   [`/master/csharp.net/README.md`](./master/csharp.net/README.md)
   [`/master/csharp.net/README-ptbr.md`](./master/csharp.net/README-ptbr.md)
-  [`/master/csharp.net/MobiCortexSdkLib/README.md`](./master/csharp.net/MobiCortexSdkLib/README.md)
 
 - Node.js documentation:
   [`/master/nodejs/README.md`](./master/nodejs/README.md)

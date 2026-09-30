@@ -40,6 +40,8 @@ namespace SmartSdk
             this.lblDescMqttBroker = new System.Windows.Forms.Label();
             this.btnWebhookServer = new System.Windows.Forms.Button();
             this.lblDescWebhookServer = new System.Windows.Forms.Label();
+            this.btnSaidas = new System.Windows.Forms.Button();
+            this.lblDescSaidas = new System.Windows.Forms.Label();
             this.panelLog = new System.Windows.Forms.Panel();
             this.txtLog = new System.Windows.Forms.TextBox();
             this.btnLimparLog = new System.Windows.Forms.Button();
@@ -176,11 +178,13 @@ namespace SmartSdk
             this.panelBotoes.Controls.Add(this.lblDescMqttBroker);
             this.panelBotoes.Controls.Add(this.btnWebhookServer);
             this.panelBotoes.Controls.Add(this.lblDescWebhookServer);
+            this.panelBotoes.Controls.Add(this.btnSaidas);
+            this.panelBotoes.Controls.Add(this.lblDescSaidas);
             this.panelBotoes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelBotoes.Location = new System.Drawing.Point(0, 61);
             this.panelBotoes.Name = "panelBotoes";
             this.panelBotoes.Padding = new System.Windows.Forms.Padding(13, 13, 13, 13);
-            this.panelBotoes.Size = new System.Drawing.Size(672, 451);
+            this.panelBotoes.Size = new System.Drawing.Size(672, 500);
             this.panelBotoes.TabIndex = 1;
             // 
             // lblTituloDemos
@@ -363,13 +367,37 @@ namespace SmartSdk
             this.lblDescWebhookServer.Text = "Starts an HTTP server to receive events via webhook. The controller sends PO" +
     "ST with JSON events.";
             // 
+            // btnSaidas
+            // 
+            this.btnSaidas.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(73)))), ((int)(((byte)(80)))), ((int)(((byte)(87)))));
+            this.btnSaidas.Enabled = false;
+            this.btnSaidas.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSaidas.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnSaidas.ForeColor = System.Drawing.Color.White;
+            this.btnSaidas.Location = new System.Drawing.Point(13, 382);
+            this.btnSaidas.Name = "btnSaidas";
+            this.btnSaidas.Size = new System.Drawing.Size(214, 35);
+            this.btnSaidas.TabIndex = 15;
+            this.btnSaidas.Text = "Outputs (DOUT / Relays)";
+            this.btnSaidas.UseVisualStyleBackColor = false;
+            this.btnSaidas.Click += new System.EventHandler(this.btnSaidas_Click);
+            // 
+            // lblDescSaidas
+            // 
+            this.lblDescSaidas.ForeColor = System.Drawing.Color.Gray;
+            this.lblDescSaidas.Location = new System.Drawing.Point(236, 382);
+            this.lblDescSaidas.Name = "lblDescSaidas";
+            this.lblDescSaidas.Size = new System.Drawing.Size(420, 35);
+            this.lblDescSaidas.TabIndex = 16;
+            this.lblDescSaidas.Text = "Lists devices (GET /devices) and commands relays/DOUT (POST /devices/relay): pulse, on, off, toggle.";
+            // 
             // panelLog
             // 
             this.panelLog.Controls.Add(this.txtLog);
             this.panelLog.Controls.Add(this.btnLimparLog);
             this.panelLog.Controls.Add(this.lblLog);
             this.panelLog.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelLog.Location = new System.Drawing.Point(0, 512);
+            this.panelLog.Location = new System.Drawing.Point(0, 561);
             this.panelLog.Name = "panelLog";
             this.panelLog.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panelLog.Size = new System.Drawing.Size(672, 95);
@@ -413,7 +441,7 @@ namespace SmartSdk
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(672, 607);
+            this.ClientSize = new System.Drawing.Size(672, 656);
             this.Controls.Add(this.panelBotoes);
             this.Controls.Add(this.panelLog);
             this.Controls.Add(this.panelTop);
@@ -459,6 +487,8 @@ namespace SmartSdk
         private Label lblDescMqttBroker;
         private Button btnWebhookServer;
         private Label lblDescWebhookServer;
+        private Button btnSaidas;
+        private Label lblDescSaidas;
         private Panel panelLog;
         private Label lblLog;
         private TextBox txtLog;

@@ -7,6 +7,14 @@ e este projeto segue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Não Lançado]
 
+### Adicionado
+- Demo de saídas: `FormSaidas` lista dispositivos (`GET /devices`) e comanda relés/DOUT (`POST /devices/relay`) — pulso, on, off, toggle.
+- SDK: `IDevicesService` / `Devices` com modelos da lista de dispositivos e comando de relé/DOUT.
+
+### Corrigido
+- SDK: `Webhook.TestAsync` passa a enviar `POST /webhook/test` com corpo JSON (a controladora recusa `GET`).
+- READMEs: nomes reais dos tipos do SDK nos exemplos, `DELETE /login` / `PUT /login` no lugar de `/logout` / `/password`, estrutura do projeto com todos os forms e o `MobiCortexSdkLibCsharp` compartilhado.
+
 ### Alterado
 - Cliente MQTT e monitoramento passam a usar TCP 1884 e o tópico `mbcortex/export/event` (sem MQTT via WebSocket).
 - SDK com REST `/mqtt-export` e botão para criar usuário de teste no formulário MQTT.

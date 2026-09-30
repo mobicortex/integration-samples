@@ -9,6 +9,7 @@
     "basic": "node examples/basic_usage.js",
     "mqtt": "node examples/mqtt_subscribe.js",
     "webhook": "node examples/webhook_server.js",
+    "outputs": "node examples/devices_outputs.js",
     "start": "node examples/cli.js",
     "legacy": "node main.js"
   },

@@ -189,10 +189,10 @@ class MbcortexClient:
         
         Args:
             unit_id: ID do cadastro central
-            name: Nome do proprietario/veiculo
+            name: Ignorado (veiculo nao aceita name; use brand/model/color)
             plate: Placa do veiculo (sera normalizada)
             lpr_ativo: Se deve ativar LPR (1=sim, 0=nao)
-            **kwargs: Campos opcionais (brand, model, color, etc)
+            **kwargs: Campos opcionais (brand, model, color, enabled)
             
         Returns:
             ID do veiculo criado pela controladora
@@ -202,16 +202,16 @@ class MbcortexClient:
         # Payload basico obrigatorio
         payload = {
             "createid": True, 
-            "tipo": 2,  # 2 = veiculo
-            "name": name, 
+            "type": 2,  # 2 = veiculo (sem "name": a API recusa com 400)
             "doc": plate_norm,
-            "cadastro_id": unit_id, 
-            "lpr_ativo": lpr_ativo
+            "lpr_enabled": bool(lpr_ativo)
         }
+        if unit_id:
+            payload["central_registry_id"] = unit_id
         
         # Adiciona campos opcionais se fornecidos
-        for field in ['brand', 'model', 'color', 'obs']:
-            if field in kwargs and kwargs[field]:
+        for field in ['brand', 'model', 'color', 'enabled']:
+            if kwargs.get(field) not in (None, ""):
                 payload[field] = kwargs[field]
         
         status, data = self._request("POST", "/mbcortex/master/api/v1/entities", json_data=payload)
@@ -226,10 +226,10 @@ class MbcortexClient:
         Args:
             vehicle_id: ID desejado para o veiculo
             unit_id: ID do cadastro central
-            name: Nome do proprietario/veiculo
+            name: Ignorado (veiculo nao aceita name; use brand/model/color)
             plate: Placa do veiculo (sera normalizada)
             lpr_ativo: Se deve ativar LPR (1=sim, 0=nao)
-            **kwargs: Campos opcionais (brand, model, color, etc)
+            **kwargs: Campos opcionais (brand, model, color, enabled)
             
         Returns:
             ID do veiculo criado (confirmado pela controladora)
@@ -239,16 +239,16 @@ class MbcortexClient:
         # Payload basico obrigatorio
         payload = {
             "id": vehicle_id,
-            "tipo": 2,  # 2 = veiculo
-            "name": name, 
+            "type": 2,  # 2 = veiculo (sem "name": a API recusa com 400)
             "doc": plate_norm,
-            "cadastro_id": unit_id, 
-            "lpr_ativo": lpr_ativo
+            "lpr_enabled": bool(lpr_ativo)
         }
+        if unit_id:
+            payload["central_registry_id"] = unit_id
         
         # Adiciona campos opcionais se fornecidos
-        for field in ['brand', 'model', 'color', 'obs']:
-            if field in kwargs and kwargs[field]:
+        for field in ['brand', 'model', 'color', 'enabled']:
+            if kwargs.get(field) not in (None, ""):
                 payload[field] = kwargs[field]
         
         status, data = self._request("POST", "/mbcortex/master/api/v1/entities", json_data=payload)
@@ -302,6 +302,22 @@ class MbcortexClient:
 
     def delete_webhook(self, slot_id: int) -> None:
         self._request("DELETE", "/mbcortex/master/api/v1/webhook", params={"id": slot_id})
+
+    def list_devices(self) -> Dict[str, Any]:
+        """GET /devices — lista dispositivos e saidas (rele/DOUT). Master Linux only."""
+        _status, data = self._request("GET", "/mbcortex/master/api/v1/devices")
+        return data if isinstance(data, dict) else {"ret": -1, "items": []}
+
+    def trigger_relay(self, body: Dict[str, Any]) -> Dict[str, Any]:
+        """POST /devices/relay — pulso ou latch em relay/DOUT.
+
+        Exemplos de body:
+          {"id": "42", "relay": 1, "time": 1000}
+          {"id": "42", "dout": 3, "time": 500}
+          {"id": "42", "relay": 1, "cmd": "on"}
+        """
+        _status, data = self._request("POST", "/mbcortex/master/api/v1/devices/relay", json_data=body)
+        return data if isinstance(data, dict) else {"ret": -1}
     
     # ============================================================================
     # METODOS DE CONSULTA E PAGINACAO  
@@ -370,7 +386,7 @@ class MbcortexClient:
         Returns:
             Lista de entidades (pode ser vazia)
         """
-        status, data = self._request("GET", "/mbcortex/master/api/v1/entities", params={"cadastro_id": unit_id})
+        status, data = self._request("GET", "/mbcortex/master/api/v1/entities", params={"central_registry_id": unit_id})
         if status == 200 and isinstance(data, dict) and data.get("ret") == 0:
             result_data = data.get("data", [])
             if not result_data:
@@ -403,7 +419,7 @@ class MbcortexClient:
         if doc_filter.strip():
             params["doc"] = doc_filter.strip()
         if tipo_filter is not None:
-            params["tipo"] = tipo_filter
+            params["type"] = tipo_filter
             
         status, data = self._request("GET", "/mbcortex/master/api/v1/entities", params=params)
         if status == 200 and isinstance(data, dict) and data.get("ret") == 0:
@@ -448,7 +464,8 @@ class MbcortexClient:
         """
         status, data = self._request("GET", "/mbcortex/master/api/v1/dashboard")
         if status == 200 and isinstance(data, dict) and data.get("ret") == 0:
-            return data.get("data", {})
+            # Resposta traz counts/midias etc. no nivel raiz (sem envelope "data")
+            return {k: v for k, v in data.items() if k != "ret"}
         raise MbcortexError(f"Falha ao obter estatisticas: {data}")
 
 
@@ -611,6 +628,9 @@ class Menu:
         print("  [8] Teste Completo - Modo AUTO (IDs automaticos)")
         print("  [9] Teste Completo - Modo FIXED (IDs fixos)")
         
+        print(f"\n  🔌 **SAIDAS**")
+        print("  [O] Dispositivos / Reles / DOUT (GET /devices + POST /devices/relay)")
+        
         print(f"\n  ℹ️  **INFORMACOES**")
         print("  [I] Sobre o Sistema")
         print("  [0] Sair")
@@ -620,9 +640,9 @@ class Menu:
         
         while True:
             opcao = input("Escolha uma opcao: ").strip().upper()
-            if opcao in ("0", "C", "T", "I") or opcao.isdigit() and 1 <= int(opcao) <= 9:
+            if opcao in ("0", "C", "T", "I", "O") or opcao.isdigit() and 1 <= int(opcao) <= 9:
                 return opcao
-            self.error("Opcao invalida. Use C, T, I, 0-9.")
+            self.error("Opcao invalida. Use C, T, I, O, 0-9.")
     
     def configurar_conexao(self) -> Dict:
         """Configura parametros de conexao."""
@@ -1096,11 +1116,10 @@ def nova_pessoa(menu: Menu, client: MbcortexClient):
         
         # Cria a pessoa (tipo 1 = pessoa)
         payload = {
-            "tipo": 1,
+            "type": 1,
             "name": name,
             "doc": doc,
-            "cadastro_id": unit_id,
-            "lpr_ativo": 0
+            "central_registry_id": unit_id
         }
         
         if entity_id == 0:
@@ -1130,7 +1149,6 @@ def novo_veiculo(menu: Menu, client: MbcortexClient):
     vehicle_id = menu.input_int("ID do Veiculo", default=0, min_val=0)
     print("\n  (digite 0 para criar cadastro automatico com nome da placa)")
     unit_id = menu.input_int("ID do Cadastro Central", default=0, min_val=0)
-    name = menu.input_required("Nome do Proprietario")
     plate = menu.input_required("Placa").upper()
     lpr = 1 if menu.input_yes_no("Ativar LPR?", default=True) else 0
     
@@ -1151,11 +1169,11 @@ def novo_veiculo(menu: Menu, client: MbcortexClient):
             menu.success(f"Cadastro central criado com ID: {unit_id}")
         
         if vehicle_id == 0:
-            new_id = client.create_vehicle_auto(unit_id=unit_id, name=name, plate=plate, 
+            new_id = client.create_vehicle_auto(unit_id=unit_id, name="", plate=plate, 
                                                  lpr_ativo=lpr, **optional)
         else:
             new_id = client.create_vehicle_fixed(vehicle_id=vehicle_id, unit_id=unit_id, 
-                                                  name=name, plate=plate, lpr_ativo=lpr, **optional)
+                                                  name="", plate=plate, lpr_ativo=lpr, **optional)
         menu.success(f"Veiculo criado com ID: {new_id}")
     except ConflictError:
         menu.error("Ja existe um veiculo com este ID ou placa")
@@ -1180,7 +1198,7 @@ def listar_entidades_por_cadastro(menu: Menu, client: MbcortexClient):
         print("  " + "-" * 70)
         
         for e in entities:
-            tipo = "Pessoa" if e.get('tipo') == 1 else "Veiculo" if e.get('tipo') == 2 else "?"
+            tipo = "Pessoa" if e.get('type') == 1 else "Veiculo" if e.get('type') == 2 else "?"
             name = e.get('name', 'N/A')[:23]
             doc = e.get('doc', 'N/A')[:20]
             print(f"  {e.get('id', 0):<10} {tipo:<10} {name:<25} {doc}")
@@ -1219,7 +1237,7 @@ def busca_avancada_entidades(menu: Menu, client: MbcortexClient):
                 print(f"\n  {'ID':<10} {'Tipo':<10} {'Nome':<25} {'Documento/Placa'}")
                 print("  " + "-" * 70)
                 for e in data:
-                    tipo = "Pessoa" if e.get('tipo') == 1 else "Veiculo" if e.get('tipo') == 2 else "?"
+                    tipo = "Pessoa" if e.get('type') == 1 else "Veiculo" if e.get('type') == 2 else "?"
                     name = e.get('name', 'N/A')[:23]
                     doc = e.get('doc', 'N/A')[:20]
                     print(f"  {e.get('id', 0):<10} {tipo:<10} {name:<25} {doc}")
@@ -1243,6 +1261,61 @@ def busca_avancada_entidades(menu: Menu, client: MbcortexClient):
         except Exception as e:
             menu.error(f"Erro: {e}")
             break
+
+
+def saidas_dispositivos(menu: Menu, client: MbcortexClient):
+    """Lista dispositivos e aciona rele/DOUT."""
+    menu.header("SAIDAS (DOUT / RELES)")
+    try:
+        client.login()
+        data = client.list_devices()
+        items = data.get("items") or []
+        print(f"\n  {len(items)} dispositivo(s):\n")
+        for d in items:
+            online = d.get("online")
+            online_s = "—" if online is None else ("online" if online else "offline")
+            print(f"  [{d.get('id')}] {d.get('nome')}  {d.get('tipo')}  {d.get('modelo') or ''}  {online_s}")
+            for o in d.get("saidas") or []:
+                if o.get("relay") is not None:
+                    label = f"relay:{o['relay']}"
+                else:
+                    label = f"dout:{o.get('dout')}"
+                    if o.get("nome"):
+                        label += f" ({o['nome']})"
+                cmds = ",".join(o.get("cmd") or [])
+                print(f"      {label}  cmd=[{cmds}]  estado={o.get('estado') or '—'}")
+
+        if not menu.input_yes_no("Acionar uma saida?", default=False):
+            return
+
+        device_id = menu.input_required("ID do dispositivo")
+        kind = menu.input_default("Tipo (relay/dout)", "relay").strip().lower() or "relay"
+        num = menu.input_int("Numero da saida", default=1, min_val=1)
+        action = menu.input_default("Acao (ms / on / off / toggle)", "1000").strip() or "1000"
+
+        body: Dict[str, Any] = {"id": device_id}
+        if kind == "dout":
+            body["dout"] = num
+        else:
+            body["relay"] = num
+        if action in ("on", "off", "toggle", "pulse"):
+            body["cmd"] = action
+        else:
+            try:
+                body["time"] = int(action)
+            except ValueError:
+                body["time"] = 1000
+
+        print(f"\n  POST /devices/relay {json.dumps(body)}")
+        result = client.trigger_relay(body)
+        for a in result.get("acionados") or []:
+            out = f"relay:{a['relay']}" if a.get("relay") is not None else f"dout:{a.get('dout')}"
+            ok = "OK" if a.get("executed") else "FAIL"
+            print(f"  {ok} {a.get('id')} {out} — {a.get('msg')}")
+        if result.get("error"):
+            menu.error(result["error"])
+    except Exception as e:
+        menu.error(f"Erro: {e}")
 
 
 def teste_completo_auto(menu: Menu, runner: TestRunner):
@@ -1358,6 +1431,15 @@ def main():
             elif opcao == "9":
                 teste_completo_fixed(menu, runner)
                 input("\nPressione ENTER para voltar ao menu...")
+
+            elif opcao == "O":
+                client = get_client_from_config(menu)
+                if client:
+                    try:
+                        saidas_dispositivos(menu, client)
+                    except Exception as e:
+                        menu.error(f"Erro: {e}")
+                    input("\nPressione ENTER para voltar ao menu...")
             
             # === CONFIGURACAO ===
             elif opcao == "C":

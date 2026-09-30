@@ -55,7 +55,8 @@ nodejs/
     ├── cli.js                # CLI interativo completo
     ├── basic_usage.js        # Exemplo básico como biblioteca
     ├── mqtt_subscribe.js     # MQTT TCP 1884 (mbcortex/export/event)
-    └── webhook_server.js     # Receptor HTTP em 0.0.0.0 (LAN)
+    ├── webhook_server.js     # Receptor HTTP em 0.0.0.0 (LAN)
+    └── devices_outputs.js    # GET /devices + POST /devices/relay (rele/DOUT)
 ```
 
 ---
@@ -135,6 +136,9 @@ NODE_TLS_REJECT_UNAUTHORIZED=0 npm run cli
 [8] Listar Entidades por Cadastro
 [9] Busca Avançada de Entidades
 
+🔌 SAÍDAS
+[O] Dispositivos / Relés / DOUT (GET /devices + POST /devices/relay)
+
 ℹ️  INFORMAÇÕES
 [I] Sobre o Sistema
 [0] Sair
@@ -197,6 +201,24 @@ npm run webhook
 ```
 
 Grave na controladora `http://<IP_LAN_DESTE_PC>:9099/webhook` — **não** use localhost. Ative registered + unregistered. Se o TCP der timeout, libere o firewall do Windows. Evite a porta 8080 se o `filesync-win64` já estiver nela.
+
+### 6. Relés / DOUT (Master Linux)
+
+Lista os dispositivos com as saídas acionáveis (`GET /devices`) e, com argumentos, aciona uma saída (`POST /devices/relay`). Conexão por `MOBICORTEX_URL` e `MOBICORTEX_PASS`.
+
+```bash
+# Só lista
+node examples/devices_outputs.js
+# ou
+npm run outputs
+
+# node examples/devices_outputs.js <id> <relay|dout> <n> <ms|pulse|on|off|toggle>
+node examples/devices_outputs.js 42 relay 1 1000
+node examples/devices_outputs.js 42 dout 3 500
+node examples/devices_outputs.js 42 relay 1 on
+```
+
+O exemplo já define `NODE_TLS_REJECT_UNAUTHORIZED=0` se a variável não existir. Trate o `id` como texto opaco (`"42"`, `"rs485:5"`, `"ctrl"`, `"<gid>:42"`); `on`/`off` só valem onde o `cmd` da saída lista esses valores.
 
 REST no cliente (`login` primeiro):
 

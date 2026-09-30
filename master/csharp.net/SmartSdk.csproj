@@ -61,6 +61,8 @@
     <Compile Update="Forms\FormSelecionarTipoEntidade.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormSelecionarTipoEntidade.cs</DependentUpon></Compile>
     <Compile Update="Forms\FormWebhookServer.cs"><SubType>Form</SubType></Compile>
     <Compile Update="Forms\FormWebhookServer.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormWebhookServer.cs</DependentUpon></Compile>
+    <Compile Update="Forms\FormSaidas.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="Forms\FormSaidas.Designer.cs"><SubType>Designer</SubType><DependentUpon>FormSaidas.cs</DependentUpon></Compile>
   </ItemGroup>
 
   <!-- Incluir arquivos de recursos (.resx) explicitamente -->

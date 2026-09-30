@@ -69,13 +69,12 @@ async function exemploBasico() {
       const vehicleOptions = {
         brand: 'Toyota',      // Marca (opcional)
         model: 'Corolla',     // Modelo (opcional)
-        color: 'Prata',       // Cor (opcional)
-        obs: 'Veículo da diretoria'  // Observações (opcional)
+        color: 'Prata'        // Cor (opcional; um dos rótulos de GET /vehicle-catalogs)
       };
       
       const vehicleId = await client.createVehicleAuto(
         unitId,                    // ID da unidade
-        'João Silva',              // Nome do proprietário
+        '',                        // name: ignorado (veículo não aceita name)
         'ABC-1234',                // Placa (será normalizada para ABC1234)
         1,                         // LPR ativo (1 = sim, 0 = não)
         vehicleOptions             // Campos opcionais
@@ -83,13 +82,11 @@ async function exemploBasico() {
       
       console.log(`✅ Veículo criado: ID=${vehicleId}`);
       console.log('📋 Dados do veículo:');
-      console.log(`   ├─ Proprietário: João Silva`);
       console.log(`   ├─ Placa: ABC1234`);
       console.log(`   ├─ Marca: ${vehicleOptions.brand}`);
       console.log(`   ├─ Modelo: ${vehicleOptions.model}`);
       console.log(`   ├─ Cor: ${vehicleOptions.color}`);
-      console.log(`   ├─ LPR: ATIVO`);
-      console.log(`   └─ Obs: ${vehicleOptions.obs}`);
+      console.log(`   └─ LPR: ATIVO`);
       console.log('');
       
       // 6️⃣ Remove o veículo (cleanup)
