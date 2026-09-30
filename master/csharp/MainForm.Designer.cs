@@ -137,7 +137,7 @@ namespace SmartSdk
             lblIP.Name = "lblIP";
             lblIP.Size = new Size(104, 15);
             lblIP.TabIndex = 0;
-            lblIP.Text = "Controller IP:";
+            lblIP.Text = "Controller IP:port:";
             // 
             // txtIP
             // 
@@ -145,7 +145,7 @@ namespace SmartSdk
             txtIP.Name = "txtIP";
             txtIP.Size = new Size(200, 23);
             txtIP.TabIndex = 1;
-            txtIP.Text = "192.168.120.45";
+            txtIP.Text = "192.168.120.45:4449";
             // 
             // btnAbrirInterfaceWeb
             // 

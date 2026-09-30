@@ -62,7 +62,7 @@ All forms share a single `MobiCortexClient` instance (`IMobiCortexClient`, from 
 ## How To Use
 
 1. Run the `SmartSdk.exe` application.
-2. Enter the controller IP address, for example `192.168.120.45`.
+2. Enter the controller IP **and port**, for example `192.168.0.176:443` or `192.168.120.45:4449`. The port is required: it is 443 or 4449 depending on the controller.
 3. Enter the password (default: `admin`).
 4. Click **Connect**.
 5. After connecting, open any demo form from the main launcher.
@@ -90,7 +90,7 @@ SmartSdk/
 
 ## REST API Overview
 
-The service communicates with the controller REST API over HTTPS (port 4449, self-signed certificate).
+The service communicates with the controller REST API over HTTPS (port 443 or 4449, self-signed certificate).
 
 Base route prefix: `/mbcortex/master/api/v1`
 

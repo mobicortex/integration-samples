@@ -62,7 +62,7 @@ Todos os formularios compartilham uma unica instancia de `MobiCortexClient` (`IM
 ## Como Usar
 
 1. Execute o aplicativo `SmartSdk.exe`.
-2. Informe o IP do controlador, por exemplo `192.168.120.45`.
+2. Informe o IP **e a porta** do controlador, por exemplo `192.168.0.176:443` ou `192.168.120.45:4449`. A porta e obrigatoria: 443 ou 4449, conforme o controlador.
 3. Informe a senha (padrao: `admin`).
 4. Clique em **Conectar**.
 5. Apos conectar, abra qualquer formulario de demonstracao pelo launcher principal.
@@ -91,7 +91,7 @@ SmartSdk/
 
 ## Visao Geral da API REST
 
-O servico se comunica com a API REST do controlador via HTTPS (porta 4449, certificado autoassinado).
+O servico se comunica com a API REST do controlador via HTTPS (porta 443 ou 4449, certificado autoassinado).
 
 Prefixo base das rotas: `/mbcortex/master/api/v1`
 

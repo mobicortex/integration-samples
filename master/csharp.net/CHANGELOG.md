@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - READMEs: real SDK type names in code samples, `DELETE /login` / `PUT /login` instead of `/logout` / `/password`, project structure with all forms and the shared `MobiCortexSdkLibCsharp`.
 
 ### Changed
+- Connection requires `IP:port` (443 or 4449, depending on the controller); there is no default port anymore.
 - MQTT client and monitoring now use TCP port 1884 and topic `mbcortex/export/event` (no WebSocket MQTT).
 - Added REST `/mqtt-export` to the SDK and a "Create test user" action on the MQTT client form.
 - MQTT monitoring and MQTT client logs wrap long event lines and pretty-print JSON payloads (`&` stays as `&`, not `\u0026`).

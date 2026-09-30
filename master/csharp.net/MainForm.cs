@@ -85,10 +85,15 @@ namespace SmartSdk
         {
             // Build the base URL from the provided IP
             var ip = txtIP.Text.Trim();
-            if (string.IsNullOrEmpty(ip)) { ShowError("Enter the controller IP"); return; }
+            if (string.IsNullOrEmpty(ip)) { ShowError("Enter the controller IP and port, e.g. 192.168.0.176:443"); return; }
 
-            // Add default port if not provided
-            if (!ip.Contains(':')) ip += ":4449";
+            // The port is required: controllers answer on 443 or 4449 depending on the model
+            var hostPort = ip.StartsWith("https://") ? ip.Substring("https://".Length) : ip;
+            if (!hostPort.TrimEnd('/').Contains(':'))
+            {
+                ShowError("Enter the port as well, e.g. 192.168.0.176:443 or 192.168.0.176:4449");
+                return;
+            }
             if (!ip.StartsWith("https://")) ip = "https://" + ip;
 
             // Configure the base URL in the service
