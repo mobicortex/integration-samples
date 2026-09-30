@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SDK: `IDevicesService` / `Devices` with models for device list and relay/DOUT commands.
 
 ### Fixed
+- Outputs form: the outputs grid and the commands follow the highlighted device (it could show the previous device's outputs), and Refresh keeps the selected device/output instead of jumping to the first row.
 - SDK: `Webhook.TestAsync` now sends `POST /webhook/test` with a JSON body (the controller rejects `GET`).
 - READMEs: real SDK type names in code samples, `DELETE /login` / `PUT /login` instead of `/logout` / `/password`, project structure with all forms and the shared `MobiCortexSdkLibCsharp`.
 

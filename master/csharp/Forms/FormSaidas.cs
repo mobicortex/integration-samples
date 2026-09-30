@@ -53,6 +53,11 @@ namespace SmartSdk
                     return;
                 }
 
+                // Keep the current selection so a refresh never moves the
+                // commands to another device.
+                var keepId = SelectedDevice()?.Id;
+                var keepOutput = SelectedOutput();
+
                 _devices = result.Data.Items ?? new();
                 gridDevices.Rows.Clear();
                 gridOutputs.Rows.Clear();
@@ -68,6 +73,8 @@ namespace SmartSdk
                     gridDevices.Rows.Add(d.Id, d.Nome, d.Tipo, d.Modelo ?? "", online, master, saidas);
                 }
 
+                RestoreSelection(keepId, keepOutput);
+
                 Log($"OK — {_devices.Count} device(s)");
             }
             catch (Exception ex)
@@ -77,6 +84,29 @@ namespace SmartSdk
             finally
             {
                 btnAtualizar.Enabled = true;
+            }
+        }
+
+        private void RestoreSelection(string? deviceId, DeviceOutput? output)
+        {
+            if (deviceId == null) return;
+            foreach (DataGridViewRow row in gridDevices.Rows)
+            {
+                if (row.Cells[0].Value?.ToString() != deviceId) continue;
+                gridDevices.CurrentCell = row.Cells[0];   // fires SelectionChanged -> fills outputs
+                break;
+            }
+            if (SelectedDevice()?.Id != deviceId || output == null) return;
+
+            var kind = output.IsRelay ? "relay" : "dout";
+            var num = output.Relay ?? output.Dout ?? 0;
+            foreach (DataGridViewRow row in gridOutputs.Rows)
+            {
+                if (row.Cells[0].Value?.ToString() == kind && row.Cells[1].Value?.ToString() == num.ToString())
+                {
+                    gridOutputs.CurrentCell = row.Cells[0];
+                    break;
+                }
             }
         }
 
@@ -103,11 +133,17 @@ namespace SmartSdk
         private void gridOutputs_SelectionChanged(object? sender, EventArgs e) =>
             UpdateCommandButtons();
 
+        // SelectionChanged can fire before CurrentRow is updated, so the
+        // highlighted row is the source of truth for display and commands.
+        private static DataGridViewRow? ActiveRow(DataGridView grid) =>
+            grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : grid.CurrentRow;
+
         private DeviceEntry? SelectedDevice()
         {
-            if (gridDevices.CurrentRow == null || gridDevices.CurrentRow.Index < 0)
+            var row = ActiveRow(gridDevices);
+            if (row == null || row.Index < 0)
                 return null;
-            var id = gridDevices.CurrentRow.Cells[0].Value?.ToString();
+            var id = row.Cells[0].Value?.ToString();
             if (string.IsNullOrEmpty(id)) return null;
             return _devices.Find(d => d.Id == id);
         }
@@ -115,11 +151,12 @@ namespace SmartSdk
         private DeviceOutput? SelectedOutput()
         {
             var device = SelectedDevice();
-            if (device?.Saidas == null || gridOutputs.CurrentRow == null || gridOutputs.CurrentRow.Index < 0)
+            var row = ActiveRow(gridOutputs);
+            if (device?.Saidas == null || row == null || row.Index < 0)
                 return null;
 
-            var kind = gridOutputs.CurrentRow.Cells[0].Value?.ToString();
-            if (!int.TryParse(gridOutputs.CurrentRow.Cells[1].Value?.ToString(), out var num))
+            var kind = row.Cells[0].Value?.ToString();
+            if (!int.TryParse(row.Cells[1].Value?.ToString(), out var num))
                 return null;
 
             return device.Saidas.Find(o =>

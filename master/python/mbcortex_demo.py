@@ -1201,7 +1201,7 @@ def listar_entidades_por_cadastro(menu: Menu, client: MbcortexClient):
             tipo = "Pessoa" if e.get('type') == 1 else "Veiculo" if e.get('type') == 2 else "?"
             name = e.get('name', 'N/A')[:23]
             doc = e.get('doc', 'N/A')[:20]
-            print(f"  {e.get('id', 0):<10} {tipo:<10} {name:<25} {doc}")
+            print(f"  {e.get('entity_id', e.get('id', 0)):<10} {tipo:<10} {name:<25} {doc}")
         
         menu.info(f"Total: {len(entities)} entidade(s)")
         
@@ -1240,7 +1240,7 @@ def busca_avancada_entidades(menu: Menu, client: MbcortexClient):
                     tipo = "Pessoa" if e.get('type') == 1 else "Veiculo" if e.get('type') == 2 else "?"
                     name = e.get('name', 'N/A')[:23]
                     doc = e.get('doc', 'N/A')[:20]
-                    print(f"  {e.get('id', 0):<10} {tipo:<10} {name:<25} {doc}")
+                    print(f"  {e.get('entity_id', e.get('id', 0)):<10} {tipo:<10} {name:<25} {doc}")
             
             print(f"\n  [N] Proxima | [P] Anterior | [F] Filtrar nome | [D] Filtrar doc | [V] Voltar")
             acao = input("  Escolha: ").strip().upper()

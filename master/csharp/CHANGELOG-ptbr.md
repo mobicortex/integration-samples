@@ -12,6 +12,7 @@ e este projeto segue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - SDK: `IDevicesService` / `Devices` com modelos da lista de dispositivos e comando de relé/DOUT.
 
 ### Corrigido
+- Tela de saídas: a grade de saídas e os comandos seguem o dispositivo destacado (podia mostrar as saídas do anterior), e o Atualizar mantém o dispositivo/saída selecionados em vez de voltar para a primeira linha.
 - SDK: `Webhook.TestAsync` passa a enviar `POST /webhook/test` com corpo JSON (a controladora recusa `GET`).
 - READMEs: nomes reais dos tipos do SDK nos exemplos, `DELETE /login` / `PUT /login` no lugar de `/logout` / `/password`, estrutura do projeto com todos os forms e o `MobiCortexSdkLibCsharp` compartilhado.
 
